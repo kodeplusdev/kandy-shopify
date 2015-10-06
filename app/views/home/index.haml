@@ -1,0 +1,17 @@
+:coffeescript
+  window.mainPageTitle = 'Home Page'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Preferences'
+          href: '/preferences'
+          target: 'app'
+        secondary:
+          label: 'Kandy.IO'
+          href: 'http://kandy.io/'
+          target: 'new'
+%h2 Kandy Shopify

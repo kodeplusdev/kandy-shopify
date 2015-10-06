@@ -1,0 +1,15 @@
+:coffeescript
+  window.mainPageTitle = 'Help Page'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        secondary:
+          label: 'Back'
+          href: '/'
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+%h2 Hey! This is the help page.

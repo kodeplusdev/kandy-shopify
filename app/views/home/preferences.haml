@@ -1,0 +1,90 @@
+:coffeescript
+  window.mainPageTitle = 'Preferences'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:
+          label: 'Back'
+          href: '/'
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: '/preferences', method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message', class: 'jumbotron'} do |f|
+  = f.hidden_field :id
+  .row
+    .col-sm-3
+      %h5 Kandy Domain Key
+      %span.help-block
+        If you haven’t already registered with your app with Kandy, you should
+        %a{href: 'https://developer.kandy.io/'} register
+        with Kandy to start
+    .col-sm-9.panel
+      .panel-body
+        .form-group
+          = label_tag :kandy_api_key, 'Domain Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_key, class: 'form-control input-sm'
+        .form-group
+          = label_tag :kandy_api_secret, 'Domain Secret Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_secret, class: 'form-control input-sm'
+  .row
+    .col-sm-3
+      %h5 Account
+    .col-sm-9.panel
+      .panel-body
+        .form-group
+          .pull-right.help-block.hide
+            %a{href: "#"} Test login
+          = label_tag :kandy_username, 'Username'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_username, class: 'form-control input-sm'
+        .form-group
+          = label_tag :kandy_password, 'Password'
+          %abbr{title: 'required'} *
+          = f.password_field :kandy_password, class: 'form-control input-sm'
+          .small.help-block We only save your token (not password). Leave blank for not change.
+        .form-group.hide
+          = label_tag :kandy_token, 'Access token'
+          = f.text_field :kandy_token, class: 'form-control input-sm', readonly: ''
+
+  .row
+    .col-sm-3
+      %h5 SMS templates
+      %span.help-block
+        %a{href: '#'}
+          %u View a list of variables you can use
+    .col-sm-9.panel
+      .panel-body
+        .row
+          .form-group
+            = label_tag :kandy_phone_number, 'Phone number'
+            %abbr{title: 'required'} *
+            = f.text_field :kandy_phone_number, class: 'form-control input-sm'
+            .small.help-block Include country code
+      = f.fields_for :template do |t|
+        = t.hidden_field :id
+        .row
+          .col-sm-6
+            .form-group
+              = label_tag :order_creation, 'Order creation (customer)'
+              = t.text_area :order_creation, class: 'form-control', rows: 5
+          .col-sm-6
+            .form-group
+              = label_tag :order_update, 'Order update (customer)'
+              = t.text_area :order_update, class: 'form-control', rows: 5
+        .row
+          .col-sm-6
+            .form-group
+              = label_tag :order_payment, 'Order payment (owner)'
+              = t.text_area :order_payment, class: 'form-control', rows: 5
+          .col-sm-6
+            .form-group
+              = label_tag :customer_creation, 'Customer creation (owner)'
+              = t.text_area :customer_creation, class: 'form-control', rows: 5
