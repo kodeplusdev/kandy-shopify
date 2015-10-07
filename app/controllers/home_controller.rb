@@ -45,9 +45,6 @@ class HomeController < ApplicationController
     redirect_to session['return_url'] || root_url
   end
 
-  def help
-  end
-
   def error
     raise "error"
   end

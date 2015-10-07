@@ -12,4 +12,17 @@
 #
 #= require jquery
 #= require jquery_ujs
+#= require bootstrap-sprockets
 #= require kandy.min.js
+
+window.newModal = (path, title) ->
+    ShopifyApp.Modal.open
+        src: path
+        title: title
+        height: 400
+        width: 'small'
+        buttons:
+            secondary:
+                label: 'Close'
+                callback: ->
+                    ShopifyApp.Modal.close()

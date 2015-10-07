@@ -3,9 +3,11 @@
   %head
     %title Install Page
   %body
-    %h2 Install the application
-    %form{action: "login", method: "GET"}
-      %label Type shop name:
-      %input{name: "shop", placeholder: "blabla.myshopify.com", type: "text"}/
-      %button{type: "submit"}
-        Install
+    .container
+      %h2 Install the application
+      = form_tag('/login', method: :get) do
+        .form-group
+          = label_tag :shop, 'Type your shop name:'
+          = text_field_tag :shop, nil, placeholder:  'blabla.myshopify.com', class: 'form-control'
+        .form-group
+          = submit_tag 'Install', class: 'btn btn-default'

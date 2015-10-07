@@ -11,7 +11,6 @@ KandyApp::Application.routes.draw do
     get 'preferences' => :preferences
     post 'preferences' => :update_preferences
     get 'install' => :install
-    get 'help' => :help
     get 'error' => :error
   end
 
@@ -22,6 +21,12 @@ KandyApp::Application.routes.draw do
       post 'order-payment' => :order_payment
       post 'order-fulfillment' => :order_fulfillment
       post 'customer-creation' => :customer_creation
+    end
+  end
+
+  scope '/help' do
+    controller :help do
+      get 'variables' => :variables
     end
   end
 
