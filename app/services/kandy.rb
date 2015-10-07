@@ -26,7 +26,7 @@ class Kandy
     if res['status'] == 0
       device_id = res['result']['devices'][0]['id']
       # key: access_token, device_id: device_id
-      res = @resource["/devices/smss?key=#{access_token}&device_id=#{device_id}"].post message: {destination: params[:to], source: params[:from], message: {text: params[:text]}}, params: {demo: 'demo'}
+      res = @resource["/devices/smss?key=#{access_token}&device_id=#{device_id}"].post message: {destination: params[:to], source: params[:from], message: {text: params[:text]}}
       json = JSON.parse res.to_s
       json
     end

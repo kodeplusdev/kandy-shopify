@@ -15,7 +15,10 @@ class HomeController < ApplicationController
     if @shop.update_attributes(shop_params)
       unless @shop.kandy_password.blank?
         kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
+
+        @shop.kandy_username = @shop.kandy_username.split('@').first unless @shop.kandy_username.blank?
         res = kandy.get_user_access_token(@shop.kandy_username, @shop.kandy_password)
+
         if res['status'] == 1
           flash[:error] = res['message']
         else
@@ -39,7 +42,7 @@ class HomeController < ApplicationController
 
     shopify_service = ShopifyIntegration.new(domain: root_url)
     shopify_service.setup_webhooks
-    redirect_to session['return_url'] || preferences_url
+    redirect_to session['return_url'] || root_url
   end
 
   def help
