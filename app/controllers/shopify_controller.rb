@@ -1,4 +1,10 @@
 class ShopifyController < WebhooksController
+
+  def script_tags
+    @shop = params[:shop]
+    render layout: false
+  end
+
   def uninstalled
     render nothing: true, status: 200
     Thread.new do

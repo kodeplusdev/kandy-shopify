@@ -7,7 +7,6 @@ class ShopifyIntegration
   end
 
   def setup_webhooks
-
     begin
       webhooks = ShopifyAPI::Webhook.find :all
       webhooks.each do |webhook|
@@ -23,6 +22,20 @@ class ShopifyIntegration
         ShopifyAPI::Webhook.create(address: domain + webhook[:url], topic: webhook[:topic], format: 'json')
       end
 
+    rescue => ex
+      puts ex.message
+    end
+  end
+
+  def setup_script_tags
+    begin
+      tags = ShopifyAPI::ScriptTag.find :all
+      tags.each do |tag|
+        tag.destroy if tag.src.include?(domain)
+      end
+      ['app/script-tags'].each do |tag|
+        ShopifyAPI::ScriptTag.create(src: domain + tag, event: 'onload')
+      end
     rescue => ex
       puts ex.message
     end

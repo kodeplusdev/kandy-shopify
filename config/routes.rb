@@ -10,7 +10,7 @@ KandyApp::Application.routes.draw do
   controller :home do
     get 'preferences' => :preferences
     post 'preferences' => :update_preferences
-    get 'install' => :install
+    get 'installed' => :installed
     get 'error' => :error
   end
 
@@ -30,7 +30,12 @@ KandyApp::Application.routes.draw do
     end
   end
 
-  post 'app/uninstalled', to: 'shopify#uninstalled'
+  scope '/app' do
+    controller :shopify do
+      get 'script-tags' => :script_tags
+      post 'uninstalled' => :uninstalled
+    end
+  end
 
   root :to => 'home#index'
 end

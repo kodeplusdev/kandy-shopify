@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   layout 'embedded_app'
   around_filter :shopify_session
-  before_action :is_initialized, except: :install
+  before_action :is_initialized, except: :installed
 
   def index
   end
@@ -35,13 +35,15 @@ class HomeController < ApplicationController
     render :preferences
   end
 
-  def install
+  def installed
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     @shop.template = Template.new
     @shop.save!
 
     shopify_service = ShopifyIntegration.new(domain: root_url)
     shopify_service.setup_webhooks
+    shopify_service.setup_script_tags
+
     redirect_to session['return_url'] || root_url
   end
 
@@ -57,7 +59,7 @@ class HomeController < ApplicationController
       if @shop.template
         session[:initialized] = 1
       else
-        redirect_to action: :install
+        redirect_to installed_path
       end
     end
   end

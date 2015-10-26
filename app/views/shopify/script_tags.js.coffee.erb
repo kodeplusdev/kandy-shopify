@@ -1,0 +1,10 @@
+done = false
+script = document.createElement('script')
+script.async = true
+script.type = 'text/javascript'
+script.src = "<%= asset_url('kandy-chatbox.js') %>"
+document.getElementsByTagName('HEAD').item(0).appendChild(script)
+script.onreadystatechange = script.onload = (e) ->
+    if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete'))
+        # TODO: something here...
+        done = true
