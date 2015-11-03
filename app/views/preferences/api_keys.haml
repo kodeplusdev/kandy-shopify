@@ -1,0 +1,41 @@
+:coffeescript
+  window.mainPageTitle = 'API Keys'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+  = f.hidden_field :id
+  = hidden_field_tag :back_url, api_keys_path
+  .row
+    .col-sm-3
+      %h5 Kandy Domain Key
+      %span.help-block
+        If you haven’t already registered with your app with Kandy, you should
+        %a{href: 'https://developer.kandy.io/'} register
+        with Kandy to start
+    .col-sm-9.panel
+      .panel-body
+        .form-group
+          = label_tag :kandy_api_key, 'Domain Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_key, class: 'form-control input-sm', placeholder: 'ABC123DEF'
+        .form-group
+          = label_tag :kandy_api_secret, 'Domain Secret Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_secret, class: 'form-control input-sm', placeholder: 'ABC123DEF'

@@ -8,6 +8,7 @@ gem 'quiet_assets'
 gem 'haml'
 gem 'rest-client'
 gem 'liquid-rails'
+gem 'rails-settings-cached', '~> 0.4.0'
 
 group :assets do
   gem 'sass-rails'

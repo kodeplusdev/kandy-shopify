@@ -11,13 +11,43 @@
  *= require_self
  *= require_tree .
  */
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
 body {
+    @extend .jumbotron;
     padding-top: 10px;
 }
 
 .jumbotron {
     padding: 15px 5px 5px 5px;
+}
+
+.widget {
+    border-radius: 5px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+
+    &.style1 {
+        h2 {
+            font-size: 30px;
+        }
+    }
+}
+
+.vertical-align {
+    h2, h3 {
+        margin: 0;
+    }
+
+    div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
+
+.font-bold {
+    font-weight: 600;
 }

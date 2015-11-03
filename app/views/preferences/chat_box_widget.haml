@@ -1,0 +1,25 @@
+:coffeescript
+  window.mainPageTitle = 'Chatbox Widget'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+  = f.hidden_field :id
+  = hidden_field_tag :back_url, chat_box_widget_path
+  .row

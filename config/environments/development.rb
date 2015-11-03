@@ -30,4 +30,7 @@ KandyApp::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Set an explicit asset host for each environment
+  config.action_controller.asset_host = 'https://kandy-shopify.ngrok.io'
 end

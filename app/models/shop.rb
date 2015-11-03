@@ -1,9 +1,12 @@
 class Shop < ActiveRecord::Base
   include ShopifyApp::Shop
+  include RailsSettings::Extend
 
   has_one :template
+  has_one :profile
 
-  accepts_nested_attributes_for :template
+  accepts_nested_attributes_for :template, :profile
   attr_accessor :kandy_password
+
 
 end

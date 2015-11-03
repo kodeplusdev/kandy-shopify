@@ -81,9 +81,9 @@
               %abbr{title: 'required'} *
               = f.password_field :kandy_password, class: 'form-control input-sm'
               .small.help-block We only save your token (not password). Leave blank for not change.
-            .form-group.hide
-              = label_tag :kandy_token, 'Access token'
-              = f.text_field :kandy_token, class: 'form-control input-sm', readonly: ''
+            .form-group
+              = label_tag :kandy_access_token, 'Your access token'
+              = f.text_field :kandy_access_token, class: 'form-control input-sm', readonly: ''
     #sms.tab-pane.jumbotron{role: 'tabpanel'}
       .row
         .col-sm-3

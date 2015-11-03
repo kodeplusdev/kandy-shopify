@@ -1,0 +1,112 @@
+:coffeescript
+  window.mainPageTitle = 'Preferences'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        secondary:
+          label: 'Dashboard'
+          href: '/'
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+.row
+  .panel
+    .panel-body
+      .col-sm-4.col-sm-offset-1
+        .widget.style1
+          .row.vertical-align
+            .col-xs-3
+              %i.fa.fa-key.fa-3x
+            .col-xs-9
+              %a{href: api_keys_path}
+                %h3.font-bold API Keys
+      .col-sm-4.col-sm-offset-3
+        .widget.style1
+          .row.vertical-align
+            .col-xs-3
+              %i.fa.fa-user.fa-3x
+            .col-xs-9
+              %a{href: kandy_account_path}
+                %h3.font-bold Account
+.row
+  .panel
+    .panel-body
+      .col-sm-4.col-sm-offset-1
+        .widget.style1
+          .row.vertical-align
+            .col-xs-3
+              %i.fa.fa-send.fa-3x
+            .col-xs-9
+              %a{href: sms_alert_templates_path}
+                %h3.font-bold SMS Alert
+.row
+  .panel
+    .panel-body
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-comments.fa-3x
+              .col-xs-9
+                %a{href: chat_box_widget_path}
+                  %h3.font-bold Chat Widget
+        .col-sm-4.col-sm-offset-3
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-file-text.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Transcripts
+      %br/
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-users.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Manage Users
+        .col-sm-4.col-sm-offset-3
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-commenting.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Canned Responses
+      %br/
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-pie-chart.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Reports
+        .col-sm-4.col-sm-offset-3
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-cubes.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Mics
+.row
+  .panel
+    .panel-body
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-phone.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Kandy Call

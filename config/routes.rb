@@ -8,19 +8,32 @@ KandyApp::Application.routes.draw do
   end
 
   controller :home do
-    get 'preferences' => :preferences
-    post 'preferences' => :update_preferences
-    get 'installed' => :installed
     get 'error' => :error
   end
 
-  scope '/sms' do
-    controller :sms do
-      post 'order-creation' => :order_creation
-      post 'order-update' => :order_update
-      post 'order-payment' => :order_payment
-      post 'order-fulfillment' => :order_fulfillment
-      post 'customer-creation' => :customer_creation
+  namespace :webhooks do
+    scope :sms do
+      controller :sms do
+        post 'order-creation' => :order_creation
+        post 'order-update' => :order_update
+        post 'order-payment' => :order_payment
+        # post 'order-fulfillment' => :order_fulfillment
+        post 'customer-creation' => :customer_creation
+      end
+    end
+    controller :uninstalled do
+      post 'app/uninstalled' => :index
+    end
+  end
+
+  scope 'preferences' do
+    controller :preferences do
+      get '/' => :index, as: :preferences
+      get 'api-keys' => :api_keys
+      get 'kandy-account' => :kandy_account
+      get 'sms-alert-templates' => :sms_alert_templates
+      get 'chat-box-widget' => :chat_box_widget
+      post 'update' => :update
     end
   end
 
@@ -32,8 +45,8 @@ KandyApp::Application.routes.draw do
 
   scope '/app' do
     controller :shopify do
+      get 'installed' => :installed
       get 'script-tags' => :script_tags
-      post 'uninstalled' => :uninstalled
     end
   end
 

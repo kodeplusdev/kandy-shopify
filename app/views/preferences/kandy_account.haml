@@ -1,0 +1,69 @@
+:coffeescript
+  window.mainPageTitle = 'Kandy Account'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+  = f.hidden_field :id
+  = hidden_field_tag :back_url, kandy_account_path
+  .row
+    .col-sm-3
+      %h5 Account
+      %span.help-block
+        If you haven’t already registered with your app with Kandy, you should
+        %a{href: 'https://developer.kandy.io/'} register
+        with Kandy to start
+    .col-sm-9.panel
+      .panel-body
+        .form-group
+          .pull-right.help-block.hide
+            %a{href: '#'} Test login
+          = label_tag :kandy_username, 'Username'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_username, class: 'form-control input-sm', placeholder: 'username@domain.com'
+        .form-group
+          = label_tag :kandy_password, 'Password'
+          %abbr{title: 'required'} *
+          = f.password_field :kandy_password, class: 'form-control input-sm', placeholder: 'password'
+          .small.help-block We only save your token (not password). Leave blank for not change.
+        -#.form-group
+          = label_tag :kandy_access_token, 'Your access token'
+          = f.text_field :kandy_access_token, class: 'form-control input-sm', readonly: ''
+  .row
+    .col-sm-3
+      %h5 Profile information
+    .col-sm-9.panel
+      .panel-body
+      = f.fields_for :profile do |p|
+        = p.hidden_field :id
+        .form-group
+          .row
+            .col-sm-6
+              = label_tag :first_name, 'First name'
+              = p.text_field :first_name, class: 'form-control input-sm', placeholder: 'first name'
+            .col-sm-6
+              = label_tag :last_name, 'Last name'
+              = p.text_field :last_name, class: 'form-control input-sm', placeholder: 'last name'
+        .form-group
+          = label_tag :email, 'Email'
+          = p.text_field :email, class: 'form-control input-sm', placeholder: 'user@email.com'
+        .form-group
+          = label_tag :phone_number, 'Tel'
+          = p.text_field :phone_number, class: 'form-control input-sm', placeholder: '+841234567890'
+          .small.help-block Include country code

@@ -1,0 +1,54 @@
+:coffeescript
+  window.mainPageTitle = 'SMS Alert Templates'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+  = f.hidden_field :id
+  = hidden_field_tag :back_url, sms_alert_templates_path
+  .row
+    .col-sm-3
+      %h5 SMS templates
+      %span.help-block
+        %a{href: '#', onclick: "newModal('#{variables_url}', 'Template variables')"}
+          %u View a list of variables you can use
+    .col-sm-9.panel
+      .panel-body
+      = f.fields_for :template do |t|
+        = t.hidden_field :id
+        .row
+          .col-sm-12
+            .form-group
+              = label_tag :order_creation, 'Order creation (customer)'
+              = t.text_area :order_creation, class: 'form-control', rows: 5
+        .row
+          .col-sm-12
+            .form-group
+              = label_tag :order_update, 'Order update (customer)'
+              = t.text_area :order_update, class: 'form-control', rows: 5
+        .row
+          .col-sm-12
+            .form-group
+              = label_tag :order_payment, 'Order payment (owner)'
+              = t.text_area :order_payment, class: 'form-control', rows: 5
+        .row
+          .col-sm-12
+            .form-group
+              = label_tag :customer_creation, 'Customer creation (owner)'
+              = t.text_area :customer_creation, class: 'form-control', rows: 5
