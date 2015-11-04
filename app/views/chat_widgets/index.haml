@@ -1,0 +1,48 @@
+:coffeescript
+  window.mainPageTitle = 'Chatbox Widget'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+.panel
+  .panel-body
+    .row
+      .pull-right.pad-right
+        %a.btn.btn-success{href: new_chat_widget_path}
+          %i.fa.fa-plus-circle
+          Add New Widget
+    .row
+      %table.table.table-hover
+        %thead
+          %tr
+            %th #
+            %th Widget name
+            %th{style: 'width: 5%; text-alain: center;'}
+            %th{style: 'width: 5%; text-alain: center;'}
+            %th{style: 'width: 5%; text-alain: center;'}
+        %tbody
+        - @chat_widgets.each do |widget|
+          %tr
+            %td= widget.id
+            %td= widget.name
+            %td
+              %button.btn.btn-sm.btn-default
+                %i.fa.fa-edit
+            %td
+              %button.btn.btn-sm.btn-primary
+                %i.fa.fa-lock
+            %td
+              %button.btn.btn-sm.btn-danger
+                %i.fa.fa-times-circle-o

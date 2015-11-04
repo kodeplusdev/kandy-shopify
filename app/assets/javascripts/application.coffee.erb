@@ -13,6 +13,8 @@
 #= require jquery
 #= require jquery_ujs
 #= require bootstrap-sprockets
+#= require spectrum
+#= require select2
 #= require kandy.min.js
 
 window.newModal = (path, title) ->
@@ -26,3 +28,8 @@ window.newModal = (path, title) ->
                 label: 'Close'
                 callback: ->
                     ShopifyApp.Modal.close()
+
+$(document).ready ->
+    $('.select2').select2
+        minimumResultsForSearch: Infinity
+        theme: 'bootstrap'

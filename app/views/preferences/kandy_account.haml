@@ -34,11 +34,11 @@
         .form-group
           .pull-right.help-block.hide
             %a{href: '#'} Test login
-          = label_tag :kandy_username, 'Username'
+          = f.label :kandy_username, 'Username'
           %abbr{title: 'required'} *
           = f.text_field :kandy_username, class: 'form-control input-sm', placeholder: 'username@domain.com'
         .form-group
-          = label_tag :kandy_password, 'Password'
+          = f.label :kandy_password, 'Password'
           %abbr{title: 'required'} *
           = f.password_field :kandy_password, class: 'form-control input-sm', placeholder: 'password'
           .small.help-block We only save your token (not password). Leave blank for not change.
@@ -55,15 +55,15 @@
         .form-group
           .row
             .col-sm-6
-              = label_tag :first_name, 'First name'
+              = p.label :first_name, 'First name'
               = p.text_field :first_name, class: 'form-control input-sm', placeholder: 'first name'
             .col-sm-6
-              = label_tag :last_name, 'Last name'
+              = p.label :last_name, 'Last name'
               = p.text_field :last_name, class: 'form-control input-sm', placeholder: 'last name'
         .form-group
-          = label_tag :email, 'Email'
+          = p.label :email, 'Email'
           = p.text_field :email, class: 'form-control input-sm', placeholder: 'user@email.com'
         .form-group
-          = label_tag :phone_number, 'Tel'
+          = p.label :phone_number, 'Tel'
           = p.text_field :phone_number, class: 'form-control input-sm', placeholder: '+841234567890'
           .small.help-block Include country code

@@ -32,10 +32,10 @@
     .col-sm-9.panel
       .panel-body
         .form-group
-          = label_tag :kandy_api_key, 'Domain Key'
+          = f.label :kandy_api_key, 'Domain Key'
           %abbr{title: 'required'} *
           = f.text_field :kandy_api_key, class: 'form-control input-sm', placeholder: 'ABC123DEF'
         .form-group
-          = label_tag :kandy_api_secret, 'Domain Secret Key'
+          = f.label :kandy_api_secret, 'Domain Secret Key'
           %abbr{title: 'required'} *
           = f.text_field :kandy_api_secret, class: 'form-control input-sm', placeholder: 'ABC123DEF'

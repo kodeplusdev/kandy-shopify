@@ -35,20 +35,20 @@
         .row
           .col-sm-12
             .form-group
-              = label_tag :order_creation, 'Order creation (customer)'
+              = t.label :order_creation, 'Order creation (customer)'
               = t.text_area :order_creation, class: 'form-control', rows: 5
         .row
           .col-sm-12
             .form-group
-              = label_tag :order_update, 'Order update (customer)'
+              = t.label :order_update, 'Order update (customer)'
               = t.text_area :order_update, class: 'form-control', rows: 5
         .row
           .col-sm-12
             .form-group
-              = label_tag :order_payment, 'Order payment (owner)'
+              = t.label :order_payment, 'Order payment (owner)'
               = t.text_area :order_payment, class: 'form-control', rows: 5
         .row
           .col-sm-12
             .form-group
-              = label_tag :customer_creation, 'Customer creation (owner)'
+              = t.label :customer_creation, 'Customer creation (owner)'
               = t.text_area :customer_creation, class: 'form-control', rows: 5

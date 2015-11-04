@@ -1,5 +1,9 @@
 KandyApp::Application.routes.draw do
 
+  resources :chat_widgets
+
+  get 'widget-preview' => 'chat_widgets#widget_preview', as: 'widget_preview'
+
   controller :sessions do
     get 'login' => :new, :as => :login
     post 'login' => :create, :as => :authenticate

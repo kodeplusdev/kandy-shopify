@@ -1,0 +1,290 @@
+:coffeescript
+  window.mainPageTitle = '#{@chat_widget.name || 'Add New'}'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+        label: 'Chatbox Widgets'
+        href: "#{chat_widgets_path}"
+        target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-preferences-form-message'
+        secondary:[
+          {
+            label: 'Preferences'
+            href: "#{preferences_path}"
+            target: 'app'
+          }
+          {
+            label: 'Back'
+            href: "#{chat_widgets_path}"
+            target: 'app'
+          }
+        ]
+    ShopifyApp.Bar.loadingOff()
+
+    $('#myTabs a').click (e) ->
+      e.preventDefault()
+      $(this).tab('show')
+
+.panel
+  .panel-body
+    = form_for @chat_widget, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+      = f.hidden_field :id
+      .row.pad-left.pad-right.pad-bottom
+        .form-inline
+          .form-group.pad-right
+            = f.label :name, 'Widget name:'
+            = f.text_field :name, class: 'form-control input-sm'
+          .form-group.pad-left.pad-right
+            = f.label :color, 'Color:'
+            = f.text_field :color, type: 'color'
+          .form-group.pad-left
+            = f.label :enabled, 'Enabled'
+            = f.check_box :enabled
+      .row.pad-left.pad-right.pad-top
+        %ul#myTabs.nav.nav-tabs{role: 'tablist'}
+          %li.active{role: 'presentation'}
+            %a{href: '#collapsed', 'aria-controls': 'collapsed', role: 'tab', 'data-toggle': 'tab'} Collapsed
+          %li{role: 'presentation'}
+            %a{href: '#start-chat', 'aria-controls': 'start-chat', role: 'tab', 'data-toggle': 'tab'} Start Chat
+          %li{role: 'presentation'}
+            %a{href: '#no-operator', 'aria-controls': 'no-operator', role: 'tab', 'data-toggle': 'tab'} No Operator
+          %li{role: 'presentation'}
+            %a{href: '#in-chat', 'aria-controls': 'in-chat', role: 'tab', 'data-toggle': 'tab'} In Chat
+          %li{role: 'presentation'}
+            %a{href: '#chat-closed', 'aria-controls': 'chat-closed', role: 'tab', 'data-toggle': 'tab'} Chat Closed
+          %li{role: 'presentation'}
+            %a{href: '#error', 'aria-controls': 'error', role: 'tab', 'data-toggle': 'tab'} Error
+
+        = fields_for :json_string do |json|
+          .form-horizontal
+            .tab-content
+              = json.fields_for :collapsed do |json_collapsed|
+                #collapsed.tab-pane.active{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_collapsed.label :title, 'Title:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.text_field :title, class: 'form-control input-sm'
+                        .form-group
+                          = json_collapsed.label :position, 'Position:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.select :position, options_for_select([['Bottom Left', 'bl'], ['Bottom Right', 'br'], ['Top Left', 'tl'], ['Top Right', 'tr']], 'br'), {}, {class: 'select2 form-control'}
+                        .form-group
+                          = json_collapsed.label :type, 'Type:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.select :type, options_for_select([['Tab', 't'], ['Image', 'i'], ['Tab & Image', 'ti']], 't'), {}, {class: 'select2 form-control'}
+                        .form-group
+                          = json_collapsed.label :image, 'Image:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.select :image, options_for_select([['Custom', '']], ''), {}, {class: 'select2 form-control'}
+                        .form-group
+                          = json_collapsed.label :custom_image_url, 'URL:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.text_field :custom_image_url, class: 'form-control input-sm'
+                        .form-group
+                          = json_collapsed.label :horizontal, 'Horizontal:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.range_field :horizontal, in: 0..100
+                        .form-group
+                          = json_collapsed.label :vertical, 'Vertical:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.range_field :vertical, in: 0..100
+                        .form-group
+                          = json_collapsed.label :scale, 'Scale:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.range_field :scale, in: 0..100
+                        .form-group
+                          .col-sm-8.col-sm-offset-4
+                            = json_collapsed.check_box :image_in_front_of_tab
+                            = json_collapsed.label :image_in_front_of_tab, 'Image in front of Tab'
+                        .form-group
+                          = json_collapsed.label :page_load, 'Page Load:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_collapsed.select :page_load, options_for_select([['Tab', 't'], ['Image', 'i'], ['Tab & Image', 'ti']], 't'), {}, {class: 'select2 form-control'}
+                        .form-group
+                          .col-sm-8.col-sm-offset-4
+                            = json_collapsed.check_box :show_widget_hide_button
+                            = json_collapsed.label :show_widget_hide_button, 'Show Widget Hide Button'
+                      .col-sm-7
+                        .preview-panel{style: 'height: 475px'}
+                          %iframe{src: widget_preview_path}
+
+              = json.fields_for :start_chat do |json_start_chat|
+                #start-chat.tab-pane{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_start_chat.label :title, 'Title:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_start_chat.text_field :title, class: 'form-control'
+                        .form-group
+                          = json_start_chat.label :intro_text, 'Intro Text:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_start_chat.text_area :intro_text, class: 'form-control', rows: 3
+                        .form-group
+                          = json_start_chat.label :request_button, 'Request Button:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_start_chat.text_field :request_button, class: 'form-control'
+                        .form-group
+                          .col-sm-4
+                            .pull-right
+                              = json_start_chat.check_box :ask_for_name
+                              = json_start_chat.label :ask_for_name, 'Ask for:'
+                          .col-sm-8
+                            = json_start_chat.text_field :ask_for_name_text, class: 'form-control'
+                        .form-group
+                          .col-sm-4
+                            .pull-right
+                              = json_start_chat.check_box :ask_for_email
+                              = json_start_chat.label :ask_for_email, 'Ask for:'
+                          .col-sm-8
+                            = json_start_chat.text_field :ask_for_email_text, class: 'form-control'
+                        .form-group
+                          .col-sm-4
+                            .pull-right
+                              = json_start_chat.check_box :ask_for_question
+                              = json_start_chat.label :ask_for_question, 'Ask for:'
+                          .col-sm-8
+                            = json_start_chat.text_area :ask_for_question_text, class: 'form-control', rows: 3
+                        .form-group
+                          .col-sm-8.col-sm-offset-4
+                            = json_start_chat.check_box :ask_for_department
+                            = json_start_chat.label :ask_for_department, 'Ask for Department'
+                      .col-sm-7
+
+              = json.fields_for :no_operator do |json_no_operator|
+                #no-operator.tab-pane{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_no_operator.label :title, 'Title:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :title, class: 'form-control'
+                        .form-group
+                          = json_no_operator.label :action, 'Action:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.select :action, options_for_select([['Hide Widget', 'h'], ['Show Unavailable Message', 'm'], ['Show Email Form', 'e']], 'm'), {}, {class: 'select2 form-control'}
+                        .form-group
+                          = json_no_operator.label :mesage, 'Message:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_area :message, class: 'form-control', rows: 3
+                        .form-group
+                          = json_no_operator.label :central_email, 'Central Email:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :central_email, class: 'form-control'
+                        .form-group
+                          = json_no_operator.label :email_intro, 'Email Intro:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_area :email_intro, class: 'form-control', rows: 3
+                        .form-group
+                          = json_no_operator.label :name, 'Name:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :name, class: 'form-control'
+                        .form-group
+                          = json_no_operator.label :email, 'Email:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :email, class: 'form-control'
+                        .form-group
+                          = json_no_operator.label :question, 'Question:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :question, class: 'form-control'
+                        .form-group
+                          = json_no_operator.label :email_sent_text, 'Email Sent Text:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_area :email_sent_text, class: 'form-control', rows: 3
+                        .form-group
+                          = json_no_operator.label :send_button, 'Send Button:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_no_operator.text_field :send_button, class: 'form-control'
+                      .col-sm-7
+
+              = json.fields_for :in_chat do |json_in_chat|
+                #in-chat.tab-pane{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_in_chat.label :title, 'Title:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :title, class: 'form-control'
+                        .form-group
+                          = json_in_chat.label :mesage, 'Message:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_area :message, class: 'form-control', rows: 3
+                        .form-group
+                          = json_in_chat.label :no_operator, 'No Operator:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_area :no_operator, class: 'form-control', rows: 3
+                        .form-group
+                          = json_in_chat.label :greeting, 'Greeting:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :greeting, class: 'form-control'
+                        .form-group
+                          = json_in_chat.label :connecting, 'Connecting:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :connecting, class: 'form-control'
+                        .form-group
+                          = json_in_chat.label :send, 'Send:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :send, class: 'form-control'
+                        .form-group
+                          = json_in_chat.label :joined_chat, 'Joined Chat:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :joined_chat, class: 'form-control'
+                        .form-group
+                          = json_in_chat.label :send_message, 'Send Message:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_in_chat.text_field :send_message, class: 'form-control'
+                      .col-sm-7
+
+              = json.fields_for :chat_closed do |json_chat_closed|
+                #chat-closed.tab-pane{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_chat_closed.label :title, 'Title:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_chat_closed.text_field :title, class: 'form-control'
+                        .form-group
+                          = json_chat_closed.label :chat_closed, 'Chat Closed:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_chat_closed.text_area :chat_closed, class: 'form-control', rows: 3
+                        .form-group
+                          = json_chat_closed.label :download, 'Download:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_chat_closed.text_field :download, class: 'form-control'
+                        .form-group
+                          .col-sm-8.col-sm-offset-4
+                            = json_chat_closed.check_box :ask_for_rating
+                            = json_chat_closed.label :ask_for_rating, 'Ask for Rating'
+                      .col-sm-7
+
+              = json.fields_for :error do |json_error|
+                #error.tab-pane{role: 'tabpanel'}
+                  .panel
+                    .panel-body
+                      .col-sm-5
+                        .form-group
+                          = json_error.label :name_required, 'Name Required:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_error.text_field :name_required, class: 'form-control'
+                        .form-group
+                          = json_error.label :email_validation, 'Email Validation:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_error.text_field :email_validation, class: 'form-control'
+                        .form-group
+                          = json_error.label :no_operator_required, 'No-operator required:', class: 'col-sm-4 control-label'
+                          .col-sm-8
+                            = json_error.text_field :no_operator_required, class: 'form-control'
+                      .col-sm-7

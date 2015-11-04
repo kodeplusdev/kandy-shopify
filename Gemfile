@@ -11,6 +11,7 @@ gem 'liquid-rails'
 gem 'rails-settings-cached', '~> 0.4.0'
 
 group :assets do
+  gem 'select2-rails'
   gem 'sass-rails'
   gem 'bootstrap-sass'
   gem 'coffee-rails'

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  enabled: false
+  json_string: MyString
+  shop_id: 
+
+two:
+  name: MyString
+  enabled: false
+  json_string: MyString
+  shop_id: 
