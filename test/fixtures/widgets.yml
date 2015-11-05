@@ -3,11 +3,13 @@
 one:
   name: MyString
   enabled: false
+  color: MyString
   json_string: MyString
   shop_id: 
 
 two:
   name: MyString
   enabled: false
+  color: MyString
   json_string: MyString
   shop_id: 

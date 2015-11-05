@@ -119,173 +119,158 @@ json =
     WidgetsName: "Default"
 
 $('body').append('' +
-'<div class="animate1 chatwindow">' +
-    '<div id="startchat" class="chatwindow">' +
-        '<img class="chat-img top-img collapsStartchat" src="" style="display:block !important;" />' +
+'<div class="animate chat-window">' +
+    '<div id="start-chat" class="chat-window">' +
+        '<img class="chat-img top-img collapse-start-chat" src="" style="display:block !important;" />' +
         '<table class="chattable">' +
-            '<tr class="chattableraw">' +
-                '<td id="starthead" class="hedertext collapsStartchat"></td>' +
-                '<td class="hederbtn">' +
-                    '<a href="#" style="padding-left: 5px;" class="collapsStartchat">' +
-                        '<img id="minimize" class="btnimg startchatbtnmini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
+            '<tr class="chattable-raw">' +
+                '<td id="start-head" class="heder-text collapse-start-chat"></td>' +
+                '<td class="heder-btn">' +
+                    '<a href="#" style="padding-left: 5px;" class="collapse-start-chat">' +
+                        '<img id="minimize" class="btn-img start-chat-btn-mini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
                     '</a>' +
                 '</td>' +
             '</tr>' +
             '<tr id="name-box">' +
                 '<td colspan="2" style="padding:0;">' +
                     '<div class="name-messages">' +
-                        '<h4 class="BizchatBox_TitleInfo" id="lblintro"></h4>' +
-                        '<input id="txtname" class="nameinput" style="" />' +
-                        '<div class="error_message" id="name_error" style=""></div>' +
-                        '<input id="txtemails" class="nameinput" />' +
-                        '<div class="error_message" id="email_error" style=""></div>' +
-                        '<select class="nameinput DrpDepartment" style="height: 32px;width: 90%;"></select>' +
-                        '<label id="lblmsg" style="margin-left: 6%;font-weight: bold;">Message</label>' +
-                        '<textarea id="txtquestion" class="quesinput"></textarea>' +
-                        '<div class="error_message" id="qust_error" style=""></div>' +
+                        '<h4 class="title-info" id="lbl-intro"></h4>' +
+                        '<input id="txt-name" class="name-input" style="" />' +
+                        '<div class="error-message" id="name-error" style=""></div>' +
+                        '<input id="txt-emails" class="name-input" />' +
+                        '<div class="error-message" id="email-error" style=""></div>' +
+                        '<select class="name-input drp-department" style="height: 32px;width: 90%;"></select>' +
+                        '<label id="lbl-msg" style="margin-left: 6%;font-weight: bold;">Message</label>' +
+                        '<textarea id="txt-question" class="question-input"></textarea>' +
+                        '<div class="error-message" id="question-error" style=""></div>' +
                         '<center>' +
-                            '<button class="btnsendreq" id="SendRequest">' +
-                                '<a id="sendreqtext" href="#" style="text-decoration:none;color:white;padding: 0px 10px;"></a>' +
+                            '<button class="btn-send-req" id="send-request">' +
+                                '<a id="send-req-text" href="#" style="text-decoration:none;color:white;padding: 0px 10px;"></a>' +
                             '</button>' +
                         '</center>' +
-                        '<div class="cls"></div>' +
-                        '<div class="logo-bizchat">' +
-                            '<a target="_blank" href="#"><img src="<%= asset_url("gray-logo.png") %>" class="desaturate" width="100">' +
-                            '</a>' +
-                        '</div>' +
                     '</div>' +
                 '</td>' +
             '</tr>' +
         '</table>' +
-        '<img class="chat-img bottom-img collapsStartchat" src="" style="display:none !important;" />' +
-        '<div id="spinnerRegion" class="global-spinner" style="display: none;">' +
+        '<img class="chat-img bottom-img collapse-start-chat" src="" style="display:none !important;" />' +
+        '<div id="spinner-region" class="global-spinner" style="display: none;">' +
             '<div class="spinner-loader"></div>' +
         '</div>' +
     '</div>' +
-    '<div id="Nooperator" class="chatwindow  ">' +
-        '<img class="chat-img top-img collapsNooperator" src="" style="display:none !important;" />' +
+    '<div id="no-operator" class="chat-window  ">' +
+        '<img class="chat-img top-img collapse-no-operator" src="" style="display:none !important;" />' +
         '<table class="chattable">' +
-            '<tr class="chattableraw">' +
-                '<td id="noophead" class="hedertext collapsNooperator"></td>' +
-                '<td class="hederbtn">' +
-                    '<a href="#" style="padding-left: 5px;" class="collapsNooperator"><img id="maxmizes" class="btnimg nooperatorbtnmini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
+            '<tr class="chattable-raw">' +
+                '<td id="no-operator-head" class="heder-text collapse-no-operator"></td>' +
+                '<td class="heder-btn">' +
+                    '<a href="#" style="padding-left: 5px;" class="collapse-no-operator"><img id="maxmizes" class="btn-img no-operator-btn-mini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
                     '</a>' +
                 '</td>' +
             '</tr>' +
-            '<tr id="NoOp-box">' +
+            '<tr id="no-operator-box">' +
                 '<td colspan="2" style="padding:0;">' +
                     '<div class="name-messages" style="padding:5px;">' +
-                        '<label id="lblemailintro"></label>' +
+                        '<label id="lbl-email-intro"></label>' +
                         '<p></p>' +
-                        '<input id="noopname" class="nameinput" placeholder="Name" />' +
-                        '<div class="error_message" id="2name_error" style=""></div>' +
-                        '<input id="noopemails" class="nameinput" placeholder="Email" />' +
-                        '<div class="error_message" id="2email_error" style=""></div>' +
-                        '<textarea id="noopquestion" class="quesinput" placeholder="What can we help with?"></textarea>' +
-                        '<div class="error_message" id="2qust_error" style=""></div>' +
+                        '<input id="no-operator-name" class="name-input" placeholder="Name" />' +
+                        '<div class="error-message" id="2name-error" style=""></div>' +
+                        '<input id="no-operator-emails" class="name-input" placeholder="Email" />' +
+                        '<div class="error-message" id="2email-error" style=""></div>' +
+                        '<textarea id="no-operator-question" class="question-input" placeholder="What can we help with?"></textarea>' +
+                        '<div class="error-message" id="2question-error" style=""></div>' +
                         '<center>' +
-                            '<button id="btnsendemail">' +
-                                '<a id="sendnooptext" href="#" style="text-decoration:none;color:white;"></a>' +
+                            '<button id="btn-send-email">' +
+                                '<a id="send-no-operator-text" href="#" style="text-decoration:none;color:white;"></a>' +
                             '</button>' +
                         '</center>' +
-                        '<div class="cls"></div>' +
-                        '<div class="logo-bizchat">' +
-                            '<a target="_blank" href="#"><img src="<%= asset_url("gray-logo.png") %>" class="desaturate" width="100">' +
-                            '</a>' +
-                        '</div>' +
                     '</div>' +
                 '</td>' +
             '</tr>' +
-        '</table><img class="chat-img bottom-img collapsNooperator" src="" style="display:none !important;" />' +
+        '</table><img class="chat-img bottom-img collapse-no-operator" src="" style="display:none !important;" />' +
     '</div>' +
-    '<div id="NooperatorSent" class="chatwindow  "><img class="chat-img top-img collapsNooperatorSuccess" src="" style="display:none !important;" />' +
+    '<div id="no-operator-sent" class="chat-window  "><img class="chat-img top-img collapse-no-operator-success" src="" style="display:none !important;" />' +
         '<table class="chattable">' +
-            '<tr class="chattableraw">' +
-                '<td id="noopsenthead" class="hedertext collapsNooperatorSuccess">No Operators Available</td>' +
-                '<td id="Nooprefresh" class="hederbtn">' +
-                    '<a href="#" id="refreshSendMail"><img style="width: 32px;" class="btnimg" src="<%= asset_url("icons/refresh.png") %>"/>' +
+            '<tr class="chattable-raw">' +
+                '<td id="no-operator-sent-head" class="heder-text collapse-no-operator-success">No Operators Available</td>' +
+                '<td id="no-operator-refresh" class="heder-btn">' +
+                    '<a href="#" id="refresh-send-mail"><img style="width: 32px;" class="btn-img" src="<%= asset_url("icons/refresh.png") %>"/>' +
                     '</a>' +
                 '</td>' +
-                '<td class="hederbtn">' +
-                    '<a href="#" style="padding-left: 4px;" class="collapsNooperatorSuccess"><img id="" class="btnimg nooperatorsuccessbtnmini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
+                '<td class="heder-btn">' +
+                    '<a href="#" style="padding-left: 4px;" class="collapse-no-operator-success"><img id="" class="btn-img no-operator-success-btn-mini" style="margin:auto;vertical-align: middle;" src="<%= asset_url("icons/plus.png") %>"/>' +
                     '</a>' +
                 '</td>' +
             '</tr>' +
-            '<tr id="NoOpSendMail-box">' +
+            '<tr id="no-operator-send-mail-box">' +
                 '<td colspan="3" style="padding:0;">' +
                     '<div class="name-messages" style="height: 75px;padding:10px;">' +
-                        '<label id="lblemailSent">email is sent and should go back to the initial page waiting for new chat sessions.</label>' +
+                        '<label id="lbl-email-sent">email is sent and should go back to the initial page waiting for new chat sessions.</label>' +
                     '</div>' +
                 '</td>' +
             '</tr>' +
-        '</table><img class="chat-img bottom-img collapsNooperatorSuccess" src="" style="display:none !important;" />' +
+        '</table><img class="chat-img bottom-img collapse-no-operator-success" src="" style="display:none !important;" />' +
     '</div>' +
-    '<div id="inchat" class="chatwindow"><img class="chat-img top-img collapsMessagechat" src="" style="display:none !important;" />' +
+    '<div id="in-chat" class="chat-window"><img class="chat-img top-img collapse-message-chat" src="" style="display:none !important;" />' +
         '<table class="chattable">' +
-            '<tr class="chattableraw">' +
-                '<td id="inchathead" class="sendreq collapsMessagechat">Welcome to LiveChat</td>' +
-                '<td class="hederbtn chatbox1">' +
-                    '<a href="#" style="padding-left: 4px;" class="collapsMessagechat"><img class="btnimg messagechatbtnmini" src="<%= asset_url("icons/plus.png") %>"/>' +
+            '<tr class="chattable-raw">' +
+                '<td id="in-chat-head" class="send-req collapse-message-chat">Welcome to LiveChat</td>' +
+                '<td class="heder-btn chat-box">' +
+                    '<a href="#" style="padding-left: 4px;" class="collapse-message-chat"><img class="btn-img message-chat-btn-mini" src="<%= asset_url("icons/plus.png") %>"/>' +
                     '</a>' +
                 '</td>' +
-                '<td class="hederbtn closebutton">' +
-                    '<a href="#" id="btnclosechat"><img style="width: 15px;" class="btnimg" src="<%= asset_url("icons/close.png") %>" />' +
+                '<td class="heder-btn close-button">' +
+                    '<a href="#" id="btn-close-chat"><img style="width: 15px;" class="btn-img" src="<%= asset_url("icons/close.png") %>" />' +
                     '</a>' +
                 '</td>' +
             '</tr>' +
             '<tr id="message-box">' +
                 '<td colspan="3" style="padding:0;">' +
-                    '<div id="operatorimgdiv" class="name-messages" style="height: 56px;overflow: hidden;border-bottom: 5px solid #dcdcdc;">' +
+                    '<div id="operator-img-div" class="name-messages" style="height: 56px;overflow: hidden;border-bottom: 5px solid #dcdcdc;">' +
                         '<div style="width:78%; float:left;">' +
-                            '<div style="float:left;"><img id="operatorprofileimg" style="height: 40px;width: 40px;margin: 8px;" src="<%= asset_url("icons/customer_support-128.png") %>"/>' +
+                            '<div style="float:left;"><img id="operator-profile-img" style="height: 40px;width: 40px;margin: 8px;" src="<%= asset_url("icons/customer_support-128.png") %>"/>' +
                             '</div>' +
                             '<div style="float:left;">' +
-                                '<div id="operatorname" style="font-size: 20px;font-weight: bold;line-height: 1.5em;"></div>' +
-                                '<div id="operatorrole" style="font-size:14px;"></div>' +
+                                '<div id="operator-name" style="font-size: 20px;font-weight: bold;line-height: 1.5em;"></div>' +
+                                '<div id="operator-role" style="font-size:14px;"></div>' +
                             '</div>' +
                         '</div>' +
                         '<div style="width:20%;float: right;margin-top: 5%;margin-right: 2%;">' +
-                            '<div class="thumbbox">' +
-                                '<a href="#"><img class="chatlike chatlikes" id="chatlikes" style="margin-top: 4%;" src="<%= asset_url("icons/thumbup.svg") %>"/>' +
+                            '<div class="thumb-box">' +
+                                '<a href="#"><img class="chat-like chat-likes" id="chat-likes" style="margin-top: 4%;" src="<%= asset_url("icons/thumbup.svg") %>"/>' +
                                 '</a>|' +
-                                '<a href="#"><img class="chatlike chatdislikes" id="chatdislikes" src="<%= asset_url("icons/thumbdown.svg") %>"/>' +
+                                '<a href="#"><img class="chat-like chat-dislikes" id="chat-dislikes" src="<%= asset_url("icons/thumbdown.svg") %>"/>' +
                                 '</a>' +
                                 '<a style="display:none;" href="#"><img src="<%= asset_url("icons/mail-icon.png") %>"/>' +
                                 '</a>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div id="defchat" class="name-messages" style="min-height: 2px;"></div>' +
-                    '<div id="conchat" class="name-messages" style="min-height: 220px;max-height: 220px; border-bottom: white;border-top: none; word-break: break-all;overflow-y: auto; display:block!important;">' +
+                    '<div id="def-chat" class="name-messages" style="min-height: 2px;"></div>' +
+                    '<div id="con-chat" class="name-messages" style="min-height: 220px;max-height: 220px; border-bottom: white;border-top: none; word-break: break-all;overflow-y: auto; display:block!important;">' +
                         '<div class="messages">' +
-                            '<div id="chatmsgs"></div>' +
+                            '<div id="chat-msgs"></div>' +
                         '</div>' +
                     '</div>' +
-                    '<div id="imgtyping" class="name-messages" style="border-top: white;"></div>' +
-                    '<div class="name-messages sendmess" style="border-top-width:5px;">' +
-                        '<textarea id="sendmsgtext" style="max-width:225px; float:left" class="messinput" rows="3" placeholder="Type and press[enter]" style="float: left;width: 82%;"></textarea>' +
-                        '<a href="javascript:void(0)"><img id="MessageSend" src="<%= asset_url("icons/send.png") %>" style="margin-top: 8%;float:left;" />' +
+                    '<div id="img-typing" class="name-messages" style="border-top: white;"></div>' +
+                    '<div class="name-messages send-mess" style="border-top-width:5px;">' +
+                        '<textarea id="send-msg-text" style="max-width:225px; float:left" class="mess-input" rows="3" placeholder="Type and press[enter]" style="float: left;width: 82%;"></textarea>' +
+                        '<a href="javascript:void(0)"><img id="message-send" src="<%= asset_url("icons/send.png") %>" style="margin-top: 8%;float:left;" />' +
                         '</a>' +
-                        '<div class="cls"></div>' +
-                        '<div class="logo-bizchat">' +
-                            '<a target="_blank" href="#"><img src="<%= asset_url("gray-logo.png") %>" class="desaturate" width="100">' +
-                            '</a>' +
-                        '</div>' +
                     '</div>' +
                 '</td>' +
             '</tr>' +
-        '</table><img class="chat-img bottom-img collapsMessagechat" src="" style="display:none !important;" />' +
+        '</table><img class="chat-img bottom-img collapse-message-chat" src="" style="display:none !important;" />' +
     '</div>' +
-    '<div id="closechat" class="chatwindow"><img class="chat-img top-img collapsClosechat" src="" style="display:none !important;" />' +
+    '<div id="close-chat" class="chat-window"><img class="chat-img top-img collapse-close-chat" src="" style="display:none !important;" />' +
         '<table class="chattable">' +
-            '<tr class="chattableraw">' +
-                '<td id="closehead" class="hedertext collapsClosechat"></td>' +
-                '<td id="clschatrefresh" class="hederbtn">' +
-                    '<a href="#" id="refreshafterchats"><img style="width: 32px;height: 32px;" class="btnimg refreshclschats" src="<%= asset_url("icons/refresh.png") %>"/>' +
+            '<tr class="chattable-raw">' +
+                '<td id="close-head" class="heder-text collapse-close-chat"></td>' +
+                '<td id="cls-chat-refresh" class="heder-btn">' +
+                    '<a href="#" id="refresh-after-chats"><img style="width: 32px;height: 32px;" class="btn-img refresh-cls-chats" src="<%= asset_url("icons/refresh.png") %>"/>' +
                     '</a>' +
                 '</td>' +
-                '<td class="hederbtn">' +
-                    '<a href="#" style="padding-left: 4px;" class="collapsClosechat"><img style="margin-bottom: 1px; margin:auto; vertical-align: middle;" class="btnimg closechatbtnmini" src="<%= asset_url("icons/plus.png") %>"/>' +
+                '<td class="heder-btn">' +
+                    '<a href="#" style="padding-left: 4px;" class="collapse-close-chat"><img style="margin-bottom: 1px; margin:auto; vertical-align: middle;" class="btn-img close-chat-btn-mini" src="<%= asset_url("icons/plus.png") %>"/>' +
                     '</a>' +
                 '</td>' +
             '</tr>' +
@@ -293,7 +278,7 @@ $('body').append('' +
                 '<td colspan="3" style="padding:0;">' +
                     '<div class="name-messages">' +
                         '<p style="text-align:center;">Thanks for chatting.</p>' +
-                        '<p class="clschatmsg"></p>' +
+                        '<p class="cls-chat-msg"></p>' +
                         '<br />' +
                         '<a href="#">' +
                             '<img class="like-img" id="like" src="<%= asset_url("icons/thumbup.svg") %>" style="margin-left: 35%;" />' +
@@ -302,26 +287,22 @@ $('body').append('' +
                         '<br />' +
                         '<br />' +
                         '<br />' +
-                        '<div class="logo-bizchat">' +
-                            '<a target="_blank" href="#"><img src="<%= asset_url("gray-logo.png") %>" class="desaturate" width="100">' +
-                            '</a>' +
-                        '</div>' +
                     '</div>' +
                 '</td>' +
             '</tr>' +
-        '</table><img class="chat-img bottom-img collapsClosechat" src="" style="display:none !important;" />' +
+        '</table><img class="chat-img bottom-img collapse-close-chat" src="" style="display:none !important;" />' +
     '</div>' +
-    '<div id="spinnerRegion" class="global-spinner" style="display: none;">' +
+    '<div id="spinner-region" class="global-spinner" style="display: none;">' +
         '<div class="spinner-loader" style="top: 45%; left: 49%;"></div>' +
     '</div>' +
 '</div>')
 
-$('#startchat').hide()
-$('#inchat').hide()
-$('#closechat').hide()
-$('#Nooperator').hide()
-$('#NooperatorSent').hide()
-$("#imgtyping").hide()
+$('#start-chat').hide()
+$('#in-chat').hide()
+$('#close-chat').hide()
+$('#no-operator').hide()
+$('#no-operator-sent').hide()
+$("#img-typing").hide()
 
 wi = $(window).width()
 if wi <= 370
@@ -344,78 +325,73 @@ $(document).on 'mouseout', '#like', ->
     $('#like').attr('src', '<%= asset_url("icons/thumbup.svg") %>')
 $(document).on 'mouseout', '#dislike', ->
     $('#dislike').attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
-$(document).on 'mouseover', '#chatlikes', ->
-    $('#chatlikes').attr('src', '<%= asset_url("icons/thumbg.svg") %>')
-$(document).on 'mouseover', '#chatdislikes', ->
-    $('#chatdislikes').attr('src', '<%= asset_url("icons/thumbr.svg") %>')
-$(document).on 'mouseout', '#chatlikes', ->
-    $('#chatlikes').attr('src', '<%= asset_url("icons/thumbup.svg") %>')
-$(document).on 'mouseout', '#chatdislikes', ->
-    $('#chatdislikes').attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
+$(document).on 'mouseover', '#chat-likes', ->
+    $('#chat-likes').attr('src', '<%= asset_url("icons/thumbg.svg") %>')
+$(document).on 'mouseover', '#chat-dislikes', ->
+    $('#chat-dislikes').attr('src', '<%= asset_url("icons/thumbr.svg") %>')
+$(document).on 'mouseout', '#chat-likes', ->
+    $('#chat-likes').attr('src', '<%= asset_url("icons/thumbup.svg") %>')
+$(document).on 'mouseout', '#chat-dislikes', ->
+    $('#chat-dislikes').attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
 
-$(document).on 'mouseover', '#MessageSend', ->
-    $('#MessageSend').css('border', '0px solid ' + json.Color + '')
-$(document).on 'mouseout', '#MessageSend', ->
-    $('#MessageSend').css('border', 'none')
+$(document).on 'mouseover', '#message-send', ->
+    $('#message-send').css('border', '0px solid ' + json.Color + '')
+$(document).on 'mouseout', '#message-send', ->
+    $('#message-send').css('border', 'none')
 
-# Start Chat Collaps Click Event
-$(document).on 'click', '.collapsStartchat', ->
-    img = $('.startchatbtnmini')[0].src
+$(document).on 'click', '.collapse-start-chat', ->
+    img = $('.start-chat-btn-mini')[0].src
     aa = img.substring(img.length - 9, img.length)
 
     if aa == "minus.png"
-        HideChatable(".startchatbtnmini")
+        HideChatable(".start-chat-btn-mini")
         HideToggle('StartChatTab')
     else
-        ShowChatable(".startchatbtnmini")
+        ShowChatable(".start-chat-btn-mini")
         ShowToggle('StartChatTab')
 
-# Message Chat Collaps Click Event
-$(document).on 'click', '.collapsMessagechat', ->
-    img = $('.messagechatbtnmini')[0].src
+$(document).on 'click', '.collapse-message-chat', ->
+    img = $('.message-chat-btn-mini')[0].src
     aa = img.substring(img.length - 9, img.length)
 
     if aa == "minus.png"
-        HideChatable(".messagechatbtnmini")
+        HideChatable(".message-chat-btn-mini")
         HideToggle('MessageChatTab')
     else
-        ShowChatable(".messagechatbtnmini")
+        ShowChatable(".message-chat-btn-mini")
         SendRequest()
 
-# Close Chat Collaps Click Event
-$(document).on 'click', '.collapsClosechat', ->
-    img = $('.closechatbtnmini')[0].src
+$(document).on 'click', '.collapse-close-chat', ->
+    img = $('.close-chat-btn-mini')[0].src
     aa = img.substring(img.length - 9, img.length)
 
     if aa == "minus.png"
-        HideChatable(".closechatbtnmini")
+        HideChatable(".close-chat-btn-mini")
         HideToggle('CloseChatTab')
     else
-        ShowChatable(".closechatbtnmini")
+        ShowChatable(".close-chat-btn-mini")
         ShowToggle('CloseChatTab')
 
-# No Operator Collaps Click Event
-$(document).on 'click', '.collapsNooperator', ->
-    img = $('.nooperatorbtnmini')[0].src
+$(document).on 'click', '.collapse-no-operator', ->
+    img = $('.no-operator-btn-mini')[0].src
     aa = img.substring(img.length - 9, img.length)
 
     if aa == "minus.png"
-        HideChatable(".nooperatorbtnmini")
+        HideChatable(".no-operator-btn-mini")
         HideToggle('NoOperatorTab')
     else
-        ShowChatable(".nooperatorbtnmini")
+        ShowChatable(".no-operator-btn-mini")
         ShowToggle('NoOperatorTab')
 
-# No Operator Success Collaps Click Event
-$(document).on 'click', '.collapsNooperatorSuccess', ->
-    img = $('.nooperatorsuccessbtnmini')[0].src
+$(document).on 'click', '.collapse-no-operator-success', ->
+    img = $('.no-operator-success-btn-mini')[0].src
     aa = img.substring(img.length - 9, img.length)
 
     if aa == "minus.png"
-        HideChatable(".nooperatorsuccessbtnmini")
+        HideChatable(".no-operator-success-btn-mini")
         HideToggle('NoOperatorSuccess')
     else
-        ShowChatable(".nooperatorsuccessbtnmini")
+        ShowChatable(".no-operator-success-btn-mini")
         ShowToggle('NoOperatorSuccess')
 
 if IsConnected
@@ -438,38 +414,35 @@ if IsConnected
         IsContinue = true
         VisitorId = localStorage.getItem("VisitorID")
 
-    # widget request -N in page load widget
-    # chat.server.widgetRequest(BizChatID, ChatUserInfoID, VisitorId, WidgetID, chat.connection.id, Key);
-
-    $(document).on 'click', '#SendRequest', ->
+    $(document).on 'click', '#send-request', ->
         if IsSendRequest
-            $('#email_error').hide()
-            $('#name_error').hide()
-            $('#txtemails').css('border-color', '')
-            $('#txtname').css('border-color', '')
+            $('#email-error').hide()
+            $('#name-error').hide()
+            $('#txt-emails').css('border-color', '')
+            $('#txt-name').css('border-color', '')
             IsSendRequest = false
-            name = $.trim($("#txtname").val())
+            name = $.trim($("#txt-name").val())
             name = json.StartChat.AskforName == false ? name == "" ? "anonymous" : "" : name
-            email = $.trim($('#txtemails').val())
-            question = $.trim($('#txtquestion').val())
+            email = $.trim($('#txt-emails').val())
+            question = $.trim($('#txt-question').val())
             if DepartmentVisible
-                if jQuery('.DrpDepartment').val() == null
+                if jQuery('.drp-department').val() == null
                     Department = "0"
                 else
-                    Department = $('.DrpDepartment option:selected').val()
+                    Department = $('.drp-department option:selected').val()
             filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/
             flag = true
             flag = name != "" ? email != "" ? filter.test(email) ? true : false : true : false
             if name != ""
                 if email != ""
                     if !filter.test(email)
-                        $('#email_error').show()
-                        $('#txtemails').css('border-color', '#CC0000')
+                        $('#email-error').show()
+                        $('#txt-emails').css('border-color', '#CC0000')
                         IsSendRequest = true
                         flag = false
             else
-                $('#txtname').css('border-color', '#CC0000')
-                $('#name_error').show()
+                $('#txt-name').css('border-color', '#CC0000')
+                $('#name-error').show()
                 IsSendRequest = true
                 flag = false
             if flag
@@ -481,44 +454,44 @@ if IsConnected
                 Ip = (Ip == null || Ip == undefined) ? "" : Ip
                 CountryName = (CountryName == null || CountryName == undefined) ? "" : CountryName
                 msg = VisitorName + ' ' + json.InChat.JoinedChat
-                SignalID = chat.connection.id
+                #SignalID = chat.connection.id
                 InChat(InChatData, VisitorName)
 
                 # chat.server.sendRequestFromWidget(UserId, BizChatID, WidgetID, WidgetName, SignalID, name, email, question, msg, Ip, newURL, lat, lang, Department, CountryCode, CountryName);
                 ShowTab('MessageChatTab')
                 ShowToggle('MessageChatTab')
-                $('#defchat').show()
-                $("#txtname").val("")
-                $("#txtemails").val("")
-                $('#txtquestion').val("")
+                $('#def-chat').show()
+                $("#txt-name").val("")
+                $("#txt-emails").val("")
+                $('#txt-question').val("")
 
-    $(document).on 'click', '#MessageSend', ->
-        $('#conchat').show()
-        val = $.trim($('.messinput').val())
+    $(document).on 'click', '#message-send', ->
+        $('#con-chat').show()
+        val = $.trim($('.mess-input').val())
         if val != ""
-            SignalID = chat.connection.id
+            #SignalID = chat.connection.id
             DateTime = new Date()
             Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2)
         # if ChatData.ChatMessages != null || ChatData.ChatMessages != undefined
             # chat.server.sendMessageFromVisitor(ChatData.VisitorId, VisitorName, BizChatID, ChatData.ChatUserInfoID, val)
-        $('.messinput').val("")
+        $('.mess-input').val("")
 
-    $('.messinput').keypress (e) ->
+    $('.mess-input').keypress (e) ->
         # chat.server.typingChecking(ChatData.VisitorId, ChatData.VisitorName, BizChatID, ChatData.ChatUserInfoID);
         if e.keyCode == 13
-            $('#conchat').show()
+            $('#con-chat').show()
             val = $.trim($(this).val())
             if val != ""
-                SignalID = chat.connection.id
+                #SignalID = chat.connection.id
                 DateTime = new Date()
                 Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2)
             # if ChatData.ChatMessages != null || ChatData.ChatMessages != undefined
                 # chat.server.sendMessageFromVisitor(ChatData.VisitorId, VisitorName, BizChatID, ChatData.ChatUserInfoID, val);
-        $('.messinput').val("")
+        $('.mess-input').val("")
         # chat.server.removeTyping(ChatData.VisitorId, ChatData.VisitorName, BizChatID, ChatData.ChatUserInfoID);
         return false
 
-    $(".messinput").blur ->
+    $(".mess-input").blur ->
         # chat.server.removeTyping(ChatData.VisitorId, ChatData.VisitorName, BizChatID, ChatData.ChatUserInfoID);
 
     $(document).on 'click', '.like-img', ->
@@ -531,7 +504,7 @@ if IsConnected
         ChatUserInfoID = null
         ChatData = null
         IsSendRequest = true
-        $('#chatmsgs').empty()
+        $('#chat-msgs').empty()
         if IsOperatorAvailable
             if json.StartChat.AskforName == false && json.StartChat.AskforEmail == false && json.StartChat.AskforQuestion == false && json.StartChat.AskforDepartment == false
                 ShowTab('MessageChatTab')
@@ -553,52 +526,50 @@ if IsConnected
                 $('.bottom-img').show() if (json.Collapse.Type == "Image" || json.Collapse.Type == "Image and Tab")
             NoOperator(json)
 
-    $(document).on 'click', '.chatlike', ->
-        if this.id == "chatlikes"
+    $(document).on 'click', '.chat-like', ->
+        if this.id == "chat-likes"
             # chat.server.ratingFromVisitor(BizChatID, ChatUserInfoID, "Like");
-            $('.chatdislikes').attr('id', 'chatdislikes')
-            $("#chatlikes").attr('src', '<%= asset_url("icons/thumbg.svg") %>')
-            $('.chatlikes').removeAttr('id')
-            $("#chatdislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
-        else if this.id == "chatdislikes"
+            $('.chat-dislikes').attr('id', 'chat-dislikes')
+            $("#chat-likes").attr('src', '<%= asset_url("icons/thumbg.svg") %>')
+            $('.chat-likes').removeAttr('id')
+            $("#chat-dislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
+        else if this.id == "chat-dislikes"
             # chat.server.ratingFromVisitor(BizChatID, ChatUserInfoID, "DisLike");
-            $('.chatlikes').attr('id', 'chatlikes')
-            $("#chatdislikes").attr('src', '<%= asset_url("icons/thumbr.svg") %>')
-            $('.chatdislikes').removeAttr('id')
-            $("#chatlikes").attr('src', '<%= asset_url("icons/thumbup.svg") %>')
+            $('.chat-likes').attr('id', 'chat-likes')
+            $("#chat-dislikes").attr('src', '<%= asset_url("icons/thumbr.svg") %>')
+            $('.chat-dislikes').removeAttr('id')
+            $("#chat-likes").attr('src', '<%= asset_url("icons/thumbup.svg") %>')
 
-    # No Operator Send Mail click event
-    $(document).on 'click', '#btnsendemail', ->
-        $('#2email_error').hide()
-        $('#2qust_error').hide()
-        $('#noopname').css('border-color', '')
-        $('#noopemails').css('border-color', '')
-        $('#noopquestion').css('border-color', '')
-        name = $.trim($("#noopname").val())
-        email = $.trim($('#noopemails').val())
-        question = $.trim($('#noopquestion').val())
+    $(document).on 'click', '#btn-send-email', ->
+        $('#2email-error').hide()
+        $('#2qust-error').hide()
+        $('#no-operator-name').css('border-color', '')
+        $('#no-operator-emails').css('border-color', '')
+        $('#no-operator-question').css('border-color', '')
+        name = $.trim($("#no-operator-name").val())
+        email = $.trim($('#no-operator-emails').val())
+        question = $.trim($('#no-operator-question').val())
         filter = /^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
         CentralEmail = json.NoOperators.CentralEmail
         if name != "" && email != "" && question != ""
             if filter.test(email)
                 # chat.server.noOperatorMailRequestFromWidget(BizChatID, name, email, question, CentralEmail);
             else
-                $('#2email_error').show()
-                $('#noopemails').css('border-color', '#CC0000')
+                $('#2email-error').show()
+                $('#no-operator-emails').css('border-color', '#CC0000')
         else
-            $('#noopname').css('border-color', '#CC0000')
-            $('#noopemails').css('border-color', '#CC0000')
-            $('#noopquestion').css('border-color', '#CC0000')
-            $('#2qust_error').show()
+            $('#no-operator-name').css('border-color', '#CC0000')
+            $('#no-operator-emails').css('border-color', '#CC0000')
+            $('#no-operator-question').css('border-color', '#CC0000')
+            $('#2question-error').show()
 
-    # No Operator Success Refresh click event
-    $(document).on 'click', '#refreshSendMail', ->
+    $(document).on 'click', '#refresh-send-mail', ->
         localStorage.removeItem("StorageData")
         localStorage.removeItem("VisitorID")
         ChatUserInfoID = null
         ChatData = null
         IsSendRequest = true
-        $('#chatmsgs').empty()
+        $('#chat-msgs').empty()
         if IsOperatorAvailable
             if json.StartChat.AskforName == false && json.StartChat.AskforEmail == false && json.StartChat.AskforQuestion == false && json.StartChat.AskforDepartment == false
                 ShowTab('MessageChatTab')
@@ -620,7 +591,7 @@ if IsConnected
                 $('.bottom-img').show() if (json.Collapse.Type == "Image" || json.Collapse.Type == "Image and Tab")
             NoOperator(json)
 
-    $(document).on 'click', '#btnclosechat', ->
+    $(document).on 'click', '#btn-close-chat', ->
         #chat.server.closeChatFromVisitor(BizChatID, ChatData.ChatUserInfoID, "false", ChatData.VisitorId);
 
     $(document).keyup (e) ->
@@ -628,13 +599,13 @@ if IsConnected
              #   if e.keyCode == 27
                     # ...
 
-    $(document).on 'click', '#refreshafterchats', ->
+    $(document).on 'click', '#refresh-after-chats', ->
         localStorage.removeItem("StorageData")
         localStorage.removeItem("VisitorID")
         ChatUserInfoID = null
         ChatData = null
         IsSendRequest = true
-        $('#chatmsgs').empty()
+        $('#chat-msgs').empty()
 
         if IsOperatorAvailable
             if json.StartChat.AskforName == false && json.StartChat.AskforEmail == false && json.StartChat.AskforQuestion == false && json.StartChat.AskforDepartment == false
@@ -657,25 +628,23 @@ if IsConnected
                 $('.bottom-img').show() if (json.Collapse.Type == "Image" || json.Collapse.Type == "Image and Tab")
             NoOperator(json)
 
-    $(document).on 'click', '.likechatdwld', ->
+    $(document).on 'click', '.like-chat-dwld', ->
         DateTime = new Date().toString()
         TimeZone1 = DateTime.substring(DateTime.indexOf("("), DateTime.indexOf(")"))
         TimeZone = TimeZone1.substring(1, TimeZone1.length)
         # window.location = Url + "/Home/Demo?" + "chatuserinfoid=" + ChatUserInfoID + "&TimeZone=" + TimeZone
 
-# send Operator status to Active Chat
 SendOperatorStatus = (Data) ->
     Data = JSON.parse(Data)
     if Data.ChatUserInfoId == ChatUserInfoID
         if Data.status == 1
             IsOperatorAvailable = true
-            $('.NoOpMsgDiv').remove()
+            $('.no-operator-msg-div').remove()
         else
             IsOperatorAvailable = false
-            $('#chatmsgs').append('<div class="inchatmsg NoOpMsgDiv">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
-            $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+            $('#chat-msgs').append('<div class="in-chat-msg no-operator-msg-div">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
+            $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# widget Response -N in page load widget
 WidgetResponse = (Response) ->
     WidgetData = JSON.parse(Response)
     if WidgetData.widget.BizChatID == BizChatID && WidgetData.key == Key && WidgetData.chatdata.ChatUserInfoID == ChatUserInfoID
@@ -709,10 +678,9 @@ WidgetResponse = (Response) ->
         InChatData = json.InChat
         for k in WidgetData.department
             if WidgetData.department[k]
-                $('.DrpDepartment').append('<option value="' + WidgetData.department[k].DepartmentId + '">' + WidgetData.department[k].DepartmentName + '</option>')
+                $('.drp-department').append('<option value="' + WidgetData.department[k].DepartmentId + '">' + WidgetData.department[k].DepartmentName + '</option>')
         BindWidget(json)
 
-# response from send request widget -N
 GetWidgetRequestResponse = (GetData) ->
     GetWidgetData = JSON.parse(GetData)
     if GetWidgetData.chatdata.BizChatId == BizChatID
@@ -721,36 +689,34 @@ GetWidgetRequestResponse = (GetData) ->
         UserName = GetWidgetData.chatdata.OperatorName
         ChatUserInfoID = GetWidgetData.chatdata.ChatUserInfoID
         ChatData = GetWidgetData.chatdata
-        $("#conchat").show()
-        $("#operatorimgdiv").show()
-        $('#defchat').css('min-height', '40px')
-        $("#imgtyping").hide()
+        $("#con-chat").show()
+        $("#operator-img-div").show()
+        $('#def-chat').css('min-height', '40px')
+        $("#img-typing").hide()
         ChatContent(GetWidgetData.chatdata.ChatMessages);
         if GetWidgetData.status.status == 0
             IsOperatorAvailable = false
-            $('#chatmsgs').append('<div class="inchatmsg NoOpMsgDiv">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
-            $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+            $('#chat-msgs').append('<div class="in-chat-msg no-operator-msg-div">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
+            $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# get response during app operator on timer click
 GetResponseOnIncomingTimer = (GetBizChatID, GetChatUserInfoID, GetOperatorId, Data) ->
     GetDatas = JSON.parse(Data)
     if GetBizChatID == BizChatID && GetChatUserInfoID == ChatData.ChatUserInfoID
-        $('#chatmsgs').empty()
-        $("#conchat").show()
-        $("#operatorimgdiv").show()
-        $('#defchat').hide()
-        $("#imgtyping").hide()
+        $('#chat-msgs').empty()
+        $("#con-chat").show()
+        $("#operator-img-div").show()
+        $('#def-chat').hide()
+        $("#img-typing").hide()
         ChatUserInfoID = GetChatUserInfoID
         ChatData.ChatMessages = GetDatas.ChatMessages
-        $('#operatorname').text(GetDatas.OperatorName)
+        $('#operator-name').text(GetDatas.OperatorName)
         if GetDatas.OperatorImage == ""
-            $('#operatorprofileimg').attr('src', '<%= asset_url("1avatar-operator.png") %>')
+            $('#operator-profile-img').attr('src', '<%= asset_url("1avatar-operator.png") %>')
         else
-            $('#operatorprofileimg').attr('src', Url + GetDatas.OperatorImage)
-        $('#operatorrole').text(GetDatas.Designation)
+            $('#operator-profile-img').attr('src', Url + GetDatas.OperatorImage)
+        $('#operator-role').text(GetDatas.Designation)
         ChatContent(GetDatas.ChatMessages)
 
-# get response during app operator on Othertimer click
 GetResponseOnAddOperatorFromInvitation = (SetBizChatId, SetChatInfoId, SetOperatorId, Data, Data1) ->
     GetDatas = JSON.parse(Data)
     MessageData = JSON.parse(Data1)
@@ -759,62 +725,57 @@ GetResponseOnAddOperatorFromInvitation = (SetBizChatId, SetChatInfoId, SetOperat
         ChatData.ChatMessages = GetDatas.ChatMessages
         ChatData.ChatUserLists = GetDatas.ChatUserLists
         for i in MessageData.ChatMessages
-            $('#chatmsgs').append('<div class="inchatmsg">' + MessageData.ChatMessages[i].Messagetext + '</div>')
-        $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+            $('#chat-msgs').append('<div class="in-chat-msg">' + MessageData.ChatMessages[i].Messagetext + '</div>')
+        $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# operator Requeue from chat -N
 RequeueOperatorFromChat = (GetUserId, GetBizChatID, GetChatUserInfoID, Data, Message) ->
     GetData = JSON.parse(Data)
     GetMsg = JSON.parse(Message)
     if BizChatID == GetBizChatID && WidgetID == GetData.WidgetId && GetChatUserInfoID == ChatData.ChatUserInfoID
         ChatData.ChatMessages.push(GetMsg)
-        $('#chatmsgs').append('<div class="inchatmsg">' + GetMsg.Messagetext + '</div>')
-        $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+        $('#chat-msgs').append('<div class="in-chat-msg">' + GetMsg.Messagetext + '</div>')
+        $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# Leave Operator from Bizchat -N
 LeaveOperatorFromChat = (GetUserId, GetBizChatID, GetChatUserInfoID, Data, Message) ->
     GetData = JSON.parse(Data);
     GetMsg = JSON.parse(Message);
     if BizChatID == GetBizChatID && WidgetID == GetData.WidgetId && GetChatUserInfoID == ChatData.ChatUserInfoID
         ChatData.ChatMessages.push(GetMsg)
-        $('#chatmsgs').append('<div class="inchatmsg">' + GetMsg.Messagetext + '</div>')
-        $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+        $('#chat-msgs').append('<div class="in-chat-msg">' + GetMsg.Messagetext + '</div>')
+        $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# get Message From Visitor
 MessageGetFromVisitorInBizChat = (json) ->
     MessageData = JSON.parse(json)
     DateTime = new Date()
     Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2)
     if MessageData.BizChatId == BizChatID && MessageData.ChatUserInfoId == ChatUserInfoID
         ChatData.ChatMessages.push(MessageData.ChatMessage)
-        $('#chatmsgs').append('<div><span class="right" style="word-break: break-word;">' + MessageData.ChatMessage.Messagetext + '<lable class="righttime">' + Time + '</lable></span><div class="clear"></div></div>')
-        $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+        $('#chat-msgs').append('<div><span class="right" style="word-break: break-word;">' + MessageData.ChatMessage.Messagetext + '<lable class="right-time">' + Time + '</lable></span><div class="clear"></div></div>')
+        $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# Add Operator on First Message  -N
 GetResponseWhenFirstOpereatorJoinChat = (GetBizChatId, GetChatUserInfoID, ChatData, data) ->
     GetData = JSON.parse(ChatData)
     if GetBizChatId == BizChatID && GetChatUserInfoID == ChatData.ChatUserInfoID
         for i in GetData.ChatMessages
             DateTime = new Date(GetData.ChatMessages[i].MessageTime)
             Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2)
-            $('#operatorname').text(GetData.ChatMessages[i].SenderName)
+            $('#operator-name').text(GetData.ChatMessages[i].SenderName)
             if GetData.ChatMessages[i].ImageUrl == ""
-                $('#operatorprofileimg').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
+                $('#operator-profile-img').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
             else
-                $('#operatorprofileimg').attr('src', GetData.ChatMessages[i].ImageUrl)
-            $('#operatorrole').text(GetDesignation)
+                $('#operator-profile-img').attr('src', GetData.ChatMessages[i].ImageUrl)
+            $('#operator-role').text(GetDesignation)
             if GetData.ChatMessages[i].IsJoin == "true"
                 if GetData.ChatMessages[i].Type != "Visitor"
-                    $('#chatmsgs').append('<div class="inchatmsg">' + GetData.ChatMessages[i].Messagetext + '</div>')
+                    $('#chat-msgs').append('<div class="in-chat-msg">' + GetData.ChatMessages[i].Messagetext + '</div>')
                 else
-                    $('#chatmsgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + GetData.ChatMessages[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '"><lable class="leftname">shivak</lable>' + GetData.ChatMessages[i].Messagetext + '<lable class="lefttime">' + Time + '</lable></span><div class="clear"></div></div>')
+                    $('#chat-msgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + GetData.ChatMessages[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '"><lable class="left-name">shivak</lable>' + GetData.ChatMessages[i].Messagetext + '<lable class="left-time">' + Time + '</lable></span><div class="clear"></div></div>')
                     $('.left').append('<style>.left:after{border-right:8px solid ' + json.Color + '}</style>')
-                    $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
-                    $("#conchat").show()
-                    $('#defchat').hide()
+                    $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
+                    $("#con-chat").show()
+                    $('#def-chat').hide()
             ChatData.ChatMessages.push(GetData.ChatMessages[i])
 
-# message send by operator in bizchat -N
 GetMessageFromOperator = (GetBizChatId, GetChatUserInfoID, Data) ->
     GetData = JSON.parse(Data)
     if GetBizChatId == BizChatID && GetChatUserInfoID == ChatData.ChatUserInfoID
@@ -823,37 +784,35 @@ GetMessageFromOperator = (GetBizChatId, GetChatUserInfoID, Data) ->
             Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2)
             if GetData.ChatMessages[i].IsJoin == "true"
                 if GetData.ChatMessages[i].Type != "Visitor"
-                    $('#chatmsgs').append('<div class="inchatmsg">' + GetData.ChatMessages[i].Messagetext + '</div>')
+                    $('#chat-msgs').append('<div class="in-chat-msg">' + GetData.ChatMessages[i].Messagetext + '</div>')
             else
                 if GetData.ChatMessages[i].ImageUrl == ""
-                    $('#chatmsgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + '/Content/images/avatars/1avatar-operator.png' + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + GetData.ChatMessages[i].Messagetext + '<lable class="lefttime">' + Time + '</lable></span><div class="clear"></div></div>')
+                    $('#chat-msgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + '/Content/images/avatars/1avatar-operator.png' + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + GetData.ChatMessages[i].Messagetext + '<lable class="left-time">' + Time + '</lable></span><div class="clear"></div></div>')
                 else
-                    $('#chatmsgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + GetData.ChatMessages[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + GetData.ChatMessages[i].Messagetext + '<lable class="lefttime">' + Time + '</lable></span><div class="clear"></div></div>')
+                    $('#chat-msgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + GetData.ChatMessages[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + GetData.ChatMessages[i].Messagetext + '<lable class="left-time">' + Time + '</lable></span><div class="clear"></div></div>')
                 $('.left').append('<style>.left:after{border-right:8px solid ' + json.Color + '}</style>')
-                $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
-                $("#conchat").show()
-                $('#defchat').hide()
+                $("#con-chat").scrollTop($("#con-chat")[0].scrollHeight)
+                $("#con-chat").show()
+                $('#def-chat').hide()
             ChatData.ChatMessages.push(GetData.ChatMessages[i]);
 
 # check typing alert -N
 TypingAlert = (SetUserId, SetUserName, SetBizChatID, SetChatUserInfoID) ->
     if SetBizChatID == BizChatID && SetChatUserInfoID == ChatUserInfoID
         if SetUserId != ChatData.VisitorId
-            $("#imgtyping").empty()
-            $("#imgtyping").show()
-            if $('#imgtyping').hasClass('Typing-' + SetUserId + '-' + SetChatUserInfoID)
-# ...
+            $("#img-typing").empty()
+            $("#img-typing").show()
+            if $('#img-typing').hasClass('typing-' + SetUserId + '-' + SetChatUserInfoID)
+                # ...
             else
-                $("#imgtyping").append('<p class="bizchat-message-pinned Typing-' + SetUserId + '-' + SetChatUserInfoID + '" >' + SetUserName + ' ' + json.InChat.Typing + '<img src ="' + Url + '/Content/images/icon/typing.gif" style="width: 16px;height: 16px;" /></p>')
-                $('.Typing-' + SetUserId + '-' + SetChatUserInfoID).show()
-                $("#conchat").scrollTop($("#conchat")[0].scrollHeight)
+                $("#img-typing").append('<p class="chat-message-pinned typing-' + SetUserId + '-' + SetChatUserInfoID + '" >' + SetUserName + ' ' + json.InChat.Typing + '<img src ="' + Url + '/Content/images/icon/typing.gif" style="width: 16px;height: 16px;" /></p>')
+                $('.typing-' + SetUserId + '-' + SetChatUserInfoID).show()
+                $("#conchat").scrollTop($("#con-chat")[0].scrollHeight)
 
-# remove typing alert -N
 RemoveTypingAlert = (SetUserId, SetUserName, SetBizChatID, SetChatUserInfoID) ->
     if SetBizChatID == BizChatID && SetChatUserInfoID == ChatUserInfoID
-        $("#imgtyping").hide()
+        $("#img-typing").hide()
 
-# chat closed From visitor -N
 CloseBizChatFromVisitor = (Data) ->
     CloseData = JSON.parse(Data)
     if ChatData.VisitorId == CloseData.VisitorId && ChatUserInfoID == CloseData.ChatUserInfoId && BizChatID == CloseData.BizChatId
@@ -861,20 +820,19 @@ CloseBizChatFromVisitor = (Data) ->
         localStorage.removeItem("VisitorID")
         ChatUserInfoID = CloseData.ChatUserInfoId
         ChatData = null
-        $('#operatorprofileimg').attr('src', '' + Url + '/Content/images/avatars/1avatar-operator.png')
-        $('#operatorname').text("")
-        $('#operatorrole').text("")
-        $('#inchathead').text("Welcome to LiveChat")
+        $('#operator-profile-img').attr('src', '' + Url + '/Content/images/avatars/1avatar-operator.png')
+        $('#operator-name').text("")
+        $('#operator-role').text("")
+        $('#in-chat-head').text("Welcome to LiveChat")
         $('.DrpDepartment option:first').val()
         ShowTab('CloseChatTab')
         ShowToggle('CloseChatTab')
-        $('.messinput').val("")
-        $('.chatdislikes').attr('id', 'chatdislikes')
-        $("#chatdislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
-        $('.chatlikes').attr('id', 'chatlikes')
-        $("#chatlikes").attr('src', 'https://dashboard.bizchatbox.com/plugin/v2/thumbup.svg')
+        $('.mess-input').val("")
+        $('.chat-dislikes').attr('id', 'chat-dislikes')
+        $("#chat-dislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
+        $('.chat-likes').attr('id', 'chat-likes')
+        $("#chat-likes").attr('src', 'https://dashboard.bizchatbox.com/plugin/v2/thumbup.svg')
 
-# chat closed From operator -N
 CloseBizChatFromOperator = (Data) ->
     CloseData = JSON.parse(Data)
     if ChatData.VisitorId == CloseData.VisitorId && ChatUserInfoID == CloseData.ChatUserInfoId && BizChatID == CloseData.BizChatId
@@ -882,26 +840,25 @@ CloseBizChatFromOperator = (Data) ->
         localStorage.removeItem("VisitorID")
         ChatUserInfoID = CloseData.ChatUserInfoId
         ChatData = null
-        $('#operatorprofileimg').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
-        $('#operatorname').text("")
-        $('#operatorrole').text("")
-        $('#inchathead').text("Welcome to LiveChat")
-        $('.DrpDepartment option:first').val()
+        $('#operator-profile-img').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
+        $('#operator-name').text("")
+        $('#operator-role').text("")
+        $('#inchat-head').text("Welcome to LiveChat")
+        $('.drp-department option:first').val()
         ShowTab('CloseChatTab')
         ShowToggle('CloseChatTab')
-        $('.messinput').val("")
-        $('.chatdislikes').attr('id', 'chatdislikes')
-        $("#chatdislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
-        $('.chatlikes').attr('id', 'chatlikes')
-        $("#chatlikes").attr('src', '<%= asset_url("icons/thumbup.svg") %>')
+        $('.mess-input').val("")
+        $('.chat-dislikes').attr('id', 'chat-dislikes')
+        $("#chat-dislikes").attr('src', '<%= asset_url("icons/thumbdown.svg") %>')
+        $('.chat-likes').attr('id', 'chat-likes')
+        $("#chat-likes").attr('src', '<%= asset_url("icons/thumbup.svg") %>')
 
-# Mail From No operator widget -N
 NoOperatorMailResponseFromWidget = (Data) ->
     NoOperatorData = JSON.parse(Data)
     if NoOperatorData.BizchatId == BizChatID && NoOperatorData.ChatUserInfoID == ChatUserInfoID
-        $("#noopname").val("")
-        $("#noopemails").val("")
-        $('#noopquestion').val("")
+        $("#no-operator-name").val("")
+        $("#no-operator-emails").val("")
+        $('#no-operator-question').val("")
         ShowTab('NoOperatorSuccess')
         ShowToggle('NoOperatorSuccess')
 
@@ -914,14 +871,14 @@ SendRequest = ->
             CountryCode = (CountryCode == null || CountryCode == undefined) ? "" : CountryCode
             Ip = (Ip == null || Ip == undefined) ? "" : Ip
             CountryName = (CountryName == null || CountryName == undefined) ? "" : CountryName
-            SignalID = chat.connection.id
+            #SignalID = chat.connection.id
             VisitorName = "anonymous"
             WidgetName = json.WidgetsName
             if IsOperatorAvailable
                 if ChatUserInfoID == "" || ChatUserInfoID == null
                     InChat(InChatData, "anonymous")
                     # chat.server.sendRequestFromWidget(UserId, BizChatID, WidgetID, WidgetName, SignalID, "anonymous", "", "", "anonymous " + json.InChat.JoinedChat, Ip, newURL, lat, lang, "0", CountryCode, CountryName)
-                    ShowToogle('MessageChatTab')
+                    ShowToggle('MessageChatTab')
                     ShowTab('MessageChatTab')
             else
                 NoOperator(json)
@@ -950,89 +907,89 @@ ShowToggle = (CurrentTab) ->
             jQuery("#message-box").toggle('fast') unless  flagInChat
             jQuery("#name-box").toggle('fast') if flagStartChat
             jQuery("#close-box").toggle('fast') if flagCloseChat
-            jQuery("#NoOp-box").toggle('fast') if flagNoOperator
-            jQuery("#NoOpSendMail-box").toggle('fast') if flagNoOperatorSuccess
+            jQuery("#no-operator-box").toggle('fast') if flagNoOperator
+            jQuery("#no-operator-send-mail-box").toggle('fast') if flagNoOperatorSuccess
             flagInChat = true
             flagStartChat = false
             flagCloseChat = false
             flagNoOperator = false
             flagNoOperatorSuccess = false
-            jQuery(".messagechatbtnmini").attr('src', '<%= asset_url("icons/minus.png") %>')
+            jQuery(".message-chat-btn-mini").attr('src', '<%= asset_url("icons/minus.png") %>')
         when 'StartChatTab'
             jQuery("#message-box").toggle('fast') if flagInChat
             jQuery("#name-box").toggle('fast') unless  flagStartChat
             jQuery("#close-box").toggle('fast') if flagCloseChat
-            jQuery("#NoOp-box").toggle('fast') if flagNoOperator
-            jQuery("#NoOpSendMail-box").toggle('fast') if flagNoOperatorSuccess
+            jQuery("#no-operator-box").toggle('fast') if flagNoOperator
+            jQuery("#no-operator-send-mail-box").toggle('fast') if flagNoOperatorSuccess
             flagInChat = false
             flagStartChat = true
             flagCloseChat = false
             flagNoOperator = false
             flagNoOperatorSuccess = false
-            jQuery(".startchatbtnmini").attr('src', '<%= asset_url("icons/minus.png") %>')
+            jQuery(".start-chat-btn-mini").attr('src', '<%= asset_url("icons/minus.png") %>')
         when 'CloseChatTab'
             jQuery("#message-box").toggle('fast') if flagInChat
             jQuery("#name-box").toggle('fast') if  flagStartChat
             jQuery("#close-box").toggle('fast') unless flagCloseChat
-            jQuery("#NoOp-box").toggle('fast') if flagNoOperator
-            jQuery("#NoOpSendMail-box").toggle('fast') if flagNoOperatorSuccess
+            jQuery("#no-operator-box").toggle('fast') if flagNoOperator
+            jQuery("#no-operator-send-mail-box").toggle('fast') if flagNoOperatorSuccess
             flagInChat = false
             flagStartChat = false
             flagCloseChat = true
             flagNoOperator = false
             flagNoOperatorSuccess = false
-            jQuery(".closechatbtnmini").attr('src', '<%= asset_url("icons/minus.png") %>')
+            jQuery(".close-chat-btn-mini").attr('src', '<%= asset_url("icons/minus.png") %>')
         when 'NoOperatorTab'
             jQuery("#message-box").toggle('fast') if flagInChat
             jQuery("#name-box").toggle('fast') if  flagStartChat
             jQuery("#close-box").toggle('fast') if flagCloseChat
-            jQuery("#NoOp-box").toggle('fast') unless flagNoOperator
-            jQuery("#NoOpSendMail-box").toggle('fast') if flagNoOperatorSuccess
+            jQuery("#no-operator-box").toggle('fast') unless flagNoOperator
+            jQuery("#no-operator-send-mail-box").toggle('fast') if flagNoOperatorSuccess
             flagInChat = false
             flagStartChat = false
             flagCloseChat = false
             flagNoOperator = true
             flagNoOperatorSuccess = false
-            jQuery(".nooperatorbtnmini").attr('src', '<%= asset_url("icons/minus.png") %>')
+            jQuery(".no-operator-btn-mini").attr('src', '<%= asset_url("icons/minus.png") %>')
         when 'NoOperatorSuccess'
             jQuery("#message-box").toggle('fast') if flagInChat
             jQuery("#name-box").toggle('fast') if  flagStartChat
             jQuery("#close-box").toggle('fast') if flagCloseChat
-            jQuery("#NoOp-box").toggle('fast') if flagNoOperator
-            jQuery("#NoOpSendMail-box").toggle('fast') unless flagNoOperatorSuccess
+            jQuery("#no-operator-box").toggle('fast') if flagNoOperator
+            jQuery("#no-operator-send-mail-box").toggle('fast') unless flagNoOperatorSuccess
             flagInChat = false
             flagStartChat = false
             flagCloseChat = false
             flagNoOperator = false
             flagNoOperatorSuccess = true
-            jQuery(".nooperatorsuccessbtnmini").attr('src', '<%= asset_url("icons/minus.png") %>')
+            jQuery(".no-operator-success-btn-mini").attr('src', '<%= asset_url("icons/minus.png") %>')
 
 HideToggle = (CurrentTab) ->
     switch (CurrentTab)
         when 'MessageChatTab'
             jQuery("#message-box").toggle('fast') if flagInChat
             flagInChat = false
-            jQuery(".messagechatbtnmini").attr('src', '<%= asset_url("icons/plus.png") %>')
+            jQuery(".message-chat-btn-mini").attr('src', '<%= asset_url("icons/plus.png") %>')
         when 'StartChatTab'
             jQuery("#name-box").toggle('fast') if flagStartChat
             flagStartChat = false
-            jQuery(".startchatbtnmini").attr('src', '<%= asset_url("icons/plus.png") %>')
+            jQuery(".start-chat-btn-mini").attr('src', '<%= asset_url("icons/plus.png") %>')
         when 'CloseChatTab'
             jQuery("#close-box").toggle('fast') if flagCloseChat
             flagCloseChat = false
-            jQuery(".closechatbtnmini").attr('src', '<%= asset_url("icons/plus.png") %>')
+            jQuery(".close-chat-btn-mini").attr('src', '<%= asset_url("icons/plus.png") %>')
         when 'NoOperatorTab'
-            jQuery("#NoOp-box").toggle('fast') if flagNoOperator
+            jQuery("#no-operator-box").toggle('fast') if flagNoOperator
             flagNoOperator = false
-            jQuery(".nooperatorbtnmini").attr('src', '<%= asset_url("icons/plus.png") %>')
+            jQuery(".no-operator-btn-mini").attr('src', '<%= asset_url("icons/plus.png") %>')
         when 'NoOperatorSuccess'
-            jQuery("#NoOpSendMail-box").toggle('fast') if flagNoOperatorSuccess
+            jQuery("#no-operator-send-mail-box").toggle('fast') if flagNoOperatorSuccess
             flagNoOperatorSuccess = false
-            jQuery(".nooperatorsuccessbtnmini").attr('src', '<%= asset_url("icons/plus.png") %>')
+            jQuery(".no-operator-success-btn-mini").attr('src', '<%= asset_url("icons/plus.png") %>')
 
 BindWidget = (AllData) ->
-    jQuery('#defchat').empty()
-    jQuery('#chatmsgs').empty()
+    jQuery('#def-chat').empty()
+    jQuery('#chat-msgs').empty()
 
     jQuery(".top-img").hide()
     jQuery(".bottom-img").hide()
@@ -1040,8 +997,8 @@ BindWidget = (AllData) ->
     jQuery("#name-box").hide()
     jQuery("#message-box").hide()
     jQuery("#close-box").hide()
-    jQuery("#NoOp-box").hide()
-    jQuery("#NoOpSendMail-box").hide()
+    jQuery("#no-operator-box").hide()
+    jQuery("#no-operator-send-mail-box").hide()
 
     SetPosition(AllData.Collapse)
     startchat(AllData)
@@ -1050,36 +1007,36 @@ BindWidget = (AllData) ->
     WidgetsAnimate(AllData.Collapse)
 
     if AllData.Enable
-        jQuery('.chattableraw').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('.btnsendreq').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('#btnsendemail').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('.sendmess').css('border-top-color', '' + AllData.Color + ' !important')
-        jQuery('.hedertext').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('.hederbtn').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('#inchathead').attr("style", "background: " + AllData.Color + " !important")
-        jQuery('#MessageSend').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('.chattable-raw').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('.btn-send-req').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('#btn-send-email').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('.send-mess').css('border-top-color', '' + AllData.Color + ' !important')
+        jQuery('.heder-text').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('.heder-btn').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('#in-chat-head').attr("style", "background: " + AllData.Color + " !important")
+        jQuery('#message-send').attr("style", "background: " + AllData.Color + " !important")
     if ChatUserInfoID != null && ChatUserInfoID != ""
         if ChatData != null
             if ChatData.Rating == "Like"
-                jQuery('#chatlikes').attr('src', '<%= asset_url("icons/thumbg.svg") %>')
-                jQuery('.chatlikes').removeAttr('id')
+                jQuery('#chat-likes').attr('src', '<%= asset_url("icons/thumbg.svg") %>')
+                jQuery('.chat-likes').removeAttr('id')
             else if ChatData.Rating == "DisLike"
-                jQuery('#chatdislikes').attr('src', '<%= asset_url("icons/thumbr.svg") %>')
-                jQuery('.chatdislikes').removeAttr('id')
+                jQuery('#chat-dislikes').attr('src', '<%= asset_url("icons/thumbr.svg") %>')
+                jQuery('.chat-dislikes').removeAttr('id')
             if ChatData.OperatorName == ""
-                jQuery('#operatorname').text("")
-                jQuery('#inchathead').text("Welcome to LiveChat")
+                jQuery('#operator-name').text("")
+                jQuery('#in-chat-head').text("Welcome to LiveChat")
             else
-                jQuery('#operatorname').text(ChatData.OperatorName)
-                jQuery('#inchathead').text("chat with  " + ChatData.OperatorName)
+                jQuery('#operator-name').text(ChatData.OperatorName)
+                jQuery('#in-chat-head').text("chat with  " + ChatData.OperatorName)
             if ChatData.OperatorImage == ""
-                jQuery('#operatorprofileimg').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
+                jQuery('#operator-profile-img').attr('src', '<%= asset_url("icons/1avatar-operator.png") %>')
             else
-                jQuery('#operatorprofileimg').attr('src', ChatData.OperatorImage)
+                jQuery('#operator-profile-img').attr('src', ChatData.OperatorImage)
             if ChatData.Designation == null
-                jQuery('#operatorrole').text("")
+                jQuery('#operator-role').text("")
             else
-                jQuery('#operatorrole').text(ChatData.Designation)
+                jQuery('#operator-role').text(ChatData.Designation)
 
             flag = true
             for i in ChatData.ChatMessages
@@ -1091,14 +1048,14 @@ BindWidget = (AllData) ->
             ChatContent(ChatData.ChatMessages)
             IsSendRequest = false
             ShowTab('MessageChatTab')
-            ShowToogle('MessageChatTab')
+            ShowToggle('MessageChatTab')
             jQuery(".chattable").show()
             jQuery("#conchat").scrollTop(jQuery("#conchat")[0].scrollHeight)
             jQuery(".top-img").hide()
             jQuery(".bottom-img").hide()
             if !IsOperatorAvailable
-                jQuery('#chatmsgs').append('<div class="inchatmsg NoOpMsgDiv">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
-                jQuery("#conchat").scrollTop(jQuery("#conchat")[0].scrollHeight)
+                jQuery('#chat-msgs').append('<div class="in-chat-msg no-operator-msg-div">An operator has not yet connected. Dont worry, an operator will be by shortly! When they connect, they all see all the messages you have sent so far.</div>')
+                jQuery("#con-chat").scrollTop(jQuery("#con-chat")[0].scrollHeight)
     else
         if IsOperatorAvailable
             if (AllData.Collapse.Position == "Bottom Left" || AllData.Collapse.Position == "Bottom Right")
@@ -1116,41 +1073,41 @@ BindWidget = (AllData) ->
 ShowTab = (CurrentTab) ->
     switch (CurrentTab)
         when 'MessageChatTab'
-            jQuery('#startchat').hide()
-            jQuery('#inchat').show()
-            jQuery('#closechat').hide()
-            jQuery('#Nooperator').hide()
-            jQuery('#NooperatorSent').hide()
+            jQuery('#start-chat').hide()
+            jQuery('#in-chat').show()
+            jQuery('#close-chat').hide()
+            jQuery('#no-operator').hide()
+            jQuery('#no-operator-dent').hide()
         when 'StartChatTab'
-            jQuery('#startchat').show()
-            jQuery('#inchat').hide()
-            jQuery('#closechat').hide()
-            jQuery('#Nooperator').hide()
-            jQuery('#NooperatorSent').hide()
+            jQuery('#start-chat').show()
+            jQuery('#in-chat').hide()
+            jQuery('#close-chat').hide()
+            jQuery('#no-operator').hide()
+            jQuery('#no-operator-dent').hide()
         when 'CloseChatTab'
-            jQuery('#startchat').hide()
-            jQuery('#inchat').hide()
-            jQuery('#closechat').show()
-            jQuery('#Nooperator').hide()
-            jQuery('#NooperatorSent').hide()
+            jQuery('#start-chat').hide()
+            jQuery('#in-chat').hide()
+            jQuery('#close-chat').show()
+            jQuery('#no-operator').hide()
+            jQuery('#no-operator-dent').hide()
         when 'NoOperatorTab'
-            jQuery('#startchat').hide()
-            jQuery('#inchat').hide()
-            jQuery('#closechat').hide()
-            jQuery('#Nooperator').show()
-            jQuery('#NooperatorSent').hide()
+            jQuery('#start-chat').hide()
+            jQuery('#in-chat').hide()
+            jQuery('#close-chat').hide()
+            jQuery('#no-operator').show()
+            jQuery('#no-operator-dent').hide()
         when 'NoOperatorSuccess'
-            jQuery('#startchat').hide()
-            jQuery('#inchat').hide()
-            jQuery('#closechat').hide()
-            jQuery('#Nooperator').hide()
-            jQuery('#NooperatorSent').show()
+            jQuery('#start-chat').hide()
+            jQuery('#in-chat').hide()
+            jQuery('#close-chat').hide()
+            jQuery('#no-operator').hide()
+            jQuery('#no-operator-dent').show()
         when 'AllHide'
-            jQuery('#startchat').hide()
-            jQuery('#inchat').hide()
-            jQuery('#closechat').hide()
-            jQuery('#Nooperator').hide()
-            jQuery('#NooperatorSent').hide()
+            jQuery('#start-chat').hide()
+            jQuery('#in-chat').hide()
+            jQuery('#close-chat').hide()
+            jQuery('#no-operator').hide()
+            jQuery('#no-operator-dent').hide()
 
 getDateTime = (val) ->
     date = new Date(val)
@@ -1188,7 +1145,7 @@ getSetFormate = (val) ->
 
 SetPosition = (val) ->
     if val.Position == "Bottom Left"
-        jQuery('.chatwindow').css
+        jQuery('.chat-window').css
             'bottom': '0'
             'left': '10px'
             'top': ''
@@ -1214,7 +1171,7 @@ SetPosition = (val) ->
                 jQuery(".top-img").show()
                 jQuery(".bottom-img").hide()
     else if val.Position == "Bottom Right"
-        jQuery('.chatwindow').css
+        jQuery('.chat-window').css
             'bottom': '0'
             'left': ''
             'top': ''
@@ -1240,7 +1197,7 @@ SetPosition = (val) ->
                     jQuery(".top-img").show()
                     jQuery(".bottom-img").hide()
     else if val.Position == "Top Left"
-        jQuery('.chatwindow').css
+        jQuery('.chat-window').css
             'bottom': ''
             'left': '10px'
             'top': '0'
@@ -1266,7 +1223,7 @@ SetPosition = (val) ->
                     jQuery(".top-img").hide()
                     jQuery(".bottom-img").show()
     else if val.Position == "Top Right"
-        jQuery('.chatwindow').css
+        jQuery('.chat-window').css
             'bottom': ''
             'left': ''
             'top': '0'
@@ -1294,85 +1251,85 @@ SetPosition = (val) ->
 
 startchat = (val) ->
     ShowTab('StartChatTab')
-    jQuery('#starthead').text(val.StartChat.Title)
-    jQuery('#lblintro').text(val.StartChat.IntroText)
-    jQuery('#txtname').attr('placeholder', val.StartChat.AskforNameInput)
-    jQuery('#txtemails').attr('placeholder', val.StartChat.AskforEmailInput)
-    jQuery('#txtquestion').attr('placeholder', val.StartChat.AskforQuestionInput)
-    jQuery('#sendreqtext').text(val.StartChat.RequestButton)
+    jQuery('#start-head').text(val.StartChat.Title)
+    jQuery('#lbl-intro').text(val.StartChat.IntroText)
+    jQuery('#txt-name').attr('placeholder', val.StartChat.AskforNameInput)
+    jQuery('#txt-emails').attr('placeholder', val.StartChat.AskforEmailInput)
+    jQuery('#txt-question').attr('placeholder', val.StartChat.AskforQuestionInput)
+    jQuery('#send-req-text').text(val.StartChat.RequestButton)
     # Bind Error Message
-    jQuery('#name_error').text(val.ErrorMessage.NameRequired)
-    jQuery('#email_error').text(val.ErrorMessage.EmailValid)
-    jQuery('#2email_error').text(val.ErrorMessage.EmailValid)
-    jQuery('#2qust_error').text(val.ErrorMessage.NoOperatorRequired)
+    jQuery('#name-error').text(val.ErrorMessage.NameRequired)
+    jQuery('#email-error').text(val.ErrorMessage.EmailValid)
+    jQuery('#2email-error').text(val.ErrorMessage.EmailValid)
+    jQuery('#2question-error').text(val.ErrorMessage.NoOperatorRequired)
 
-    jQuery('#name_error').hide()
-    jQuery('#email_error').hide()
-    jQuery('#2email_error').hide()
-    jQuery('#2name_error').hide()
-    jQuery('#2qust_error').hide()
+    jQuery('#name-error').hide()
+    jQuery('#email-error').hide()
+    jQuery('#2email-error').hide()
+    jQuery('#2name-error').hide()
+    jQuery('#2qust-error').hide()
 
 
     if val.StartChat.AskforName
-        jQuery('#txtname').show()
+        jQuery('#txt-name').show()
     else
-        jQuery('#txtname').hide()
+        jQuery('#txt-name').hide()
 
     if val.StartChat.AskforEmail
-        jQuery('#txtemails').show()
+        jQuery('#txt-emails').show()
     else
-        jQuery('#txtemails').hide()
+        jQuery('#txt-emails').hide()
 
     if val.StartChat.AskforQuestion
-        jQuery('#txtquestion').show()
-        jQuery('#lblmsg').show()
+        jQuery('#txt-question').show()
+        jQuery('#lbl-msg').show()
     else
-        jQuery('#txtquestion').hide()
-        jQuery('#lblmsg').hide()
+        jQuery('#txt-question').hide()
+        jQuery('#lbl-msg').hide()
 
     if val.StartChat.AskforDepartment
-        if jQuery('.DrpDepartment').val() != null
+        if jQuery('.drp-department').val() != null
             DepartmentVisible = true
-            jQuery('.DrpDepartment').show()
+            jQuery('.drp-department').show()
         else
             DepartmentVisible = false
-            jQuery('.DrpDepartment').hide()
+            jQuery('.drp-department').hide()
     else
         DepartmentVisible = false
-        jQuery('.DrpDepartment').hide()
+        jQuery('.drp-department').hide()
 
 NoOperator = (val) ->
-    jQuery('#noophead').text(val.NoOperators.Title)
+    jQuery('#no-operator-head').text(val.NoOperators.Title)
     if val.NoOperators.Action == "Hide Widget"
         ShowTab('AllHide')
     else if val.NoOperators.Action == "Show Unavailable Message"
         ShowTab('NoOperatorTab')
-        jQuery('#lblemailintro').text(val.NoOperators.Message)
-        jQuery('#noopname').hide()
-        jQuery('#noopemails').hide()
-        jQuery('#noopquestion').hide()
-        jQuery('#btnsendemail').hide()
+        jQuery('#lbl-email-intro').text(val.NoOperators.Message)
+        jQuery('#no-operator-name').hide()
+        jQuery('#no-operator-emails').hide()
+        jQuery('#no-operator-question').hide()
+        jQuery('#btn-send-email').hide()
     else if val.NoOperators.Action == "Show Email Form"
         ShowTab('NoOperatorTab');
-        jQuery('#lblemailintro').text(val.NoOperators.EmailIntro)
-        jQuery('#noopname').show()
-        jQuery('#noopemails').show()
-        jQuery('#noopquestion').show()
-        jQuery('#btnsendemail').show()
-    jQuery('#noopname').attr('placeholder', val.NoOperators.YourName)
-    jQuery('#noopemails').attr('placeholder', val.NoOperators.YourEmail)
-    jQuery('#noopquestion').attr('placeholder', val.NoOperators.YourQuestion)
-    jQuery('#lblemailSent').text(val.NoOperators.EmailSentText)
-    jQuery('#sendnooptext').text(val.NoOperators.SendButton)
+        jQuery('#lbl-email-intro').text(val.NoOperators.EmailIntro)
+        jQuery('#no-operator-name').show()
+        jQuery('#no-operator-emails').show()
+        jQuery('#nno-operator-question').show()
+        jQuery('#btn-send-email').show()
+    jQuery('#no-operator-name').attr('placeholder', val.NoOperators.YourName)
+    jQuery('#no-operator-emails').attr('placeholder', val.NoOperators.YourEmail)
+    jQuery('#no-operator-question').attr('placeholder', val.NoOperators.YourQuestion)
+    jQuery('#lbl-email-sent').text(val.NoOperators.EmailSentText)
+    jQuery('#send-no-operator-text').text(val.NoOperators.SendButton)
 
 InChat = (val, VisitorName) ->
-    jQuery('#conchat').hide()
-    jQuery('#defchat').show()
-    jQuery('#defchat').append('<lable>' + val.Greeting + ' ' + VisitorName + '!</lable><br/>')
-    jQuery('#defchat').append('<lable>' + val.Connecting + '</lable>')
+    jQuery('#con-chat').hide()
+    jQuery('#def-chat').show()
+    jQuery('#def-chat').append('<lable>' + val.Greeting + ' ' + VisitorName + '!</lable><br/>')
+    jQuery('#def-chat').append('<lable>' + val.Connecting + '</lable>')
     setTimeout ->
-        jQuery('#defchat').empty();
-        jQuery('#defchat').append('<div style="margin-top: 4%;"><img src="<%= asset_url("icons/50-20.png") %>" alt="" /><span style="margin-left: 4%;" id="noopmsg" class="inchatmsg">' + val.Message + '</span></div>');
+        jQuery('#def-chat').empty();
+        jQuery('#def-chat').append('<div style="margin-top: 4%;"><img src="<%= asset_url("icons/50-20.png") %>" alt="" /><span style="margin-left: 4%;" id="no-operator-msg" class="in-chat-msg">' + val.Message + '</span></div>');
     , 1200
 
 CloseChat = (val) ->
@@ -1384,14 +1341,14 @@ CloseChat = (val) ->
         jQuery('#dislike').hide()
 
     if val.CustomLinkButton
-        jQuery('#btntext').show()
+        jQuery('#btn-text').show()
     else
-        jQuery('#btntext').hide()
+        jQuery('#btn-text').hide()
 
-    jQuery('#closehead').text(val.Title);
-    jQuery('.clschatmsg').text(val.ChatClosed);
-    jQuery('#btntext').text(val.ButtonText);
-    jQuery('.likechatdwld').text(val.Download);
+    jQuery('#close-head').text(val.Title);
+    jQuery('.cls-chat-msg').text(val.ChatClosed);
+    jQuery('#btn-text').text(val.ButtonText);
+    jQuery('.like-chat-dwld').text(val.Download);
 
 Pad = (padString, value, length) ->
     str = value.toString()
@@ -1400,7 +1357,7 @@ Pad = (padString, value, length) ->
     return str
 
 ChatContent = (InChatData) ->
-    jQuery("#chatmsgs").empty()
+    jQuery("#chat-msgs").empty()
     if InChatData != undefined || InChatData != null
         if InChatData.length > 0
             for i in InChatData
@@ -1408,14 +1365,14 @@ ChatContent = (InChatData) ->
                 Time = Pad("0", DateTime.getHours(), 2) + ':' + Pad("0", DateTime.getMinutes(), 2);
                 if InChatData[i].IsJoin == "true" || InChatData[i].IsJoin == "True"
                     if InChatData[i].Type != "Visitor"
-                        jQuery('#chatmsgs').append('<div class="inchatmsg">' + InChatData[i].Messagetext + '</div>')
+                        jQuery('#chat-msgs').append('<div class="in-chat-msg">' + InChatData[i].Messagetext + '</div>')
                 else
                     if InChatData[i].Type == "Visitor"
-                        jQuery('#chatmsgs').append('<div><span class="right" style="word-break: break-word;">' + InChatData[i].Messagetext + '<lable class="righttime">' + Time + '</lable></span><div class="clear"></div></div>')
+                        jQuery('#chat-msgs').append('<div><span class="right" style="word-break: break-word;">' + InChatData[i].Messagetext + '<lable class="right-time">' + Time + '</lable></span><div class="clear"></div></div>')
                     else
-                        jQuery('#chatmsgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + InChatData[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + InChatData[i].Messagetext + '<lable class="lefttime">' + Time + '</lable></span><div class="clear"></div></div>')
+                        jQuery('#chat-msgs').append('<div><div style="float: left;height: auto;margin-bottom: 0px;"><img style="width:35px;" src="' + Url + InChatData[i].ImageUrl + '"></div><span class="left" style="word-break: break-word;background: ' + json.Color + '">' + InChatData[i].Messagetext + '<lable class="left-time">' + Time + '</lable></span><div class="clear"></div></div>')
                         jQuery('.left').append('<style>.left:after{border-right:8px solid ' + json.Color + '}</style>')
-            jQuery("#conchat").scrollTop(jQuery("#conchat")[0].scrollHeight)
+            jQuery("#con-chat").scrollTop(jQuery("#con-chat")[0].scrollHeight)
 
 SetImgPosition = (val) ->
     if val.Collapse.Image != 0
@@ -1471,8 +1428,8 @@ SetImgPosition = (val) ->
 
 WidgetsAnimate = (val) ->
     if val.PageLoad != "none"
-        jQuery('.chatwindow').removeClass().addClass(val.PageLoad + ' animated').one 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', ->
+        jQuery('.chat-window').removeClass().addClass(val.PageLoad + ' animated').one 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', ->
             jQuery(this).removeClass()
-            jQuery(this).addClass('chatwindow')
+            jQuery(this).addClass('chat-window')
 
 BindWidget(json)

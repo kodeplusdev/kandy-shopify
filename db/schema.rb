@@ -11,19 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151103051138) do
-
-  create_table "chat_widgets", force: :cascade do |t|
-    t.string   "name"
-    t.boolean  "enabled"
-    t.string   "color"
-    t.string   "json_string"
-    t.integer  "shop_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  add_index "chat_widgets", ["shop_id"], name: "index_chat_widgets_on_shop_id"
+ActiveRecord::Schema.define(version: 20151105085541) do
 
   create_table "profiles", force: :cascade do |t|
     t.string   "first_name"
@@ -73,5 +61,17 @@ ActiveRecord::Schema.define(version: 20151103051138) do
   end
 
   add_index "templates", ["shop_id"], name: "index_templates_on_shop_id"
+
+  create_table "widgets", force: :cascade do |t|
+    t.string   "name",                            null: false
+    t.boolean  "enabled",     default: true
+    t.string   "color",       default: "#000000", null: false
+    t.string   "json_string",                     null: false
+    t.integer  "shop_id"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "widgets", ["shop_id"], name: "index_widgets_on_shop_id"
 
 end

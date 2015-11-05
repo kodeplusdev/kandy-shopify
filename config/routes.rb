@@ -1,9 +1,5 @@
 KandyApp::Application.routes.draw do
 
-  resources :chat_widgets
-
-  get 'widget-preview' => 'chat_widgets#widget_preview', as: 'widget_preview'
-
   controller :sessions do
     get 'login' => :new, :as => :login
     post 'login' => :create, :as => :authenticate
@@ -31,6 +27,10 @@ KandyApp::Application.routes.draw do
   end
 
   scope 'preferences' do
+    controller :widgets do
+      resources :widgets
+      get 'preview' => :preview
+    end
     controller :preferences do
       get '/' => :index, as: :preferences
       get 'api-keys' => :api_keys
