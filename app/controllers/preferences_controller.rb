@@ -18,12 +18,25 @@ class PreferencesController < ApplicationController
         if res['status'] == 1
           flash[:error] = res['message']
         else
-          @shop.kandy_access_token = res['result']['user_access_token']
-          @shop.save
-          flash[:notice] = 'Updated successfull'
+          unless @shop.kandy_password_test.blank?
+            kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
+
+            @shop.kandy_username_test = @shop.kandy_username.split('@').first unless @shop.kandy_username.blank?
+            res = kandy.get_user_access_token(@shop.kandy_username_test, @shop.kandy_password_test)
+
+            if res['status'] == 1
+              flash[:error] = res['message']
+            else
+              @shop.kandy_access_token_test = res['result']['user_access_token']
+              @shop.save
+              flash[:notice] = 'Updated successful'
+            end
+          else
+            flash[:notice] = 'Updated successful'
+          end
         end
       else
-        flash[:notice] = 'Updated successfull'
+        flash[:notice] = 'Updated successful'
       end
     else
       flash[:error] = @shop.errors.full_messages.first

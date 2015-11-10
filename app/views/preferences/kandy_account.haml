@@ -42,6 +42,17 @@
           %abbr{title: 'required'} *
           = f.password_field :kandy_password, class: 'form-control input-sm', placeholder: 'password'
           .small.help-block We only save your token (not password). Leave blank for not change.
+        .form-group
+          .pull-right.help-block.hide
+            %a{href: '#'} Test login
+          = f.label :kandy_username_test, 'Username Guest'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_username_test, class: 'form-control input-sm', placeholder: 'username@domain.com'
+        .form-group
+          = f.label :kandy_password_test, 'Password Guest'
+          %abbr{title: 'required'} *
+          = f.password_field :kandy_password_test, class: 'form-control input-sm', placeholder: 'password'
+          .small.help-block We only save your token (not password). Leave blank for not change.
         -#.form-group
           = label_tag :kandy_access_token, 'Your access token'
           = f.text_field :kandy_access_token, class: 'form-control input-sm', readonly: ''

@@ -37,15 +37,17 @@ ActiveRecord::Schema.define(version: 20151105085541) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "shops", force: :cascade do |t|
-    t.string   "shopify_domain",                     null: false
-    t.string   "shopify_token",                      null: false
-    t.boolean  "initialized",        default: false
+    t.string   "shopify_domain",                          null: false
+    t.string   "shopify_token",                           null: false
+    t.boolean  "initialized",             default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "kandy_api_key"
     t.string   "kandy_api_secret"
     t.string   "kandy_username"
     t.string   "kandy_access_token"
+    t.string   "kandy_username_test"
+    t.string   "kandy_access_token_test"
   end
 
   add_index "shops", ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
@@ -65,8 +67,8 @@ ActiveRecord::Schema.define(version: 20151105085541) do
   create_table "widgets", force: :cascade do |t|
     t.string   "name",                            null: false
     t.boolean  "enabled",     default: true
-    t.string   "color",       default: "#000000", null: false
-    t.string   "json_string",                     null: false
+    t.string   "color",       default: "#000000"
+    t.text     "json_string"
     t.integer  "shop_id"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false

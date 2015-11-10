@@ -92,7 +92,7 @@ body {
     }
 }
 
-#myTabs {
+.no-border {
     border: 0;
 }
 
@@ -100,4 +100,31 @@ body {
     height: 100%;
     width: 100%;
     border: 0;
+}
+
+.message-display-container {
+  height: 300px;
+  overflow-y: auto;
+  padding-top: -15px;
+  .list-group-item {
+    border: 0;
+  }
+}
+
+.agent-message {
+  background-color: #f1f0ec;
+}
+
+.visitor-message {
+  .media-body {
+    width: 100%;
+  }
+  .media-right {
+    padding-left: inherit;
+  }
+}
+
+.field_with_errors {
+  @extend .form-group;
+  @extend .has-error;
 }

@@ -7,7 +7,7 @@ class Shop < ActiveRecord::Base
   has_many :widgets
 
   accepts_nested_attributes_for :template, :profile
-  attr_accessor :kandy_password
+  attr_accessor :kandy_password, :kandy_password_test
 
 
 end

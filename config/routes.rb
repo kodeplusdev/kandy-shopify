@@ -30,6 +30,7 @@ KandyApp::Application.routes.draw do
     controller :widgets do
       resources :widgets
       get 'preview' => :preview
+      post 'widgets/:id' => :update
     end
     controller :preferences do
       get '/' => :index, as: :preferences

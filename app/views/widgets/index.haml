@@ -38,11 +38,11 @@
             %td= widget.id
             %td= widget.name
             %td
-              %button.btn.btn-sm.btn-default
+              %a.btn.btn-sm.btn-default{href: edit_widget_path(widget)}
                 %i.fa.fa-edit
             %td
-              %button.btn.btn-sm.btn-primary
+              %a.btn.btn-sm.btn-primary{href: '#'}
                 %i.fa.fa-lock
             %td
-              %button.btn.btn-sm.btn-danger
+              %a.btn.btn-sm.btn-danger{href: widget_path(widget), 'data-confirm': 'Are you sure?', 'rel': 'nofollow', 'data-method': 'delete'}
                 %i.fa.fa-times-circle-o

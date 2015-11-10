@@ -223,6 +223,7 @@ DEPENDENCIES
   dotenv-rails
   haml
   jquery-rails (~> 4.0.4)
+  json
   less-rails-bootstrap
   liquid-rails
   pg
