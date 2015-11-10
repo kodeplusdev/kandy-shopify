@@ -54,6 +54,12 @@ class PreferencesController < ApplicationController
   end
 
   def chat_box_widget
+    if @shop.widget.json_string.blank?
+      @shop.widget.json_string = Widget.DEFAULT
+    end
+  end
+
+  def chat_box_widget_preview
   end
 
   private
@@ -65,6 +71,15 @@ class PreferencesController < ApplicationController
   def shop_params
     params.require(:shop).permit(:id, :kandy_api_key, :kandy_api_secret, :kandy_username, :kandy_password,
                                  template_attributes: [:id, :order_creation, :order_update, :order_payment, :customer_creation],
-                                 profile_attributes: [:id, :first_name, :last_name, :phone_number, :email])
+                                 profile_attributes: [:id, :first_name, :last_name, :phone_number, :email],
+                                 widget_attributes: [:id, :name, :enabled, :color,
+                                                     json_string: [
+                                                         collapse: [:title, :position, :type, :image, :custom_image_url, :horizontal, :vertical, :scale, :image_in_front_of_tab, :page_load, :show_widget_hide_button],
+                                                         start_chat: [:title, :intro_text, :request_button, :ask_for_name, :ask_for_name_text, :ask_for_email, :ask_for_email_text, :ask_for_question, :ask_for_question_text, :ask_for_department],
+                                                         no_operators: [:title, :action, :message, :central_email, :email_intro, :name, :email, :question, :email_sent_text, :send_button],
+                                                         in_chat: [:title, :message, :no_operators, :greeting, :connecting, :typing, :joined_chat, :send_message],
+                                                         chat_close: [:title, :chat_closed, :download, :ask_for_rating],
+                                                         error_messages: [:name_required, :email_validation, :no_operator_required]
+                                                     ]])
   end
 end

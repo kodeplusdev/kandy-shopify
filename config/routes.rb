@@ -27,17 +27,13 @@ KandyApp::Application.routes.draw do
   end
 
   scope 'preferences' do
-    controller :widgets do
-      resources :widgets
-      get 'preview' => :preview
-      post 'widgets/:id' => :update
-    end
     controller :preferences do
       get '/' => :index, as: :preferences
-      get 'api-keys' => :api_keys
-      get 'kandy-account' => :kandy_account
-      get 'sms-alert-templates' => :sms_alert_templates
-      get 'chat-box-widget' => :chat_box_widget
+      get 'api-keys' => :api_keys, as: 'api_keys'
+      get 'kandy-account' => :kandy_account, as: 'kandy_account'
+      get 'sms-alert-templates' => :sms_alert_templates, as: 'sms_alert_templates'
+      get 'chat-box-widget' => :chat_box_widget, as: 'chat_box_widget'
+      get 'chat-box-widget-preview' => :chat_box_widget_preview, as: 'chat_box_widget_preview'
       post 'update' => :update
     end
   end

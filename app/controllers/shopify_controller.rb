@@ -7,6 +7,7 @@ class ShopifyController < ApplicationController
     @shop.initialized = true
     @shop.template = Template.new
     @shop.profile = Profile.new
+    @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: false)
     @shop.save
     session[:initialized] = 1
 
@@ -16,7 +17,7 @@ class ShopifyController < ApplicationController
   end
 
   def script_tags
-    @shop = params[:shop]
+    @shop = Shop.find_by_shopify_domain(params[:shop])
     render layout: false
   end
 

@@ -5,4 +5,9 @@ class SessionsController < ApplicationController
     reset_session
     super
   end
+
+  def callback
+    reset_session
+    super
+  end
 end
