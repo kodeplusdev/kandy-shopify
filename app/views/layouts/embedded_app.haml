@@ -9,10 +9,15 @@
         shopOrigin: "https://#{@shop_session.url if @shop_session}"
         debug: true
 
-      if "#{flash[:notice]}" != ""
-        ShopifyApp.flashNotice("#{flash[:notice]}")
-      if "#{flash[:error]}" != ""
-        ShopifyApp.flashError("#{flash[:error]}")
+      ShopifyApp.ready ->
+        if "#{flash[:notice]}" != ""
+          ShopifyApp.flashNotice("#{flash[:notice]}")
+        if "#{flash.now[:notice]}" != ""
+          ShopifyApp.flashNotice("#{flash.now[:notice]}")
+        if "#{flash[:error]}" != ""
+          ShopifyApp.flashError("#{flash[:error]}")
+        if "#{flash.now[:error]}" != ""
+          ShopifyApp.flashError("#{flash.now[:error]}")
     = stylesheet_link_tag 'application'
     = javascript_include_tag 'application'
     = csrf_meta_tags

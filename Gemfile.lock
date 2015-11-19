@@ -41,6 +41,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     arel (6.0.0)
+    bcrypt (3.1.10)
     bootstrap-sass (3.3.1.0)
       sass (~> 3.2)
     builder (3.2.2)
@@ -54,6 +55,19 @@ GEM
     coffee-script-source (1.9.1.1)
     commonjs (0.2.7)
     daemons (1.2.2)
+    devise (3.5.1)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      responders
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
+    devise_invitable (1.5.3)
+      actionmailer (>= 3.2.6, < 5)
+      devise (>= 3.2.0)
+    devise_lastseenable (0.0.6)
+      devise
+      rails (>= 3.0.4)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.0.2)
@@ -73,6 +87,9 @@ GEM
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.7.0)
+    jbuilder (2.3.2)
+      activesupport (>= 3.0.0, < 5)
+      multi_json (~> 1.2)
     jquery-rails (4.0.4)
       rails-dom-testing (~> 1.0)
       railties (>= 4.2.0)
@@ -125,6 +142,7 @@ GEM
       omniauth (~> 1.2)
     omniauth-shopify-oauth2 (1.1.10)
       omniauth-oauth2 (~> 1.2)
+    orm_adapter (0.5.0)
     pg (0.18.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -135,6 +153,7 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.2)
+    rack-cors (0.3.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.2)
@@ -167,6 +186,8 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
     ref (1.0.5)
+    responders (2.1.0)
+      railties (>= 4.2.0, < 5)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
@@ -213,6 +234,8 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
+    warden (1.2.3)
+      rack (>= 1.0)
 
 PLATFORMS
   ruby
@@ -220,8 +243,12 @@ PLATFORMS
 DEPENDENCIES
   bootstrap-sass
   coffee-rails
+  devise
+  devise_invitable
+  devise_lastseenable
   dotenv-rails
   haml
+  jbuilder
   jquery-rails (~> 4.0.4)
   json
   less-rails-bootstrap
@@ -229,6 +256,7 @@ DEPENDENCIES
   pg
   pry-rails
   quiet_assets
+  rack-cors
   rails (= 4.2.2)
   rails-settings-cached (~> 0.4.0)
   rest-client

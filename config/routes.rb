@@ -1,5 +1,7 @@
 KandyApp::Application.routes.draw do
 
+  devise_for :users
+
   controller :sessions do
     get 'login' => :new, :as => :login
     post 'login' => :create, :as => :authenticate
@@ -44,9 +46,29 @@ KandyApp::Application.routes.draw do
     end
   end
 
+  scope '/chat' do
+    controller :chat do
+      post 'widget' => :widget, as: 'chat_widget'
+      get 'online' => :check, as: 'chat_check_online'
+      post 'online' => :ping, as: 'chat_ping_online'
+      post 'change-user-status' => :change_user_status, as: 'change_user_status'
+      post 'request' => :request_chat, as: 'chat_request'
+      post 'join' => :join_chat, as: 'chat_join'
+      post 'leave' => :leave_chat, as: 'chat_leave'
+      post 'close' => :close_chat, as: 'chat_close'
+      post 'save' => :save_message, as: 'chat_save'
+      post 'rating' => :rating, as: 'chat_rating'
+      get 'load' => :load_chat, as: 'chat_load'
+      post 'send-mail' => :send_mail, as: 'chat_send_mail'
+      get 'download' => :download, as: 'chat_download'
+      post 'ban' => :ban, as: 'chat_ban'
+    end
+  end
+
   scope '/app' do
     controller :shopify do
       get 'installed' => :installed
+      post 'installed' => :setup
       get 'script-tags' => :script_tags
     end
   end

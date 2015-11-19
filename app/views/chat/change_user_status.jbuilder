@@ -1,0 +1,1 @@
+json.status @user.status

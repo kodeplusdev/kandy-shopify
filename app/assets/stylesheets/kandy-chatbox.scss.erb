@@ -38,7 +38,11 @@
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
-.chattable-raw .heder-text {
+.chattable td {
+  padding: 0;
+}
+
+.chattable-raw .header-text {
     width: 76%;
     color: #fff;
     -moz-border-radius: 5px 0px 0 0px;
@@ -70,7 +74,7 @@
     cursor: pointer;
 }
 
-.chattable-raw .heder-btn {
+.chattable-raw .header-btn {
     width: 8%;
     color: #fff;
     -moz-border-radius: 0px 5px 0px 0;
@@ -82,7 +86,7 @@
     padding: 0px;
 }
 
-.chattable-raw .heder-btn .btn-img {
+.chattable-raw .header-btn .btn-img {
     width: 20px;
     align-self: flex-end;
     margin-bottom: 0px;
@@ -128,7 +132,7 @@
 .chattable .name-messages {
     border: 1px solid #dcdcdc;
     background: #fff;
-    /*overflow: auto;*/
+    overflow: auto;
     margin-top: -1%;
     color: gray !important;
     font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif !important;
@@ -402,7 +406,7 @@ button a {
     }
 }
 
-.heder-btn a {
+.header-btn a {
     background: rgba(0, 0, 0, 0.34);
     display: block;
     line-height: 43px;
@@ -486,3 +490,21 @@ button a {
     transform: translateY(-8px);
 }
 
+#in-chat-head {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+#in-chat {
+  #def-chat {
+    label {
+      font-size: 12px;
+    }
+  }
+  textarea {
+    min-height: inherit;
+    font-size: 11px;
+  }
+}

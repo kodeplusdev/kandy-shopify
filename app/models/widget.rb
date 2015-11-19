@@ -38,10 +38,10 @@ class Widget < ActiveRecord::Base
             type: 'ti',
             vertical: 50
         },
-        color: '#000000',
+        color: '#5cb85c',
         enable: true,
         error_messages: {
-            email_validation: 'Please Enter Valid Email.',
+            email_valid: 'Please Enter Valid Email.',
             name_required: 'Please Enter Name.',
             no_operator_required: 'Please Enter Name, Email and Question.'
         },
@@ -49,11 +49,14 @@ class Widget < ActiveRecord::Base
             connecting: 'Connecting you to the chat now...',
             greeting: 'Hello,',
             joined_chat: 'has joined the chat!',
+            left_chat: 'has left the chat',
+            closed_chat: 'has closed the chat',
             message: 'An operator will be right with you!',
             no_operators: 'An operator has not yet connected. Don\'t worry, an operator will be by shortly! When they connect, they\'ll see all the messages you\'ve sent so far.',
-            send_message: 'Enter Your Message and press Enter to send',
-            title: 'Chatting with.',
-            typing: 'is typing'
+            send_message: 'Type your message here and press <enter> to send.',
+            title: 'Chatting with',
+            typing: 'is typing',
+            start_message: 'Hi! Can we answer a question for you?'
         },
         no_operators: {
             action: 'e',
@@ -75,6 +78,7 @@ class Widget < ActiveRecord::Base
             ask_for_name_text: 'Enter your name here',
             ask_for_question: false,
             ask_for_question_text: 'Enter your question here',
+            ask_for_department: false,
             intro_text: 'Enter your info below to begin.',
             popout_automatically: false,
             request_button: 'Send Chat Request',

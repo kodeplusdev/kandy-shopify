@@ -19,90 +19,90 @@
 @import "select2-bootstrap";
 
 body {
-    @extend .jumbotron;
-    padding-top: 10px;
+  @extend .jumbotron;
+  padding-top: 10px;
 }
 
 .jumbotron {
-    padding: 15px 5px 5px 5px;
+  padding: 15px 5px 5px 5px;
 }
 
 .widget {
-    border-radius: 5px;
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    margin-top: 10px;
+  border-radius: 5px;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 
-    &.style1 {
-        h2 {
-            font-size: 30px;
-        }
+  &.style1 {
+    h2 {
+      font-size: 30px;
     }
+  }
 }
 
 .vertical-align {
-    h2, h3 {
-        margin: 0;
-    }
+  h2, h3 {
+    margin: 0;
+  }
 
-    div {
-        display: inline-block;
-        vertical-align: middle;
-    }
+  div {
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 
 .font-bold {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .pad-right {
-    padding-right: 10px;
+  padding-right: 10px;
 }
 
 .pad-left {
-    padding-left: 10px;
+  padding-left: 10px;
 }
 
 .pad-top {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 .pad-bottom {
-    padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .pad {
-    @extend .pad-top, .pad-bottom, .pad-left, .pad-right;
+  @extend .pad-top, .pad-bottom, .pad-left, .pad-right;
 }
 
 .form-horizontal .form-group input[type='range'] {
-    margin-top: 8px;
+  margin-top: 8px;
 }
 
 .form-group .select2 {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .panel-content {
-    background-color: #eeeeee;
-    padding-top: 20px;
+  background-color: #eeeeee;
+  padding-top: 20px;
 
-    .panel {
-        min-height: 300px;
-    }
+  .panel {
+    min-height: 300px;
+  }
 }
 
 .no-border {
-    border: 0;
+  border: 0;
 }
 
 #preview-panel, iframe {
-    height: 100%;
-    width: 100%;
-    border: 0;
+  height: 100%;
+  width: 100%;
+  border: 0;
 }
 
-.message-display-container {
+.messages-display-container {
   height: 300px;
   overflow-y: auto;
   padding-top: -15px;
@@ -116,15 +116,64 @@ body {
 }
 
 .visitor-message {
-  .media-body {
-    width: 100%;
+  /*.media-heading {*/
+  //  @extend .pull-right
+  /*}*/
+  /*.media-body {*/
+  /*width: 100%;*/
+  /*}*/
+  /*.media-right {*/
+  /*padding-left: inherit;*/
+  /*}*/
+}
+
+#conversation-tabs-content .list-group-item {
+  h4 small {
+    font-size: 11px;
   }
-  .media-right {
-    padding-left: inherit;
+  img {
+    width: 48px;
+    height: 48px;
   }
+}
+
+.status-message {
+  color: gray;
+  font-size: 11px;
+  text-align: center;
 }
 
 .field_with_errors {
   @extend .form-group;
   @extend .has-error;
+}
+
+.dropdown-li {
+  display: inline-block !important;
+}
+
+.dropdown-link {
+  display: inline-block !important;
+  //padding-right: 4px !important;
+}
+
+.dropdown-caret {
+  display: inline-block !important;
+  padding-left: 4px !important;
+  margin-left: -10px;
+}
+
+.nav-tabs > li {
+  a {
+    margin-right: inherit;
+  }
+  &.active {
+    a.dropdown-link {
+      border-right: 0;
+      margin-right: 1px;
+    }
+    a.dropdown-caret {
+      border-left: 0;
+    }
+  }
 }

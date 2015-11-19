@@ -1,0 +1,479 @@
+window.onerror = ->
+  return true
+
+$(document).ready ->
+  $('#user-status-btn').click ->
+    jQuery.ajax
+      url: chatData.shop.host + 'chat/change-user-status'
+      type: 'POST'
+      dataType: 'json'
+      success: (res) ->
+        updateOperatorStatus(res.status)
+
+
+window.isConnected = ->
+  jQuery.ajax
+    url: loadChatUrl
+    type: 'GET'
+    dataType: 'json'
+    success: (res) ->
+      window.chatData = res
+
+      setInterval ->
+        jQuery.ajax
+          url: res.shop.host + 'chat/online'
+          type: 'POST'
+          dataType: 'json'
+      , 15 * 1000
+
+      updateOperatorStatus(res.me.status)
+
+      if res.users
+        for u in res.users
+          $('#users-online-list').append """
+            <a href='#' class='list-group-item'>#{u.display_name}</a>
+          """
+
+      if res.conversations
+        for c in res.conversations
+          displayMessage(c)
+
+window.displayMessage = (c) ->
+  time = new Date(c.created_at)
+  $('#conversations-list').append """
+    <a id="conversation-#{c.id}" href='#' class='list-group-item'>
+      <span class='badge'>#{time.toLocaleTimeString()}</span>
+      <h5 class='list-group-item-heading'>#{c.title}</h5>
+      <div class='list-group-item-text'>#{c.location.country_name}</div>
+    </a>
+  """
+  if checkOperatorJoined(c.id)
+    displayConversation(c)
+
+  $('#conversation-' + c.id).click ->
+    notifyOperatorJoinedChat(c.id)
+    displayConversation(c)
+
+window.displayHistoryMessages = (messages) ->
+  for m in messages
+    json = JSON.parse(m.message.json)
+    if json.is_joined
+      appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}")
+    else if json.is_left
+      appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.left_chat}")
+    else if json.type == 'o'
+      appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
+    else if json.type == 'v'
+      appendVisitorMessage(json.id, json.text, m.timestamp)
+
+window.displayConversation = (c) ->
+  $('#conversations-dashboard').show()
+  $('#welcome-dashboard').hide()
+
+  unless $('#conversation-tabs-' + c.id).length
+    $('#conversation-tabs').append """
+      <li class="dropdown dropdown-li" id="conversation-tabs-#{c.id}" role='presentation'>
+          <a class="dropdown-link disabled" href="#conversation-tabs-content-#{c.id}"
+          aria-controls="conversation-tabs-content-#{c.id}" role="tab" data-toggle="tab">
+            #{c.title}
+          </a>
+          <a class="dropdown-caret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
+          <ul class="dropdown-menu">
+              <li><a href="#" onclick="notifyOperatorCloseChat(#{c.id})">End chat</a></li>
+              <li><a href="#" onclick="notifyOperatorLeftChat(#{c.id})">Leave chat</a></li>
+              <li><a href="#" onclick="inviteNewOperator(#{c.id})">Invite operator</a></li>
+          </ul>
+      </li>
+    """
+    $('#conversation-tabs-content').append """
+      <div class="tab-pane" id="conversation-tabs-content-#{c.id}" role="tabpanel">
+        <div class="panel">
+          <div class="panel-body">
+            <div class="row messages-display-container">
+              <div class="list-group">
+              </div>
+            </div>
+            <div class="row send-form-container">
+              <form>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <textarea class="form-control" rows="3" placeholder="Type and press [enter]"></textarea>
+                  </div>
+                  <div class="col-sm-2">
+                    <button class="btn btn-sm btn-success">
+                      <i class="fa fa-send"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    """
+
+    displayHistoryMessages(c.messages)
+    displayInfoVisitor(c)
+
+
+
+    $("#conversation-tabs-#{c.id}").on 'show.bs.tab', ->
+      displayInfoVisitor(c)
+
+    $("#conversation-tabs-content-#{c.id} form textarea").keypress (e) ->
+      typingChecking()
+      if e.keyCode is 13
+        msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
+        if msg isnt ''
+          sendNewMessageToVisitor(c.id, msg)
+        $("#conversation-tabs-content-#{c.id} form textarea").val('')
+        removeTyping()
+        return false
+
+    $("#conversation-tabs-content-#{c.id} form button").click (e) ->
+      e.preventDefault()
+      msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
+      if msg isnt ''
+        sendNewMessageToVisitor(c.id, msg)
+      $("#conversation-tabs-content-#{c.id} form textarea").val('')
+
+    $('.dropdown-toggle').dropdown()
+
+  $('#conversation-tabs > .active').removeClass('active')
+  $('#conversation-tabs-content > .active').removeClass('active')
+
+  $('#conversation-tabs-' + c.id).addClass('active')
+  $('#conversation-tabs-content-' + c.id).addClass('active')
+
+  $('#conversation-tabs a[data-toggle="tab"]').click (e) ->
+    e.preventDefault()
+    $(this).tab('show')
+
+
+window.sendNewMessageToVisitor = (id, text) ->
+  json =
+    id: id
+    type: 'o'
+    text: text
+    cmd: 'new_message'
+    avatar: chatData.me.avatar
+    display_name: chatData.me.display_name
+    user_id: chatData.me.id
+
+  KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
+    msg.timestamp = new Date().getTime()
+    appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, msg.timestamp)
+    saveMessage(id, msg)
+  , (msg) ->
+    displayErrorMessage(msg)
+
+  KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
+    console.log(msg)
+  , (msg) ->
+    displayErrorMessage(msg)
+
+window.appendOperatorMessage = (id, name, avatar, msg, time) ->
+  DateTime = new Date(Number(time))
+  Time = DateTime.toLocaleString()
+
+  elems = "#conversation-tabs-content-#{id} .messages-display-container"
+  if !avatar || avatar == ''
+    avatar = '<%= asset_url('avatars/1avatar-operator.png') %>'
+  $("#{elems}  .list-group").append """
+    <div class="list-group-item agent-message">
+      <div class="media">
+        <div class="media-left">
+          <img class="media-object" src="#{avatar}">
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
+            #{msg}
+        </div>
+      </div>
+    </div>
+  """
+  $(elems).scrollTop($(elems)[0].scrollHeight)
+
+window.appendVisitorMessage = (id, msg, time) ->
+  DateTime = new Date(Number(time))
+  Time = DateTime.toLocaleString()
+
+  elems = "#conversation-tabs-content-#{id} .messages-display-container"
+  $("#{elems}  .list-group").append """
+    <div class="list-group-item visitor-message">
+      <div class="media">
+        <div class="media-left">
+          <img class="media-object" src="<%= asset_url('avatars/visitor-avatar-thick.png') %>">
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">Visitor <small>- #{Time}</small></h4>
+          #{msg}
+        </div>
+      </div>
+    </div>
+  """
+  $(elems).scrollTop($(elems)[0].scrollHeight)
+
+window.appendStatusChange = (id, msg) ->
+  elems = "#conversation-tabs-content-#{id} .messages-display-container"
+  $("#{elems}  .list-group").append """
+    <div class="pad-top pad-bottom status-message">#{msg}</div>
+  """
+  $(elems).scrollTop($(elems)[0].scrollHeight)
+
+window.typingChecking = ->
+
+window.removeTyping = ->
+
+window.saveMessage = (id, msg) ->
+  for c in chatData.conversations
+    if c.id == id
+      c.messages.push(msg)
+  jQuery.ajax
+    url: chatData.shop.host + 'chat/save'
+    type: 'post'
+    dataType: 'json'
+    data:
+      id: id
+      message: msg
+    success: ->
+
+window.updateOperatorStatus = (status) ->
+  $('#user-status-btn').removeClass('hide')
+  if status is 1
+    $('#user-status-btn').removeClass('btn-warning')
+    $('#user-status-btn').addClass('btn-success')
+    $('#user-status-btn').text('Available')
+  else
+    $('#user-status-btn').removeClass('btn-success')
+    $('#user-status-btn').addClass('btn-warning')
+    $('#user-status-btn').text('Unavailable')
+
+window.displayInfoVisitor = (conversation) ->
+  $('#conversation-detail').html """
+    <div class="row">
+      <b>Name: </b> #{conversation.name}
+    </div>
+    <div class="row">
+      <b>Email: </b> #{conversation.email}
+    </div>
+    <div class="row">
+      <b>IP: </b> #{conversation.location.ip}
+    </div>
+  """
+
+  $('#conversation-history').html ->
+    html = "<ul>"
+    for h in conversation.histories
+      html += "<li><a href=\'#\' target='_blank'>#{h.created_at}</a></li>"
+    html += "</ul>"
+
+  $('#conversation-location').html """
+    <iframe allowfullscreen="" frameborder="0" height="300"
+      src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d16057920.548641127!2d97.664496763505!3d10.70431336366971!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1zNzQgxJHGsOG7nW5nIDM2IHAgbGluaCDEkcO0bmcgcSB0aOG7pyDEkeG7qWMgdHAgaOG7kyBjaMOtIG1pbmg!5e0!3m2!1sen!2s!4v1446966827278"
+      style="border:0" width="270"></iframe>
+  """
+
+window.checkOperatorJoined = (id) ->
+  if chatData.me.conversations
+    for c in chatData.me.conversations
+      if c.id == id
+        return true
+  return false
+
+
+window.notifyOperatorJoinedChat = (id) ->
+  unless checkOperatorJoined(id)
+    jQuery.ajax
+      url: chatData.shop.host + 'chat/join'
+      type: 'POST'
+      dataType: 'json'
+      data:
+        id: id
+      success: (res) ->
+        chatData.me.conversations.push({id: id})
+        for c in chatData.conversations
+          if c.id == id
+            c.operators.push({id: chatData.me.id})
+        json =
+          id: id
+          display_name: chatData.me.display_name
+          cmd: 'new_message'
+          type: 'o'
+          avatar: chatData.me.avatar
+          role: chatData.me.role
+          is_joined: true
+        KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
+          msg.timestamp = new Date().getTime()
+          saveMessage(id, msg)
+        , (msg) ->
+          displayErrorMessage(msg)
+        KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
+          console.log(msg)
+        , (msg) ->
+          displayErrorMessage(msg)
+      error: (e) ->
+        console.log(e)
+
+window.notifyOperatorLeftChat = (id) ->
+  $("#conversation-tabs-#{id}").remove()
+  $("#conversation-tabs-content-#{id}").remove()
+  $('#conversation-detail').html('')
+  $('#conversation-location').html('')
+
+  if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
+    $('#conversations-dashboard').hide()
+    $('#welcome-dashboard').show()
+
+  if checkOperatorJoined(id)
+    jQuery.ajax
+      url: chatData.shop.host + 'chat/leave'
+      type: 'POST'
+      dataType: 'json'
+      data:
+        id: id
+      success: (res) ->
+        for c in chatData.me.conversations
+          if c.id == id
+            idx = chatData.me.conversations.indexOf(c)
+            chatData.me.conversations.splice(idx, 1)
+            break
+        for c in chatData.conversations
+          if c.id == id
+            for o in c.operators
+              if o.id == chatData.me.id
+                idx = c.operators.indexOf(o)
+                c.operators.splice(idx, 1)
+        json =
+          id: id
+          display_name: chatData.me.display_name
+          cmd: 'new_message'
+          type: 'o'
+          avatar: chatData.me.avatar
+          role: chatData.me.role
+          is_left: true
+        KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
+          msg.timestamp = new Date().getTime()
+          saveMessage(id, msg)
+          console.log(msg)
+        , (msg) ->
+          displayErrorMessage(msg)
+        KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
+          console.log(msg)
+        , (msg) ->
+          displayErrorMessage(msg)
+      error: (e) ->
+        console.log(e)
+
+window.notifyOperatorCloseChat = (id) ->
+  jQuery.ajax
+    url: chatData.shop.host + 'chat/close'
+    type: 'POST'
+    dataType: 'json'
+    data:
+      id: id
+    success: () ->
+      json =
+        cmd: 'notify_close_chat'
+        id: id
+        display_name: chatData.me.display_name
+        type: 'o'
+      KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
+        msg.timestamp = new Date().getTime()
+        saveMessage(id, msg)
+      , (msg) ->
+        console.log(msg)
+      KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
+        console.log(msg)
+      , (msg) ->
+        console.log(msg)
+
+window.closeChat = (id, msg) ->
+  if $("#conversation-tabs-#{id}").length
+    appendStatusChange(id, msg)
+    $("#conversation-tabs-content-#{id} .send-form-container").html """
+      <center>
+        <a href="#{chatData.shop.host + '/chat/download?id=' + id}" class="btn" alt="Download">
+          <i class="fa fa-cloud-download fa-2x"></i>
+        </a>
+        <a href="#" class="btn" onclick="sendMailConversation(#{id})" alt="Email">
+          <i class="fa fa-envelope-o fa-2x"></i>
+        </a>
+        <a href="#" class="btn" onclick="banVisitorIP(#{id})" alt="Ban IP">
+          <i class="fa fa-ban fa-2x"></i>
+        </a>
+        <a href="#" class="btn" onclick="closeConversationTab(#{id})" alt="Close">
+          <i class="fa fa-times fa-2x"></i>
+        </a>
+      </center>
+    """
+  else
+    closeConversationTab(id)
+
+window.sendMailConversation = (id) ->
+
+window.banVisitorIP = (id) ->
+
+window.inviteNewOperator = (id) ->
+
+window.closeConversationTab = (id) ->
+  $("#conversation-tabs-#{id}").remove()
+  $("#conversation-tabs-content-#{id}").remove()
+  $('#conversation-detail').html('')
+  $('#conversation-location').html('')
+  $("#conversation-#{id}").remove()
+  if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
+    $('#conversations-dashboard').hide()
+    $('#welcome-dashboard').show()
+
+window.displayErrorMessage = (msg) ->
+  console.log(msg)
+
+window.handleEventListeners = (data) ->
+  console.log(data)
+  data.message.json = JSON.parse(data.message.json)
+  if isValidChat (data)
+    json = data.message.json
+    switch json.cmd
+      when 'new_chat'
+        if json.domain_id && json.domain_id isnt '' && Number(json.domain_id) == chatData.shop.id
+          addNewChat(data)
+      when 'new_message'
+        addNewMessage(data)
+      when 'notify_close_chat'
+        closeChat(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.closed_chat}")
+
+window.addNewChat = (data) ->
+  c = data.message.json
+  time = new Date(c.created_at)
+  $('#conversations-list').append """
+    <a id="conversation-#{c.id}" href='#' class='list-group-item'>
+      <span class='badge'>#{time.toLocaleTimeString()}</span>
+      <h5 class='list-group-item-heading'>#{c.title}</h5>
+      <div class='list-group-item-text'>#{c.location.country_name}</div>
+    </a>
+  """
+  $('#conversation-' + c.id).click ->
+    notifyOperatorJoinedChat(c.id)
+    displayConversation(c)
+
+window.addNewMessage = (data) ->
+  json = data.message.json
+
+  for c in chatData.conversations
+    if c.id == json.id
+      c.messages.push(data)
+      break
+
+  if json.is_joined
+    appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}")
+  else if json.is_left
+    appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.left_chat}")
+  else if json.type == 'o' && json.user_id != chatData.me.id
+    appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, data.timestamp)
+  else if json.type == 'v'
+    appendVisitorMessage(json.id, json.text, data.timestamp)
+
+window.isValidChat = (data) ->
+  json = data.message.json
+  return json

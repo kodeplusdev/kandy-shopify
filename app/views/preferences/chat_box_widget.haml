@@ -166,7 +166,7 @@
                                 = json_start_chat.label :ask_for_question, 'Ask for:'
                             .col-sm-8
                               = json_start_chat.text_area :ask_for_question_text, class: 'form-control', rows: 3
-                          .form-group
+                          .form-group.hide
                             .col-sm-8.col-sm-offset-4
                               = json_start_chat.check_box :ask_for_department
                               = json_start_chat.label :ask_for_department, 'Ask for Department'
@@ -249,6 +249,18 @@
                             .col-sm-8
                               = json_in_chat.text_field :joined_chat, class: 'form-control'
                           .form-group
+                            = json_in_chat.label :left_chat, 'Left Chat:', class: 'col-sm-4 control-label'
+                            .col-sm-8
+                              = json_in_chat.text_field :left_chat, class: 'form-control'
+                          .form-group
+                            = json_in_chat.label :closed_chat, 'Closed Chat:', class: 'col-sm-4 control-label'
+                            .col-sm-8
+                              = json_in_chat.text_field :closed_chat, class: 'form-control'
+                          .form-group
+                            = json_in_chat.label :start_message, 'Start Message:', class: 'col-sm-4 control-label'
+                            .col-sm-8
+                              = json_in_chat.text_field :start_message, class: 'form-control'
+                          .form-group
                             = json_in_chat.label :send_message, 'Send Message:', class: 'col-sm-4 control-label'
                             .col-sm-8
                               = json_in_chat.text_field :send_message, class: 'form-control'
@@ -283,9 +295,9 @@
                             .col-sm-8
                               = json_error_messages.text_field :name_required, class: 'form-control'
                           .form-group
-                            = json_error_messages.label :email_validation, 'Email Validation:', class: 'col-sm-4 control-label'
+                            = json_error_messages.label :email_valid, 'Email Valid:', class: 'col-sm-4 control-label'
                             .col-sm-8
-                              = json_error_messages.text_field :email_validation, class: 'form-control'
+                              = json_error_messages.text_field :email_valid, class: 'form-control'
                           .form-group
                             = json_error_messages.label :no_operator_required, 'No-operator required:', class: 'col-sm-4 control-label'
                             .col-sm-8

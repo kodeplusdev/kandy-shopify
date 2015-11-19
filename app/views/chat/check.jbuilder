@@ -1,0 +1,1 @@
+json.available @users.size > 0

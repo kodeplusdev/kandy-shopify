@@ -1,5 +1,8 @@
+%script{src: asset_url('kandy-chatbox-dashboard.js')}
 :coffeescript
   window.mainPageTitle = 'Home Page'
+  window.loadChatUrl = "#{chat_load_url}"
+  window.chatData = {}
 
   ShopifyApp.ready ->
     ShopifyApp.Bar.initialize
@@ -8,16 +11,22 @@
       buttons:
         primary:
           label: 'Preferences'
-          href: '/preferences'
-          target: 'app'
+          href: "#{preferences_url}"
+          target: 'new'
         secondary:
           label: 'Kandy.IO'
           href: 'http://kandy.io/'
           target: 'new'
 
-    $('#myTabs a[data-toggle="tab"]').click (e) ->
-      e.preventDefault()
-      $(this).tab('show')
+    KandyAPI.setup
+      listeners:
+        message: handleEventListeners
+
+    KandyAPI.login "#{@shop.kandy_api_key}", "#{@shop.kandy_username}", "#{@shop.kandy_password}", (msg) ->
+      isConnected()
+    , (e) ->
+      ShopifyApp.flashError("Error occurred while connecting to Kandy server. Press F5 to refresh.")
+      console.log e
 
 .row
   .col-sm-3
@@ -25,70 +34,26 @@
       .panel.panel-default
         .panel-heading
           .pull-right
-            %button.btn.btn-xs.btn-warning Unavailable
+            %button#user-status-btn.btn.btn-xs.btn-warning.hide Unavailable
           %i.fa.fa-commenting
           Incoming chat
         .panel-body
-          .list-group
-            %a.list-group-item{href: '#'}
-              %span.badge 14:04
-              %h5.list-group-item-heading Visitor 1
-              .list-group-item-text
-                demo 1
-            %a.list-group-item{href: '#'}
-              %span.badge 14:04
-              %h5.list-group-item-heading Visitor 2
-              .list-group-item-text
-                demo 2
+          .list-group#conversations-list
     .row
       .panel.panel-default
         .panel-heading
           %i.fa.fa-users
           Online
         .panel-body
-          .list-group
-            %a.list-group-item{href: '#'}
-              User 1
-            %a.list-group-item{href: '#'}
-              User 2
+          .list-group#users-online-list
 
   .col-sm-9
-    .row
+    .row#conversations-dashboard{style: 'display: none;'}
       .col-sm-8
         .panel.panel-default
           .panel-body
-            %ul#myTabs.nav.nav-tabs{role: 'tablist'}
-              %li.active{role: 'presentation'}
-                %a{href: '#tab1', 'aria-controls': 'tab1', role: 'tab', 'data-toggle': 'tab'} Visitor 1
-              %li{role: 'presentation'}
-                %a{href: '#tab2', 'aria-controls': 'tab2', role: 'tab', 'data-toggle': 'tab'} Visitor 2
-            .tab-content
-              #tab1.tab-pane.active{role: 'tabpanel'}
-                .panel
-                  .panel-body
-                    .row.message-display-container
-                      .list-group
-                        .list-group-item.visitor-message
-                          .media
-                            .media-body
-                              %h4.media-heading Visitor
-                              Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet
-                            .media-right
-                              %img.media-object{src: 'https://placehold.it/64x64'}
-                        .list-group-item.agent-message
-                          .media
-                            .media-left
-                              %img.media-object{src: 'https://placehold.it/64x64'}
-                            .media-body
-                              %h4.media-heading Agent
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                    .row.send-form-container
-                      %form
-                        %textarea.form-control{rows: 5}
-              #tab2.tab-pane{role: 'tabpanel'}
-                .panel
-                  .panel-body
-                    demo
+            %ul#conversation-tabs.nav.nav-tabs{role: 'tablist'}
+            .tab-content#conversation-tabs-content
       .col-sm-4
         .row
           .panel.panel-default
@@ -97,30 +62,23 @@
               Details
             .panel-body
               .pad-left.pad-right
-                .row
-                  %b Name:
-                  Visitor 1
-                .row
-                  %b Email:
-                  visitor@example.com
-                .row
-                  %b Site:
-                  letranloc-2.myshopify.com
-                .row
-                  %b IP:
-                  192.168.0.1
+                #conversation-detail
         .row
           .panel.panel-default
             .panel-heading
               %i.fa.fa-history
               Chat history
             .panel-body
-              .text-center
-                \...
+              #conversation-history
+                .text-center
+                  \...
         .row
           .panel.panel-default
             .panel-heading
               %i.fa.fa-location-arrow
               Location
             .panel-body
-              %iframe{src: 'https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d16057920.548641127!2d97.664496763505!3d10.70431336366971!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1zNzQgxJHGsOG7nW5nIDM2IHAgbGluaCDEkcO0bmcgcSB0aOG7pyDEkeG7qWMgdHAgaOG7kyBjaMOtIG1pbmg!5e0!3m2!1sen!2s!4v1446966827278', width: 270, height: 300, frameborder: 0, style: 'border:0', allowfullscreen: ''}
+              #conversation-location
+    .row#welcome-dashboard
+      .panel-body
+        %h3= "Hey #{current_user.display_name}"

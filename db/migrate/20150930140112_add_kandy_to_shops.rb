@@ -3,8 +3,8 @@ class AddKandyToShops < ActiveRecord::Migration
     add_column :shops, :kandy_api_key, :string
     add_column :shops, :kandy_api_secret, :string
     add_column :shops, :kandy_username, :string
-    add_column :shops, :kandy_access_token, :string
-    add_column :shops, :kandy_username_test, :string
-    add_column :shops, :kandy_access_token_test, :string
+    add_column :shops, :kandy_password, :string
+    add_column :shops, :kandy_username_guest, :string
+    add_column :shops, :kandy_password_guest, :string
   end
 end

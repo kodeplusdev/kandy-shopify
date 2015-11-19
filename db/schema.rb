@@ -11,19 +11,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151105085541) do
+ActiveRecord::Schema.define(version: 20151115033947) do
 
-  create_table "profiles", force: :cascade do |t|
-    t.string   "first_name"
-    t.string   "last_name"
-    t.string   "phone_number"
-    t.string   "email"
+  create_table "conversations", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "status",     default: 1
+    t.text     "messages",   default: "[]"
+    t.integer  "rating",     default: 0
     t.integer  "shop_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.integer  "visitor_id"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "email"
+    t.text     "location",   default: "{}"
   end
 
-  add_index "profiles", ["shop_id"], name: "index_profiles_on_shop_id"
+  add_index "conversations", ["shop_id"], name: "index_conversations_on_shop_id"
+  add_index "conversations", ["visitor_id"], name: "index_conversations_on_visitor_id"
+
+  create_table "conversations_users", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "conversation_id"
+  end
+
+  add_index "conversations_users", ["conversation_id"], name: "index_conversations_users_on_conversation_id"
+  add_index "conversations_users", ["user_id"], name: "index_conversations_users_on_user_id"
 
   create_table "settings", force: :cascade do |t|
     t.string   "var",                   null: false
@@ -37,17 +49,17 @@ ActiveRecord::Schema.define(version: 20151105085541) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "shops", force: :cascade do |t|
-    t.string   "shopify_domain",                          null: false
-    t.string   "shopify_token",                           null: false
-    t.boolean  "initialized",             default: false
+    t.string   "shopify_domain",                       null: false
+    t.string   "shopify_token",                        null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "kandy_api_key"
     t.string   "kandy_api_secret"
     t.string   "kandy_username"
-    t.string   "kandy_access_token"
-    t.string   "kandy_username_test"
-    t.string   "kandy_access_token_test"
+    t.string   "kandy_password"
+    t.string   "kandy_username_guest"
+    t.string   "kandy_password_guest"
+    t.boolean  "initialized",          default: false
   end
 
   add_index "shops", ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
@@ -63,6 +75,43 @@ ActiveRecord::Schema.define(version: 20151105085541) do
   end
 
   add_index "templates", ["shop_id"], name: "index_templates_on_shop_id"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  default: "",         null: false
+    t.string   "encrypted_password",     default: "",         null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,          null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.datetime "last_seen"
+    t.string   "invitation_token"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer  "invitation_limit"
+    t.integer  "invited_by_id"
+    t.string   "invited_by_type"
+    t.integer  "invitations_count",      default: 0
+    t.string   "role",                   default: "operator"
+    t.integer  "shop_id"
+    t.string   "full_name"
+    t.string   "phone_number"
+    t.string   "avatar"
+    t.integer  "status",                 default: 0
+  end
+
+  add_index "users", ["email"], name: "index_users_on_email", unique: true
+  add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+  add_index "users", ["invitations_count"], name: "index_users_on_invitations_count"
+  add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id"
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["shop_id"], name: "index_users_on_shop_id"
 
   create_table "widgets", force: :cascade do |t|
     t.string   "name",                            null: false

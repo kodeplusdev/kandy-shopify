@@ -1,0 +1,12 @@
+%h2 Resend confirmation instructions
+%br
+.col-sm-4
+  = form_for resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, role: 'form'} do |f|
+    = devise_error_messages!
+    .form-group
+      .input-group
+        .input-group-addon
+          = fa_icon 'envelope-o'
+        = f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'Email'
+    = f.submit "Resend confirmation instructions", class: 'btn btn-primary'
+  = render "devise/shared/links"

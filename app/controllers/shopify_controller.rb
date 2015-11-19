@@ -1,19 +1,39 @@
 class ShopifyController < ApplicationController
+  layout 'embedded_app'
   skip_before_filter :verify_authenticity_token, only: :script_tags
-  around_filter :shopify_session, except: :script_tags
+  skip_filter :shopify_session, only: [:script_tags]
 
   def installed
-    @shop = Shop.find_by_shopify_domain(params[:shop])
-    @shop.initialized = true
-    @shop.template = Template.new
-    @shop.profile = Profile.new
-    @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: false)
-    @shop.save
-    session[:initialized] = 1
+    @shop = Shop.find_by_shopify_domain(@shop_session.url)
+    if @shop.initialized
+      redirect_to root_url
+    end
+  end
 
-    setup_webhooks
-    setup_script_tags
-    redirect_to session['return_url'] || root_url
+  def setup
+    email = params[:email]
+    if email.blank? || !(email =~ /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
+      flash[:error] = 'A valid email is required.'
+      render :installed
+    else
+      @shop = Shop.find_by_shopify_domain(params[:shop])
+      if @shop.initialized
+        redirect_to root_url
+      end
+
+      @shop.template = Template.new
+      @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: false)
+      @shop.users.invite!(email: email, role: User::ADMIN)
+      @shop.initialized = true
+      session[:initialized] = 1
+      @shop.save!
+
+      setup_webhooks
+      setup_script_tags
+
+      flash.now[:notice] = 'An invitation email has been sent.'
+      redirect_to session['return_url'] || root_url
+    end
   end
 
   def script_tags

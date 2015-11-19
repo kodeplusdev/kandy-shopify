@@ -3,11 +3,11 @@ class Shop < ActiveRecord::Base
   include RailsSettings::Extend
 
   has_one :template
-  has_one :profile
+  has_many :users
+  has_many :conversations
   has_one :widget
 
-  accepts_nested_attributes_for :template, :profile, :widget
-  attr_accessor :kandy_password, :kandy_password_test
+  accepts_nested_attributes_for :template, :widget
 
 
 end

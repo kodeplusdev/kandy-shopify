@@ -56,6 +56,15 @@ module KandyApp
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    config.middleware.insert_before 0, 'Rack::Cors' do
+      allow do
+        origins '*'
+        resource '/chat/*',
+                 methods: [:get, :post, :put, :delete, :options],
+                 max_age: 600
+      end
+    end
+
     Dir.glob("#{Rails.root}/app/assets/images/**/").each do |path|
       config.assets.paths << path
     end

@@ -1,9 +1,8 @@
 class HomeController < ApplicationController
-  layout 'embedded_app'
-  around_filter :shopify_session
-  before_action :is_initialized
+  before_action :authenticate_user!
 
   def index
+    @shop = Shop.find_by_shopify_domain(@shop_session.url)
   end
 
   def preferences
@@ -37,16 +36,21 @@ class HomeController < ApplicationController
 
   private
 
-  def is_initialized
+  def authenticate_user!
     if session[:initialized].blank?
-      @shop = Shop.find_by_shopify_domain(params[:shop])
+      @shop = Shop.find_by_shopify_domain(@shop_session.url)
       unless @shop.blank?
         if @shop.initialized
           session[:initialized] = 1
+          super
         else
           redirect_to installed_path(request.query_parameters)
         end
+      else
+        super
       end
+    else
+      super
     end
   end
 

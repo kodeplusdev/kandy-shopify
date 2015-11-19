@@ -41,40 +41,18 @@
           = f.label :kandy_password, 'Password'
           %abbr{title: 'required'} *
           = f.password_field :kandy_password, class: 'form-control input-sm', placeholder: 'password'
-          .small.help-block We only save your token (not password). Leave blank for not change.
+          .small.help-block Leave blank for not change.
         .form-group
           .pull-right.help-block.hide
             %a{href: '#'} Test login
-          = f.label :kandy_username_test, 'Username Guest'
+          = f.label :kandy_username_guest, 'Username Guest'
           %abbr{title: 'required'} *
-          = f.text_field :kandy_username_test, class: 'form-control input-sm', placeholder: 'username@domain.com'
+          = f.text_field :kandy_username_guest, class: 'form-control input-sm', placeholder: 'username@domain.com'
         .form-group
-          = f.label :kandy_password_test, 'Password Guest'
+          = f.label :kandy_password_guest, 'Password Guest'
           %abbr{title: 'required'} *
-          = f.password_field :kandy_password_test, class: 'form-control input-sm', placeholder: 'password'
-          .small.help-block We only save your token (not password). Leave blank for not change.
+          = f.password_field :kandy_password_guest, class: 'form-control input-sm', placeholder: 'password'
+          .small.help-block Leave blank for not change.
         -#.form-group
           = label_tag :kandy_access_token, 'Your access token'
           = f.text_field :kandy_access_token, class: 'form-control input-sm', readonly: ''
-  .row
-    .col-sm-3
-      %h5 Profile information
-    .col-sm-9.panel
-      .panel-body
-      = f.fields_for :profile do |p|
-        = p.hidden_field :id
-        .form-group
-          .row
-            .col-sm-6
-              = p.label :first_name, 'First name'
-              = p.text_field :first_name, class: 'form-control input-sm', placeholder: 'first name'
-            .col-sm-6
-              = p.label :last_name, 'Last name'
-              = p.text_field :last_name, class: 'form-control input-sm', placeholder: 'last name'
-        .form-group
-          = p.label :email, 'Email'
-          = p.text_field :email, class: 'form-control input-sm', placeholder: 'user@email.com'
-        .form-group
-          = p.label :phone_number, 'Tel'
-          = p.text_field :phone_number, class: 'form-control input-sm', placeholder: '+841234567890'
-          .small.help-block Include country code

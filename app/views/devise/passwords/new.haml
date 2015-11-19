@@ -1,0 +1,12 @@
+.col-sm-4
+  %h2 Forgot your password?
+  %br
+  = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :post, role: 'form' } do |f|
+    = devise_error_messages!
+    .form-group
+      .input-group
+        .input-group-addon
+          = fa_icon 'envelope-o'
+        = f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'Email'
+    = f.submit "Send me reset password instructions", class: 'btn btn-primary'
+  = render "devise/shared/links"
