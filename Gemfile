@@ -16,21 +16,21 @@ gem 'devise'
 gem 'devise_invitable'
 gem 'devise_lastseenable'
 
-group :assets do
-  gem 'select2-rails'
-  gem 'sass-rails'
-  gem 'bootstrap-sass'
-  gem 'coffee-rails'
-  gem 'uglifier', '>= 1.0.3'
-end
+gem 'select2-rails'
+gem 'sass-rails'
+gem 'bootstrap-sass'
+gem 'coffee-rails'
+gem 'uglifier', '>= 1.0.3'
+
+gem 'thin'
+gem 'less-rails-bootstrap'
+gem 'therubyracer', platforms: :ruby
+gem 'pry-rails'
+
+gem 'dotenv-rails'
 
 group :development, :test do
-  gem 'thin'
-  gem 'less-rails-bootstrap'
-  gem 'therubyracer', platforms: :ruby
-  gem 'pry-rails'
   gem 'sqlite3'
-  gem 'dotenv-rails'
 end
 
 group :production do
