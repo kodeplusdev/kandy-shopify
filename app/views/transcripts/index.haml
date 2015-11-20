@@ -1,0 +1,178 @@
+:coffeescript
+  window.mainPageTitle = 'Transcripts'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        secondary:
+          label: 'Preferences'
+          href: "#{preferences_url}"
+          target: 'app'
+
+    $('.table > tbody > tr').on 'click', (e) ->
+      if e.target.type isnt 'checkbox'
+        window.document.location = $(this).data('href')
+
+    $('#checkbox-all').change ->
+      $('.checkbox-ids').prop('checked', $(this).prop('checked'))
+
+    $('.checkbox-ids').change ->
+      checked = $(this).prop('checked')
+      if !checked && $('#checkbox-all').prop('checked')
+        $('#checkbox-all').prop('checked', false)
+
+    $('input[type=checkbox]').change ->
+      length = $('.checkbox-ids:checked').length
+      if length is 0
+        $('#conversations-delete').hide()
+        $('#conversations-archived').hide()
+        $('#conversations-unarchived').hide()
+      else
+        $('#conversations-delete').show()
+        $('#conversations-archived').show()
+        $('#conversations-unarchived').show()
+      if length is $('.checkbox-ids').length
+        $('#checkbox-all').prop('checked', true)
+
+    $('#conversations-delete').on 'click', ->
+      ids = $('.checkbox-ids:checked').map ->
+        $(this).val()
+      .get()
+      $.ajax
+        url: "#{chat_transcripts_path}"
+        type: 'DELETE'
+        dataType: 'json'
+        data:
+          ids: ids
+        success: (res) ->
+          if res.deleted > 0
+            ShopifyApp.flashNotice(res.deleted + " chat transcript(s) deleted.")
+            location.reload()
+          else
+            ShopifyApp.flashError("0 chat transcript deleted.")
+
+    $('#conversations-delete-all').on 'click', ->
+      $.ajax
+        url: "#{chat_transcripts_path}"
+        type: 'DELETE'
+        dataType: 'json'
+        data:
+          all: true
+        success: (res) ->
+          if res.deleted > 0
+            ShopifyApp.flashNotice(res.deleted + " chat transcript(s) deleted.")
+            location.reload()
+          else
+            ShopifyApp.flashError("0 chat transcript deleted.")
+
+    $('#conversations-search button').on 'click', ->
+      searchConversations()
+
+    $('#conversations-search input').keypress (e) ->
+      if e.keyCode is 13
+        searchConversations()
+
+    $('#conversations-archived').on 'click', ->
+      ids = $('.checkbox-ids:checked').map ->
+        $(this).val()
+      .get()
+      $.ajax
+        url: "#{chat_transcripts_path}"
+        type: 'PUT'
+        dataType: 'json'
+        data:
+          archived: ids
+        success: (res) ->
+          if res.archived > 0
+            ShopifyApp.flashNotice(res.archived + " chat transcript(s) archived.")
+            location.reload()
+          else
+            ShopifyApp.flashError("0 chat transcript archived.")
+
+    $('#conversations-unarchived').on 'click', ->
+      ids = $('.checkbox-ids:checked').map ->
+        $(this).val()
+      .get()
+      $.ajax
+        url: "#{chat_transcripts_path}"
+        type: 'PUT'
+        dataType: 'json'
+        data:
+          unarchived: ids
+        success: (res) ->
+          if res.unarchived > 0
+            ShopifyApp.flashNotice(res.unarchived + " chat transcript(s) unarchived.")
+            location.reload()
+          else
+            ShopifyApp.flashError("0 chat transcript unarchived.")
+
+    $('#conversations-show-archived').on 'click', ->
+      url = window.location.href
+      window.location.href = setUrlParameter(url, 'archived', 'true')
+
+    $('#conversations-hide-archived').on 'click', ->
+      url = window.location.href
+      window.location.href = setUrlParameter(url, 'archived', 'false')
+
+  searchConversations = () ->
+    q = $('#conversations-search input').val()
+    if q isnt ''
+      url = window.location.href
+      window.location.href = setUrlParameter(url, 'q', q)
+
+
+.panel
+  .panel-body
+    .row.pad-bottom
+      .col-sm-6
+        .input-group#conversations-search
+          %input.form-control{type: 'text', placeholder: 'Search for...', value: params[:q]}
+          %span.input-group-btn
+            %button.btn.btn-default{type: 'button'} Search
+      .pull-right{style: 'padding-right: 100px'}
+        .btn-group{role: 'group'}
+          %button.btn.btn-default.dropdown-toggle{type: 'button', 'data-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false}
+            Actions
+            %span.caret
+          %ul.dropdown-menu
+            %li#conversations-delete{style: 'display: none;'}
+              %a{href: '#'} Delete selected
+            %li#conversations-delete-all
+              %a{href: '#'} Delete all
+            %li#conversations-archived{style: 'display: none;'}
+              %a{href: '#'} Archived selected
+            %li#conversations-unarchived{style: 'display: none;'}
+              %a{href: '#'} Unarchived selected
+            - if @archived
+              %li#conversations-hide-archived
+                %a{href: '#'} Hide archived
+            - else
+              %li#conversations-show-archived
+                %a{href: '#'} Show archived
+
+    .row.pad-top
+      %table.table.table-hover.clickable
+        %thead
+          %tr
+            %th
+              %input#checkbox-all{type: 'checkbox'}
+            %th Date
+            %th Visitor
+            %th Operator
+            %th Rating
+            %th Status
+        %tbody
+          - @conversations.each do |conversation|
+            %tr{'data-href': chat_transcript_path(conversation)}
+              %td
+                %input.checkbox-ids{type: 'checkbox', value: conversation.id}
+              %td= conversation.created_at
+              %td= conversation.title
+              %td= conversation.users.size > 0 ? conversation.users.first.display_name : ''
+              %td= conversation.rating == 1 ? 'Like' : (conversation.rating == -1 ? 'Dislike' : '')
+              %td= conversation.status == 1 ? 'Open' : 'Close'
+    .row
+      .pull-right.pad-right
+        = will_paginate @conversations, class: 'digg_pagination'

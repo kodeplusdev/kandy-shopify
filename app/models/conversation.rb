@@ -18,6 +18,8 @@ class Conversation < ActiveRecord::Base
       CLOSE = 0
   ]
 
+  self.per_page = 15
+
   class << self
     RATING.each do |rating|
       define_method "#{rating}" do

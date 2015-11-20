@@ -38,6 +38,12 @@ KandyApp::Application.routes.draw do
       get 'chat-box-widget-preview' => :chat_box_widget_preview, as: 'chat_box_widget_preview'
       post 'update' => :update
     end
+    controller :transcripts do
+      get '/transcripts' => :index, as: 'chat_transcripts'
+      get '/transcripts/:id' => :view, as: 'chat_transcript'
+      delete 'transcripts' => :destroy
+      match 'transcripts' => :archive, via: [:put, :patch]
+    end
   end
 
   scope '/help' do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151115033947) do
+ActiveRecord::Schema.define(version: 20151120140430) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
@@ -20,10 +20,12 @@ ActiveRecord::Schema.define(version: 20151115033947) do
     t.integer  "rating",     default: 0
     t.integer  "shop_id"
     t.integer  "visitor_id"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.string   "email"
     t.text     "location",   default: "{}"
+    t.boolean  "deleted",    default: false
+    t.boolean  "archived",   default: false
   end
 
   add_index "conversations", ["shop_id"], name: "index_conversations_on_shop_id"

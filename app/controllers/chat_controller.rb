@@ -21,7 +21,7 @@ class ChatController < ApplicationController
   def load_chat
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     @users = @shop.users.all
-    @conversations = @shop.conversations.opens
+    @conversations = @shop.conversations.opens.where(deleted: false, archived: false)
     render layout: false
   end
 

@@ -16,6 +16,7 @@ gem 'devise'
 gem 'devise_invitable'
 gem 'devise_lastseenable'
 
+gem 'will_paginate'
 gem 'select2-rails'
 gem 'sass-rails'
 gem 'bootstrap-sass'

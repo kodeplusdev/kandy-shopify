@@ -236,6 +236,7 @@ GEM
     unf_ext (0.0.7.1)
     warden (1.2.3)
       rack (>= 1.0)
+    will_paginate (3.0.7)
 
 PLATFORMS
   ruby
@@ -267,6 +268,7 @@ DEPENDENCIES
   therubyracer
   thin
   uglifier (>= 1.0.3)
+  will_paginate
 
 BUNDLED WITH
    1.10.5
