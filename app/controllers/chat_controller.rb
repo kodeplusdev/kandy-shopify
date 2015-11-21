@@ -1,7 +1,7 @@
 class ChatController < ApplicationController
   skip_before_filter :verify_authenticity_token, only: [:widget, :save_message]
-  skip_filter :shopify_session, except: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat]
-  before_action :authenticate_user!, only: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat]
+  skip_filter :shopify_session, except: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat, :download]
+  before_action :authenticate_user!, only: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat, :send_mail_transcript]
 
   def widget
     @shop = Shop.find(params[:id])
@@ -87,12 +87,17 @@ class ChatController < ApplicationController
     render nothing: true
   end
 
+  def send_mail_transcript
+    render layout: false, json: {status: true}
+  end
+
   def download
-    render nothing: true
+    @conversation = Conversation.find(params[:id])
+    send_data @conversation.download, filename: "#{@conversation.title}-#{@conversation.created_at}.txt"
   end
 
   def ban
-    render nothing: true
+    render layout: false, json: {status: true}
   end
 
   def ping

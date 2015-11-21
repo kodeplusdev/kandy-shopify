@@ -1,10 +1,15 @@
 :coffeescript
   window.mainPageTitle = 'Transcripts'
+  window.widgetConfig = #{raw @widget_config_json}
 
   ShopifyApp.ready ->
     ShopifyApp.Bar.initialize
       title: window.mainPageTitle
       icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
       buttons:
         secondary:
           label: 'Preferences'
@@ -12,8 +17,25 @@
           target: 'app'
 
     $('.table > tbody > tr').on 'click', (e) ->
-      if e.target.type isnt 'checkbox'
-        window.document.location = $(this).data('href')
+      $.ajax
+        url: $(this).data('href')
+        type: 'GET'
+        dataType: 'json'
+        success: (res) ->
+          $('#conversation-detail-modal').on 'show.bs.modal', (e) ->
+            $('#conversation-detail-modal').attr('data-id', res.id)
+            $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
+            html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
+              '</p><p>IP: ' + res.location.ip + ' (<a class="small" href="#" id="conversation-ban-btn">ban</a>)</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
+
+            for m in res.messages
+              html += renderMessageHtml(m)
+
+            html += '</div></div>'
+
+            $('#conversation-detail-modal .modal-body').html(html)
+
+          $('#conversation-detail-modal').modal('show')
 
     $('#checkbox-all').change ->
       $('.checkbox-ids').prop('checked', $(this).prop('checked'))
@@ -116,11 +138,78 @@
       url = window.location.href
       window.location.href = setUrlParameter(url, 'archived', 'false')
 
+    $(document).on 'click', '#conversation-download-btn', ->
+      id = $('#conversation-detail-modal').attr('data-id')
+      window.open('#{chat_download_url}?id=' + id, '_blank')
+
+    $(document).on 'click', '#conversation-email-btn', ->
+      id = $('#conversation-detail-modal').attr('data-id')
+      email = prompt('Please enter your email:')
+      if email
+        if /^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/.test(email)
+          $.ajax
+            url: '#{chat_send_mail_transcript_path}'
+            type: 'POST'
+            dataType: 'json'
+            data:
+              id: id
+              email: email
+            success: (res) ->
+              ShopifyApp.flashNotice("A email has been sent to you.")
+              $('#conversation-detail-modal').modal('hide')
+        else
+          ShopifyApp.flashError("Please enter a valid email address.")
+
+    $(document).on 'click', '#conversation-ban-btn', ->
+      id = $('#conversation-detail-modal').attr('data-id')
+      $.ajax
+        url: '#{chat_ban_url}'
+        type: 'delete'
+        dataType: 'json'
+        data:
+          id: id
+        success: (res) ->
+          $('#conversation-detail-modal').modal('hide')
+
+
   searchConversations = () ->
     q = $('#conversations-search input').val()
     if q isnt ''
       url = window.location.href
       window.location.href = setUrlParameter(url, 'q', q)
+
+  renderMessageHtml = (m) ->
+    json = JSON.parse(m.message.json)
+    if json.is_joined
+      appendStatusChange(json.display_name + ' ' + widgetConfig.in_chat.joined_chat)
+    else if json.is_left
+      appendStatusChange(json.display_name + ' ' + widgetConfig.in_chat.left_chat)
+    else if json.type == 'o'
+      appendOperatorMessage(json.display_name, json.avatar, json.text, m.timestamp)
+    else if json.type == 'v'
+      appendVisitorMessage(json.display_name, json.text, m.timestamp)
+
+  window.appendStatusChange = (msg) ->
+    '<div class="pad-top pad-bottom status-message">' + msg + '</div>'
+
+  window.appendOperatorMessage = (name, avatar, msg, time) ->
+    DateTime = new Date(Number(time))
+    Time = DateTime.toLocaleString()
+
+    if !avatar || avatar == ''
+      avatar = "#{asset_url('avatars/1avatar-operator.png')}"
+    '<div class="list-group-item agent-message"><div class="media"><div class="media-left">' +
+    '<img class="media-object" src="' + avatar+'"></div><div class="media-body"><h4 class="media-heading">' + name+
+    ' <small>- ' + Time+ '</small></h4>' + msg+ '</div></div></div>'
+
+  window.appendVisitorMessage = (name, msg, time) ->
+    DateTime = new Date(Number(time))
+    Time = DateTime.toLocaleString()
+
+    '<div class="list-group-item visitor-message"><div class="media"><div class="media-left">' +
+    '<img class="media-object" src="#{asset_url('avatars/visitor-avatar-thick.png')}"></div>' +
+    ' <div class="media-body"><h4 class="media-heading">' + name +
+    ' <small>- ' + Time + '</small></h4>' + msg + '</div></div></div>'
 
 
 .panel
@@ -176,3 +265,17 @@
     .row
       .pull-right.pad-right
         = will_paginate @conversations, class: 'digg_pagination'
+
+#conversation-detail-modal.modal.fade{tabindex: '-1', role: 'dialog', 'aria-labelledby': 'conversation-detail-modal-label'}
+  .modal-dialog{role: 'document'}
+    .modal-content
+      .modal-header
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+          %span{'aria-hidden': 'true'} &times;
+        %h4#conversation-detail-modal-label.modal-title Conversation detail
+      .modal-body
+        \...
+      .modal-footer
+        %button#conversation-download-btn.btn.btn-primary{type: 'button'} Download Transcript
+        %button#conversation-email-btn.btn.btn-success{type: 'button'} Email Transcript
+        %button.btn.btn-default{type: 'button', 'data-dismiss': 'modal'} Close

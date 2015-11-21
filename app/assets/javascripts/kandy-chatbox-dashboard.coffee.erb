@@ -64,7 +64,7 @@ window.displayHistoryMessages = (messages) ->
     else if json.type == 'o'
       appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
     else if json.type == 'v'
-      appendVisitorMessage(json.id, json.text, m.timestamp)
+      appendVisitorMessage(json.id, json.display_name, json.text, m.timestamp)
 
 window.displayConversation = (c) ->
   $('#conversations-dashboard').show()
@@ -194,7 +194,7 @@ window.appendOperatorMessage = (id, name, avatar, msg, time) ->
   """
   $(elems).scrollTop($(elems)[0].scrollHeight)
 
-window.appendVisitorMessage = (id, msg, time) ->
+window.appendVisitorMessage = (id, name, msg, time) ->
   DateTime = new Date(Number(time))
   Time = DateTime.toLocaleString()
 
@@ -206,7 +206,7 @@ window.appendVisitorMessage = (id, msg, time) ->
           <img class="media-object" src="<%= asset_url('avatars/visitor-avatar-thick.png') %>">
         </div>
         <div class="media-body">
-          <h4 class="media-heading">Visitor <small>- #{Time}</small></h4>
+          <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
           #{msg}
         </div>
       </div>
@@ -472,7 +472,7 @@ window.addNewMessage = (data) ->
   else if json.type == 'o' && json.user_id != chatData.me.id
     appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, data.timestamp)
   else if json.type == 'v'
-    appendVisitorMessage(json.id, json.text, data.timestamp)
+    appendVisitorMessage(json.id, json.display_name, json.text, data.timestamp)
 
 window.isValidChat = (data) ->
   json = data.message.json

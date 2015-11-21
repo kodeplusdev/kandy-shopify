@@ -314,6 +314,7 @@ class window.KCWidget
               json: JSON.stringify
                 id: res.id
                 text: question
+                display_name: _self.chatData.title
                 type: 'v'
             timestamp: new Date().getTime()
           res.messages.push(json)
@@ -351,6 +352,7 @@ class window.KCWidget
         id: _self.chatData.id
         cmd: 'new_message'
         type: 'v'
+        display_name: _self.chatData.title
         text: msg
       KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
         console.log(msg)
@@ -398,7 +400,7 @@ class window.KCWidget
           json =
             cmd: 'notify_close_chat'
             id: _self.chatData.id
-            display_name: 'Visitor'
+            display_name: _self.chatData.title
             type: 'v'
           KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
             msg.timestamp = new Date().getTime()

@@ -66,8 +66,9 @@ KandyApp::Application.routes.draw do
       post 'rating' => :rating, as: 'chat_rating'
       get 'load' => :load_chat, as: 'chat_load'
       post 'send-mail' => :send_mail, as: 'chat_send_mail'
+      post 'send-mail-transcript' => :send_mail_transcript, as: 'chat_send_mail_transcript'
       get 'download' => :download, as: 'chat_download'
-      post 'ban' => :ban, as: 'chat_ban'
+      delete 'ban' => :ban, as: 'chat_ban'
     end
   end
 

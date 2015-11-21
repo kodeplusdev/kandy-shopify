@@ -45,6 +45,17 @@ class Conversation < ActiveRecord::Base
     name || 'Visitor'
   end
 
+  def download
+"Details:
+  Date: #{created_at}
+  Name: #{title}
+  Email: #{email}
+  IP Address: #{location['ip']}
+  Status: #{status == 1 ? 'Open' : 'Close'}
+  Rating: #{rating == 1 ? 'Like' : rating == -1 ? 'Dislike' : 'None'}
+"
+  end
+
   RATING.each do |rating|
     define_method "#{rating}?" do
       self.rating == rating

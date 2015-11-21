@@ -3,6 +3,7 @@ class TranscriptsController < ApplicationController
   before_action :shop
 
   def index
+    @widget_config_json = @shop.widget.json_string.to_json
     @archived = !(params[:archived].blank? || params[:archived] == 'false')
     if params[:q].blank?
       if @archived
@@ -26,6 +27,7 @@ class TranscriptsController < ApplicationController
 
   def view
     @conversation = Conversation.find(params[:id])
+    render layout: false
   end
 
   def archive
