@@ -15,22 +15,33 @@
 .row
   .panel
     .panel-body
-      .col-sm-4.col-sm-offset-1
-        .widget.style1
-          .row.vertical-align
-            .col-xs-3
-              %i.fa.fa-key.fa-3x
-            .col-xs-9
-              %a{href: api_keys_path}
-                %h3.font-bold API Keys
-      .col-sm-4.col-sm-offset-3
-        .widget.style1
-          .row.vertical-align
-            .col-xs-3
-              %i.fa.fa-user.fa-3x
-            .col-xs-9
-              %a{href: kandy_account_path}
-                %h3.font-bold Account
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-key.fa-3x
+              .col-xs-9
+                %a{href: api_keys_path}
+                  %h3.font-bold API Keys
+        .col-sm-4.col-sm-offset-3
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-user.fa-3x
+              .col-xs-9
+                %a{href: kandy_account_path}
+                  %h3.font-bold Account
+      %br/
+      .row
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-user-secret.fa-3x
+              .col-xs-9
+                %a{href: edit_user_registration_path}
+                  %h3.font-bold Profile
 .row
   .panel
     .panel-body

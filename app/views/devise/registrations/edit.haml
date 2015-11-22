@@ -1,29 +1,55 @@
-.col-sm-4
-  %h2
-    Edit #{resource_name.to_s.humanize}
-  = form_for resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, role: 'form'} do |f|
-    = devise_error_messages!
-    .form-group
-      = f.label :email
-      = f.email_field :email, readonly: true, class: 'form-control'
-    - if devise_mapping.confirmable? && resource.pending_reconfirmation?
-      %div
-        Currently waiting confirmation for: #{resource.unconfirmed_email}
-    .form-group
-      = f.label :password
-      %i (leave blank if you don't want to change it)
-      = f.password_field :password, autocomplete: "off", class: 'form-control'
-    .form-group
-      = f.label :password_confirmation
-      = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
-    .form-group
-      = f.label :current_password
-      %i (we need your current password to confirm your changes)
-      = f.password_field :current_password, autocomplete: "off", class: 'form-control'
-    = f.submit "Update", class: 'btn btn-primary'
+:coffeescript
+  window.mainPageTitle = "#{current_user.display_name}"
 
-  %h3 Cancel my account
-  %p
-    Unhappy?
-    = button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-danger"
-  = link_to "Back", :back
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-profile-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_path}"
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+.row
+  .col-sm-3
+    %h5 Edit profile
+  .col-sm-9.panel
+    .panel-body
+      = form_for resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, role: 'form', 'data-shopify-app-submit': 'save-profile-form-message'} do |f|
+        = devise_error_messages!
+        .form-group
+          = f.label :email
+          = f.email_field :email, readonly: true, class: 'form-control'
+        - if devise_mapping.confirmable? && resource.pending_reconfirmation?
+          %div
+            Currently waiting confirmation for: #{resource.unconfirmed_email}
+        .form-group
+          = f.label :password
+          %i (leave blank if you don't want to change it)
+          = f.password_field :password, autocomplete: 'off', class: 'form-control'
+        .form-group
+          = f.label :password_confirmation
+          = f.password_field :password_confirmation, autocomplete: 'off', class: 'form-control'
+        .form-group
+          = f.label :current_password
+          %i (we need your current password to confirm your changes)
+          = f.password_field :current_password, autocomplete: 'off', class: 'form-control'
+        = f.submit 'Update', class: 'btn btn-primary hide'
+- unless current_user.admin?
+  .row
+    .col-sm-3
+      %h4 Cancel my account
+    .col-sm-9.panel
+      .panel-body
+        %p
+          Unhappy?
+          = button_to 'Cancel my account', registration_path(resource_name), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-danger'
