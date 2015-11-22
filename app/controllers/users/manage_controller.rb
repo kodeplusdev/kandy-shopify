@@ -37,7 +37,7 @@ class Users::ManageController < DeviseController
       params[:user].delete :role
     end
     if @user.update_attributes(user_params)
-      flash[:notice] = 'Updated successful.'
+      flash[:notice] = 'Updated successfully.'
     else
       flash[:error] = 'All fields must be valid.'
     end

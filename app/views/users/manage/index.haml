@@ -45,4 +45,5 @@
             %td
               %a.btn.btn-xs.btn-primary{href: users_manage_edit_path(u)}
                 %i.fa.fa-edit
-              = link_to ' x ', users_manage_edit_path(u), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-xs btn-danger'
+              - unless u.admin?
+                = link_to ' x ', users_manage_edit_path(u), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-xs btn-danger'
