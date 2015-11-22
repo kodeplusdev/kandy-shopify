@@ -1,23 +1,27 @@
 :coffeescript
-  window.mainPageTitle = 'Kandy Setup'
+  window.mainPageTitle = 'Add New User'
 
   ShopifyApp.ready ->
     ShopifyApp.Bar.initialize
       title: window.mainPageTitle
       icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
       buttons:
         primary:
-          label: 'Send'
-          message: 'save-preferences-form-message'
-    ShopifyApp.Bar.loadingOff()
+          label: 'Send an invitation'
+          message: 'save-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{users_manage_path}"
+          target: 'app'
 
-= form_tag installed_path, method: :post, 'data-shopify-app-submit': 'save-preferences-form-message' do
-  = hidden_field_tag :shop, @shop_session.url
+= form_tag users_invite_path, method: :post, 'data-shopify-app-submit': 'save-form-message' do
   .row
     .col-sm-3
-      %h5 Admin account
-      %span.help-block
-        Please enter your admin email. We'll send you a email with an invitation to register first admin account.
+      %h5 Send invitation
     .col-sm-9.panel
       .panel-body
         .row.form-group

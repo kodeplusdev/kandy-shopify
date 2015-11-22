@@ -1,0 +1,59 @@
+:coffeescript
+  window.mainPageTitle = '#{@user.display_name}'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Save'
+          message: 'save-form-message'
+        secondary:
+          label: 'Back'
+          href: "#{users_manage_path}"
+          target: 'app'
+
+.row
+  .col-sm-3
+    %h5 Account information
+  .col-sm-9.panel
+    .panel-body
+      .row
+        = form_for @user, url: users_manage_edit_path(@user), method: :post, html: {'data-shopify-app-submit': 'save-form-message'} do |f|
+          = f.hidden_field :id
+          .row.form-group
+            .col-sm-12
+              = f.label :email
+              = f.text_field :email, class: 'form-control', readonly: true
+          .row.form-group
+            .col-sm-6
+              = f.label :first_name
+              = f.text_field :first_name, class: 'form-control'
+            .col-sm-6
+              = f.label :last_name
+              = f.text_field :last_name, class: 'form-control'
+          .row.form-group
+            .col-sm-12
+              = f.label :phone_number
+              = f.text_field :phone_number, class: 'form-control'
+          .row.form-group
+            .col-sm-12
+              = f.label :avatar, 'Avatar URL'
+              = f.text_field :avatar, class: 'form-control'
+          .row.form-group
+            .col-sm-12
+              = f.label :role
+              = f.select :role, User::ROLE, {}, {class: 'form-control', disabled: !(current_user.admin? && @user.id != current_user.id)}
+- if current_user.admin? && @user.id != current_user.id
+  .row
+    .col-sm-3
+      %h5 Delete account
+    .col-sm-9.panel
+      .panel-body
+        %p Unhappy?
+        = link_to 'Cancel this account', users_manage_edit_path(@user), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-danger'

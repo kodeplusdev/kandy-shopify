@@ -1,0 +1,48 @@
+:coffeescript
+  window.mainPageTitle = 'Manage Users'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        primary:
+          label: 'Add new user'
+          href: "#{users_invite_path}"
+          target: 'app'
+        secondary:
+          label: 'Back'
+          href: "#{preferences_url}"
+          target: 'app'
+
+.panel
+  .panel-body
+    %table.table.table-hover.clickable
+      %thead
+        %tr
+          %th Avatar
+          %th Full name
+          %th Email
+          %th Phone number
+          %th
+      %tbody
+        - @users.each do |u|
+          %tr{'data-href': users_manage_edit_path(u)}
+            - if u.avatar.blank?
+              %td
+                %img{width: 32, height: 32, src: asset_url('avatars/1avatar-operator.png')}
+            - else
+              %td
+                %img{width: 32, height: 32, src: u.avatar}
+            %td= u.full_name
+
+            %td= u.email
+            %td= u.phone_number
+            %td
+              %a.btn.btn-xs.btn-primary{href: users_manage_edit_path(u)}
+                %i.fa.fa-edit
+              = link_to ' x ', users_manage_edit_path(u), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-xs btn-danger'

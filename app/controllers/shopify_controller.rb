@@ -12,6 +12,9 @@ class ShopifyController < ApplicationController
 
   def setup
     email = params[:email]
+    first_name = params[:first_name] || ''
+    last_name = params[:last_name] || ''
+
     if email.blank? || !(email =~ /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
       flash[:error] = 'A valid email is required.'
       render :installed
@@ -23,7 +26,7 @@ class ShopifyController < ApplicationController
 
       @shop.template = Template.new
       @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: false)
-      @shop.users.invite!(email: email, role: User::ADMIN)
+      @shop.users.invite!(email: email, first_name: first_name, last_name: last_name, role: User::ADMIN)
       @shop.initialized = true
       session[:initialized] = 1
       @shop.save!

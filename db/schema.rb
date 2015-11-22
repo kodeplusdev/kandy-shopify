@@ -102,7 +102,8 @@ ActiveRecord::Schema.define(version: 20151120140430) do
     t.integer  "invitations_count",      default: 0
     t.string   "role",                   default: "operator"
     t.integer  "shop_id"
-    t.string   "full_name"
+    t.string   "first_name"
+    t.string   "last_name"
     t.string   "phone_number"
     t.string   "avatar"
     t.integer  "status",                 default: 0

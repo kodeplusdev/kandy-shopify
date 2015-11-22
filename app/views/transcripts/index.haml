@@ -16,7 +16,7 @@
           href: "#{preferences_url}"
           target: 'app'
 
-    $('.table > tbody > tr').on 'click', (e) ->
+    $('.table.clickable > tbody > tr').on 'click', (e) ->
       $.ajax
         url: $(this).data('href')
         type: 'GET'

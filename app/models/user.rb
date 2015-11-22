@@ -6,10 +6,11 @@ class User < ActiveRecord::Base
          :lastseenable, :invitable
 
   has_and_belongs_to_many :conversations
-  attr_readonly :display_name
+  attr_readonly :display_name, :full_name
 
   ROLE = [
       ADMIN = 'admin',
+      SUPERUSER = 'super_user',
       OPERATOR = 'operator'
   ]
 
@@ -45,6 +46,10 @@ class User < ActiveRecord::Base
 
   def display_name
     full_name || email
+  end
+
+  def full_name
+    "#{first_name} #{last_name}"
   end
 
   def self.available

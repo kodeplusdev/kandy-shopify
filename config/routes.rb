@@ -2,6 +2,21 @@ KandyApp::Application.routes.draw do
 
   devise_for :users
 
+  devise_scope :user do
+    namespace :users do
+      scope 'manage' do
+        controller :manage do
+          get '/' => :index, as: 'manage'
+          get '/edit/:id' => :edit, as: 'manage_edit'
+          get '/invite' => :invite, as: 'invite'
+          post '/invite' => :new_invite
+          post '/edit/:id' => :update
+          delete '/edit/:id' => :destroy
+        end
+      end
+    end
+  end
+
   controller :sessions do
     get 'login' => :new, :as => :login
     post 'login' => :create, :as => :authenticate
@@ -14,7 +29,7 @@ KandyApp::Application.routes.draw do
   end
 
   namespace :webhooks do
-    scope :sms do
+    scope 'sms' do
       controller :sms do
         post 'order-creation' => :order_creation
         post 'order-update' => :order_update
