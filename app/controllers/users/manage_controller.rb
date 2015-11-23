@@ -22,7 +22,7 @@ class Users::ManageController < DeviseController
       flash[:error] = 'A valid email is required.'
       render :invite
     else
-      @shop = Shop.find_by_shopify_domain(params[:shop])
+      @shop = Shop.find_by_shopify_domain(@shop_session.url)
 
       @shop.users.invite!(email: email, first_name: first_name, last_name: last_name, role: User::OPERATOR)
 

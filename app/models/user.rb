@@ -10,13 +10,13 @@ class User < ActiveRecord::Base
 
   ROLE = [
       ADMIN = 'admin',
-      SUPERUSER = 'super_user',
+      SUPERUSER = 'superuser',
       OPERATOR = 'operator'
   ]
 
   STATUS = [
-      AVAILABLE = 1,
-      UNAVAILABLE = 0
+      AVAILABLE = 'available',
+      UNAVAILABLE = 'unavailable'
   ]
 
   ROLE.each do |role|
@@ -42,6 +42,9 @@ class User < ActiveRecord::Base
         where(status: status)
       end
     end
+    def online
+      self.available.where('last_seen >= ?', Time.now - 2.minutes)
+    end
   end
 
   def display_name
@@ -52,8 +55,8 @@ class User < ActiveRecord::Base
     "#{first_name} #{last_name}"
   end
 
-  def self.available
-    where(status: User::AVAILABLE).where('last_seen >= ?', Time.now - 2.minutes)
+  def online?
+    self.last_seen >= Time.now - 2.minutes
   end
 
   def stamp!

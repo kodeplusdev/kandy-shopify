@@ -8,14 +8,14 @@ class Conversation < ActiveRecord::Base
   attr_readonly :title
 
   RATING = [
-      NONE = 0,
-      LIKE = 1,
-      DISLIKE = -1
+      NONE = 'none',
+      LIKE = 'like',
+      DISLIKE = 'dislike'
   ]
 
   STATUS = [
-      OPEN = 1,
-      CLOSE = 0
+      OPEN = 'open',
+      CLOSE = 'close'
   ]
 
   self.per_page = 15
@@ -26,6 +26,7 @@ class Conversation < ActiveRecord::Base
         where(rating: rating)
       end
     end
+
     STATUS.each do |status|
       define_method "#{status}" do
         where(status: status)
@@ -33,27 +34,34 @@ class Conversation < ActiveRecord::Base
     end
   end
 
-  def self.opens
-    where(status: Conversation::OPEN)
-  end
-
   def self.history(email, ip)
     where('location LIKE ? OR email LIKE ?', "%#{ip}%", "%#{email}%")
   end
 
   def title
-    name || 'Visitor'
+    name || 'anonymous'
   end
 
   def download
+    text =
 "Details:
   Date: #{created_at}
   Name: #{title}
   Email: #{email}
   IP Address: #{location['ip']}
-  Status: #{status == 1 ? 'Open' : 'Close'}
-  Rating: #{rating == 1 ? 'Like' : rating == -1 ? 'Dislike' : 'None'}
+  Status: #{status == 'open' ? 'Open' : 'Close'}
+  Rating: #{rating == 'like' ? 'Like' : rating == 'dislike' ? 'Dislike' : 'None'}
+
 "
+    messages.each do |m|
+      json = JSON.parse(m['message']['json'])
+      if json['is_joined'] || json['is_left'] || json['is_closed']
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{json['text']}\r"
+      else
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{json['display_name']} said: #{json['text']}\r"
+      end
+    end
+    text
   end
 
   RATING.each do |rating|

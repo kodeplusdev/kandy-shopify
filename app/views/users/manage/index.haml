@@ -19,6 +19,9 @@
           href: "#{preferences_url}"
           target: 'app'
 
+    $(document).on 'click', '.clickable tbody tr', ->
+      window.document.location.href = $(this).data('href')
+
 .panel
   .panel-body
     %table.table.table-hover.clickable

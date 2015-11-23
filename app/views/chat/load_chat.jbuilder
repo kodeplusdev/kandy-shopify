@@ -20,5 +20,6 @@ json.conversations @conversations do |conversation|
 end
 json.users @users do |user|
   json.(user, :id, :email, :full_name, :display_name, :role, :avatar)
-  json.conversations user.conversations.size
+  json.online user.online?
+  json.conversations user.conversations, :id
 end

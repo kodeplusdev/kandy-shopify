@@ -1,13 +1,27 @@
-.col-sm-4
-  %h2 Change your password
-  = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :put, role: 'form'} do |f|
-    = devise_error_messages!
-    = f.hidden_field :reset_password_token
-    .form-group
-      = f.label :password
-      = f.password_field :password, autofocus: true, autocomplete: "off", class: 'form-control'
-    .form-group
-      = f.label :password_confirmation, "Confirm new password"
-      = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
-    = f.submit "Change my password", class: 'btn btn-primary'
-  = render "devise/shared/links"
+:coffeescript
+  window.mainPageTitle = 'Change your password'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Change password'
+          message: 'login-form-message'
+    ShopifyApp.Bar.loadingOff()
+
+.panel
+  .panel-body
+    .col-sm-4
+      = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :put, role: 'form', 'data-shopify-app-submit': 'login-form-message'} do |f|
+        = devise_error_messages!
+        = f.hidden_field :reset_password_token
+        .form-group
+          = f.label :password
+          = f.password_field :password, autofocus: true, autocomplete: "off", class: 'form-control'
+        .form-group
+          = f.label :password_confirmation, "Confirm new password"
+          = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
+        = f.submit "Change my password", class: 'btn btn-primary hide'
+      = render "devise/shared/links"

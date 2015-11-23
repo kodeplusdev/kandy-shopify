@@ -15,13 +15,13 @@ ActiveRecord::Schema.define(version: 20151120140430) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
-    t.integer  "status",     default: 1
+    t.string   "status",     default: "open"
     t.text     "messages",   default: "[]"
-    t.integer  "rating",     default: 0
+    t.string   "rating",     default: "none"
     t.integer  "shop_id"
     t.integer  "visitor_id"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.string   "email"
     t.text     "location",   default: "{}"
     t.boolean  "deleted",    default: false
@@ -79,18 +79,18 @@ ActiveRecord::Schema.define(version: 20151120140430) do
   add_index "templates", ["shop_id"], name: "index_templates_on_shop_id"
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  default: "",         null: false
-    t.string   "encrypted_password",     default: "",         null: false
+    t.string   "email",                  default: "",            null: false
+    t.string   "encrypted_password",     default: "",            null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,          null: false
+    t.integer  "sign_in_count",          default: 0,             null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
     t.datetime "last_seen"
     t.string   "invitation_token"
     t.datetime "invitation_created_at"
@@ -106,7 +106,7 @@ ActiveRecord::Schema.define(version: 20151120140430) do
     t.string   "last_name"
     t.string   "phone_number"
     t.string   "avatar"
-    t.integer  "status",                 default: 0
+    t.string   "status",                 default: "unavailable"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

@@ -2,9 +2,9 @@ class CreateConversations < ActiveRecord::Migration
   def change
     create_table :conversations do |t|
       t.string :name
-      t.integer :status, default: 1
+      t.string :status, default: 'open'
       t.text :messages, default: '[]'
-      t.integer :rating, default: 0
+      t.string :rating, default: 'none'
       t.references :shop, index: true, foreign_key: true
       t.references :visitor, index: true, foreign_key: true
 

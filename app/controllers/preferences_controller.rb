@@ -1,6 +1,7 @@
 class PreferencesController < ApplicationController
   before_action :authenticate_user!
   before_action :shop, except: [:index, :update]
+  before_action :admin_only!, except: [:index]
 
   def index
   end

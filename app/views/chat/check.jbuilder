@@ -1,1 +1,1 @@
-json.available @users.size > 0
+json.online @users.size > 0

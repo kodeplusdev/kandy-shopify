@@ -1,12 +1,29 @@
-.col-sm-4
-  %h2 Forgot your password?
-  %br
-  = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :post, role: 'form' } do |f|
-    = devise_error_messages!
-    .form-group
-      .input-group
-        .input-group-addon
-          = fa_icon 'envelope-o'
-        = f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'Email'
-    = f.submit "Send me reset password instructions", class: 'btn btn-primary'
-  = render "devise/shared/links"
+:coffeescript
+  window.mainPageTitle = 'Forgot your password?'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Send instructions'
+          message: 'login-form-message'
+        secondary:
+          label: 'Login'
+          href: '#{new_user_session_path}'
+          target: 'app'
+    ShopifyApp.Bar.loadingOff()
+
+.panel
+  .panel-body
+    .col-sm-4
+      = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :post, role: 'form', 'data-shopify-app-submit': 'login-form-message'} do |f|
+        = devise_error_messages!
+        .form-group
+          .input-group
+            .input-group-addon
+              %i.fa.fa-envelope-o
+            = f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'Email'
+        = f.submit "Send me reset password instructions", class: 'btn btn-primary hide'
+      = render "devise/shared/links"

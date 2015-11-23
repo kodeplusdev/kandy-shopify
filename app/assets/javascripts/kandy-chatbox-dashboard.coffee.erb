@@ -57,10 +57,8 @@ window.displayMessage = (c) ->
 window.displayHistoryMessages = (messages) ->
   for m in messages
     json = JSON.parse(m.message.json)
-    if json.is_joined
-      appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}")
-    else if json.is_left
-      appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.left_chat}")
+    if json.is_joined || json.is_left || json.is_closed
+      appendStatusChange(json.id, json.text)
     else if json.type == 'o'
       appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
     else if json.type == 'v'
@@ -178,7 +176,7 @@ window.appendOperatorMessage = (id, name, avatar, msg, time) ->
 
   elems = "#conversation-tabs-content-#{id} .messages-display-container"
   if !avatar || avatar == ''
-    avatar = '<%= asset_url('avatars/1avatar-operator.png') %>'
+    avatar = '<%= asset_url('avatars/avatar-operator.png') %>'
   $("#{elems}  .list-group").append """
     <div class="list-group-item agent-message">
       <div class="media">
@@ -240,7 +238,7 @@ window.saveMessage = (id, msg) ->
 
 window.updateOperatorStatus = (status) ->
   $('#user-status-btn').removeClass('hide')
-  if status is 1
+  if status is 'available'
     $('#user-status-btn').removeClass('btn-warning')
     $('#user-status-btn').addClass('btn-success')
     $('#user-status-btn').text('Available')
@@ -303,6 +301,7 @@ window.notifyOperatorJoinedChat = (id) ->
           avatar: chatData.me.avatar
           role: chatData.me.role
           is_joined: true
+          text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}"
         KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
           msg.timestamp = new Date().getTime()
           saveMessage(id, msg)
@@ -352,6 +351,7 @@ window.notifyOperatorLeftChat = (id) ->
           avatar: chatData.me.avatar
           role: chatData.me.role
           is_left: true
+          text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.left_chat}"
         KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
           msg.timestamp = new Date().getTime()
           saveMessage(id, msg)
@@ -378,6 +378,8 @@ window.notifyOperatorCloseChat = (id) ->
         id: id
         display_name: chatData.me.display_name
         type: 'o'
+        is_closed: true
+        text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.closed_chat}"
       KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
         msg.timestamp = new Date().getTime()
         saveMessage(id, msg)
@@ -441,7 +443,7 @@ window.handleEventListeners = (data) ->
       when 'new_message'
         addNewMessage(data)
       when 'notify_close_chat'
-        closeChat(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.closed_chat}")
+        closeChat(json.id, json.text)
 
 window.addNewChat = (data) ->
   c = data.message.json
@@ -465,10 +467,8 @@ window.addNewMessage = (data) ->
       c.messages.push(data)
       break
 
-  if json.is_joined
-    appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}")
-  else if json.is_left
-    appendStatusChange(json.id, "#{json.display_name} #{chatData.shop.widget.json.in_chat.left_chat}")
+  if json.is_joined || json.is_left
+    appendStatusChange(json.id, json.text)
   else if json.type == 'o' && json.user_id != chatData.me.id
     appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, data.timestamp)
   else if json.type == 'v'

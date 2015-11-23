@@ -5,7 +5,7 @@ class ChatController < ApplicationController
 
   def widget
     @shop = Shop.find(params[:id])
-    @conversation = Conversation.opens.find(params[:chat_id])
+    @conversation = Conversation.open.find(params[:chat_id])
   rescue ActiveRecord::RecordNotFound
   ensure
     render layout: false
@@ -14,14 +14,14 @@ class ChatController < ApplicationController
   def request_chat
     @shop = Shop.find(params[:id])
     @conversation = @shop.conversations.create(name: params[:name], email: params[:email], location: params[:location], messages: [])
-    @users = @shop.users.available
+    @users = @shop.users.online
     render layout: false
   end
 
   def load_chat
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     @users = @shop.users.all
-    @conversations = @shop.conversations.opens.where(deleted: false, archived: false)
+    @conversations = @shop.conversations.open.where(deleted: false, archived: false)
     render layout: false
   end
 
@@ -73,8 +73,8 @@ class ChatController < ApplicationController
 
   def rating
     @conversation = Conversation.find(params[:chat_id])
-    if %w(-1 1).include?(params[:rating])
-      @conversation.rating = params[:rating].to_i
+    if %w(like dislike).include?(params[:rating])
+      @conversation.rating = params[:rating]
       @conversation.save!
     end
   rescue ActiveRecord::RecordNotFound
@@ -106,14 +106,14 @@ class ChatController < ApplicationController
 
   def check
     @shop = Shop.find(params[:id])
-    @users = @shop.users.available
+    @users = @shop.users.online
     render layout: false
   end
 
   def change_user_status
     @user = User.find(current_user.id)
     if @user
-      if @user.status == User::AVAILABLE
+      if @user.available?
         @user.status = User::UNAVAILABLE
       else
         @user.status = User::AVAILABLE

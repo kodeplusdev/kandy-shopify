@@ -33,7 +33,6 @@ class window.KCWidget
         message: _self.handleEventListeners
 
   handleEventListeners: (data) ->
-    console.log data
     data.message.json = JSON.parse(data.message.json)
     if _self.isValidRequest(data)
       json = data.message.json
@@ -61,8 +60,11 @@ class window.KCWidget
         DateTime = new Date(Number(message.timestamp))
         Time = _self.pad('0', DateTime.getHours(), 2) + ':' + _self.pad('0', DateTime.getMinutes(), 2)
         json = message.message.json
+
         if json.is_joined
           if !_self.chatData.operators || !_self.chatData.operators.length
+            _self.chatData.operators.push(json)
+
             if !json.display_name || json.display_name is ''
               jQuery('#operator-name').text('')
               jQuery('#in-chat-head').text(_self.config.start_chat.title)
@@ -71,7 +73,7 @@ class window.KCWidget
               jQuery('#in-chat-head').text("#{_self.config.in_chat.title} #{json.display_name}")
 
             if !json.avatar || json.avatar is ''
-              jQuery('#operator-profile-img').attr('src', '<%= asset_url('avatars/1avatar-operator.png') %>')
+              jQuery('#operator-profile-img').attr('src', '<%= asset_url('avatars/avatar-operator.png') %>')
             else
               jQuery('#operator-profile-img').attr('src', json.avatar)
 
@@ -80,15 +82,18 @@ class window.KCWidget
             else
               jQuery('#operator-role').text(json.role)
 
-          jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.joined_chat}</div>")
+          jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
         else if json.is_left
-          jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.left_chat}</div>")
+          jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
+          for o in _self.chatData.operators
+            if o.id == json.id
+              _self.chatData.operators.splice(o)
         else
           if json.type is 'v'
             jQuery('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + json.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
           else
             if !json.avatar || json.avatar is ''
-              jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/1avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+              jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
             else
               jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + json.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
             jQuery('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
@@ -108,7 +113,7 @@ class window.KCWidget
       $('#img-typing').hide()
 
     notifyCloseChat: ->
-      $('#operator-profile-img').attr('src', '<%= asset_url('avatars/1avatar-operator.png') %>')
+      $('#operator-profile-img').attr('src', '<%= asset_url('avatars/avatar-operator.png') %>')
       $('#operator-name').text('')
       $('#operator-role').text('')
       $('#in-chat-head').text(_self.config.collapse.title)
@@ -192,20 +197,20 @@ class window.KCWidget
 
     $(document).on 'click', '.like-img', ->
       if this.id is 'like'
-        _self.ratingFromVisitor(1)
+        _self.ratingFromVisitor('like')
       else
-        _self.ratingFromVisitor(-1)
+        _self.ratingFromVisitor('dislike')
       _self.refreshChat()
 
     $(document).on 'click', '.chat-like', ->
       if this.id is 'chat-likes'
-        _self.ratingFromVisitor(1)
+        _self.ratingFromVisitor('like')
         $('.chat-dislikes').attr('id', 'chat-dislikes')
         $('#chat-likes').attr('src', '<%= asset_url('icons/thumbg.svg') %>')
         $('.chat-likes').removeAttr('id')
         $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbdown.svg') %>')
       else if this.id is 'chat-dislikes'
-        _self.ratingFromVisitor(-1)
+        _self.ratingFromVisitor('dislike')
         $('.chat-likes').attr('id', 'chat-likes')
         $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbr.svg') %>')
         $('.chat-dislikes').removeAttr('id')
@@ -279,9 +284,9 @@ class window.KCWidget
           id: _self.domain.id
         dataType: 'json'
         success: (res) ->
-          if res.available isnt _self.chatData.available
-            _self.chatData.available = res.available
-            if res.available
+          if res.online isnt _self.chatData.online
+            _self.chatData.online = res.online
+            if res.online
               $('.no-operator-msg-div').remove()
             else
               $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>');
@@ -330,7 +335,7 @@ class window.KCWidget
         $('#img-typing').hide()
         _self.chatContent()
 
-        unless res.available
+        unless res.online
           $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>')
           $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
 
@@ -402,6 +407,8 @@ class window.KCWidget
             id: _self.chatData.id
             display_name: _self.chatData.title
             type: 'v'
+            is_closed: true
+            text: "#{_self.chatData.title} #{_self.config.in_chat.closed_chat}"
           KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
             msg.timestamp = new Date().getTime()
             _self.saveMessage(msg)
@@ -454,7 +461,7 @@ class window.KCWidget
       _self.isSendRequest = false
       if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
           _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
-        if _self.chatData.available
+        if _self.chatData.online
           if !_self.chatData.id || _self.chatData.id is ''
             _self.inChat('anonymous')
             _self.displayStartMessage()
@@ -472,7 +479,7 @@ class window.KCWidget
     if _self.checkingOperatorAvailable
       clearInterval(_self.checkingOperatorAvailable)
       _self.checkingOperatorAvailable = undefined
-    available = _self.chatData.available
+    available = _self.chatData.online
     _self.chatData = {messages: []}
     _self.isSendRequest = true
     $('#chat-msgs').empty()
@@ -500,7 +507,7 @@ class window.KCWidget
             <tr class='chattable-raw'>
               <td id='start-head' class='header-text collapse-start-chat'></td>
               <td class='header-btn'>
-                <a href='#' style='padding-left: 5px;' class='collapse-start-chat'>
+                <a style='padding-left: 5px;' class='collapse-start-chat'>
                   <img id='minimize' class='btn-img start-chat-btn-mini' style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/plus.png') %>'>
                 </a>
               </td>
@@ -518,7 +525,7 @@ class window.KCWidget
                   <div class='error-message' id='question-error' style=''></div>
                   <center>
                     <button class='btn-send-req' id='send-request'>
-                      <a id='send-req-text' href='#' style='text-decoration:none;color:white;padding: 0px 10px;'></a>
+                      <a id='send-req-text' style='text-decoration:none;color:white;padding: 0px 10px;'></a>
                     </button>
                   </center>
                 </div>
@@ -532,13 +539,13 @@ class window.KCWidget
         </div>
       </div>
       <div id='no-operator' class='chat-window  ' style='display: none;'>
-        <img class='chat-img top-img collapse-no-operator' src='' style='display:none !important;'>
+        <img class='chat-img top-img collapse-no-operator' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
             <tr class='chattable-raw'>
               <td id='no-operator-head' class='header-text collapse-no-operator'></td>
               <td class='header-btn'>
-                <a href='#' style='padding-left: 5px;' class='collapse-no-operator'>
+                <a style='padding-left: 5px;' class='collapse-no-operator'>
                   <img id='maxmizes' class='btn-img no-operator-btn-mini' style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/plus.png') %>'>
                 </a>
               </td>
@@ -556,7 +563,7 @@ class window.KCWidget
                   <div class='error-message' id='2question-error' style=''></div>
                   <center>
                     <button id='btn-send-email'>
-                      <a id='send-no-operator-text' href='#' style='text-decoration:none;color:white;'></a>
+                      <a id='send-no-operator-text' style='text-decoration:none;color:white;'></a>
                     </button>
                   </center>
                 </div>
@@ -567,18 +574,18 @@ class window.KCWidget
         <img class='chat-img bottom-img collapse-no-operator' src='' style='display:none !important;'>
       </div>
       <div id='no-operator-sent' class='chat-window  ' style='display: none;'>
-        <img class='chat-img top-img collapse-no-operator-success' src='' style='display:none !important;'>
+        <img class='chat-img top-img collapse-no-operator-success' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
             <tr class='chattable-raw'>
               <td id='no-operator-sent-head' class='header-text collapse-no-operator-success'>No Operators Available</td>
               <td id='no-operator-refresh' class='header-btn'>
-                <a href='#' id='refresh-send-mail'>
+                <a id='refresh-send-mail'>
                   <img style='width: 32px;' class='btn-img' src='<%= asset_url('icons/refresh.png') %>'>
                 </a>
               </td>
               <td class='header-btn'>
-                <a href='#' style='padding-left: 4px;' class='collapse-no-operator-success'>
+                <a style='padding-left: 4px;' class='collapse-no-operator-success'>
                   <img id='' class='btn-img no-operator-success-btn-mini' style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/plus.png') %>'>
                 </a>
               </td>
@@ -595,18 +602,18 @@ class window.KCWidget
         <img class='chat-img bottom-img collapse-no-operator-success' src='' style='display:none !important;'>
       </div>
       <div id='in-chat' class='chat-window' style='display: none;'>
-        <img class='chat-img top-img collapse-message-chat' src='' style='display:none !important;'>
+        <img class='chat-img top-img collapse-message-chat' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
             <tr class='chattable-raw'>
               <td id='in-chat-head' class='send-req collapse-message-chat'>#{_self.config.collapse.title}</td>
               <td class='header-btn chat-box'>
-                <a href='#' style='padding-left: 4px;' class='collapse-message-chat'>
+                <a style='padding-left: 4px;' class='collapse-message-chat'>
                   <img class='btn-img message-chat-btn-mini' src='<%= asset_url('icons/plus.png') %>'>
                 </a>
               </td>
               <td class='header-btn close-button'>
-                <a href='#' id='btn-close-chat'>
+                <a id='btn-close-chat'>
                   <img style='width: 15px;' class='btn-img' src='<%= asset_url('icons/close.png') %>'>
                 </a>
               </td>
@@ -625,14 +632,14 @@ class window.KCWidget
                   </div>
                   <div style='width:20%;float: right;margin-top: 5%;margin-right: 2%;'>
                     <div class='thumb-box'>
-                      <a href='#'>
+                      <a>
                         <img class='chat-like chat-likes' id='chat-likes' style='margin-top: 4%;' src='<%= asset_url('icons/thumbup.svg') %>'>
                       </a>
                       |
-                      <a href='#'>
+                      <a>
                         <img class='chat-like chat-dislikes' id='chat-dislikes' src='<%= asset_url('icons/thumbdown.svg') %>'>
                       </a>
-                      <a style='display:none;' href='#'>
+                      <a style='display:none;'>
                         <img src='<%= asset_url('icons/mail-icon.png') %>'>
                       </a>
                     </div>
@@ -658,18 +665,18 @@ class window.KCWidget
         <img class='chat-img bottom-img collapse-message-chat' src='' style='display:none !important;'>
       </div>
       <div id='close-chat' class='chat-window' style='display: none;'>
-        <img class='chat-img top-img collapse-close-chat' src='' style='display:none !important;'>
+        <img class='chat-img top-img collapse-close-chat' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
             <tr class='chattable-raw'>
               <td id='close-head' class='header-text collapse-close-chat'></td>
               <td id='cls-chat-refresh' class='header-btn'>
-                <a href='#' id='refresh-after-chats'>
+                <a id='refresh-after-chats'>
                   <img style='width: 32px;height: 32px;' class='btn-img refresh-cls-chats' src='<%= asset_url('icons/refresh.png') %>'>
                 </a>
               </td>
               <td class='header-btn'>
-                <a href='#' style='padding-left: 4px;' class='collapse-close-chat'>
+                <a style='padding-left: 4px;' class='collapse-close-chat'>
                   <img style='margin-bottom: 1px; margin:auto; vertical-align: middle;' class='btn-img close-chat-btn-mini' src='<%= asset_url('icons/plus.png') %>'>
                 </a>
               </td>
@@ -679,7 +686,7 @@ class window.KCWidget
                 <div class='name-messages'>
                   <p class='cls-chat-msg'></p>
                   <br>
-                  <a href='#'>
+                  <a>
                     <img class='like-img' id='like' src='<%= asset_url('icons/thumbup.svg') %>' style='margin-left: 35%;'>
                     <img style='margin-left: 7%;' class='like-img' id='dislike' src='<%= asset_url('icons/thumbdown.svg') %>'>
                   </a>
@@ -923,10 +930,10 @@ class window.KCWidget
       jQuery('#message-send').attr('style', 'background: ' + _self.config.color + ' !important')
 
     if _self.chatData.id && _self.chatData.id isnt ''
-      if _self.chatData.rating is 1
+      if _self.chatData.rating is 'like'
         jQuery('#chat-likes').attr('src', '<%= asset_url('icons/thumbg.svg') %>')
         jQuery('.chat-likes').removeAttr('id')
-      else if _self.chatData.rating is -1
+      else if _self.chatData.rating is 'dislike'
         jQuery('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbr.svg') %>')
         jQuery('.chat-dislikes').removeAttr('id')
 
@@ -941,7 +948,7 @@ class window.KCWidget
           jQuery('#in-chat-head').text("#{_self.config.in_chat.title} #{op.display_name}")
 
         if !op.avatar || op.avatar is ''
-          jQuery('#operator-profile-img').attr('src', '<%= asset_url('avatars/1avatar-operator.png') %>')
+          jQuery('#operator-profile-img').attr('src', '<%= asset_url('avatars/avatar-operator.png') %>')
         else
           jQuery('#operator-profile-img').attr('src', op.avatar)
 
@@ -966,11 +973,11 @@ class window.KCWidget
       jQuery('#con-chat').scrollTop(jQuery('#con-chat')[0].scrollHeight)
       jQuery('.top-img').hide()
       jQuery('.bottom-img').hide()
-      unless _self.chatData.available
+      unless _self.chatData.online
         jQuery('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>')
         jQuery('#con-chat').scrollTop(jQuery('#con-chat')[0].scrollHeight)
     else
-      if _self.chatData.available
+      if _self.chatData.online
         if _self.config.collapse.position is 'bl' || _self.config.collapse.position is 'r'
           jQuery('.top-img').show() if _self.config.collapse.type is 'i' || _self.config.collapse.type is 'ti'
         else
@@ -1217,7 +1224,7 @@ class window.KCWidget
       _self.showTab('AllHide')
     else if _self.config.no_operators.action is 'm'
       _self.showTab('NoOperatorTab')
-      jQuery('#lbl-email-intro').text(_self.config.no_operators.Message)
+      jQuery('#lbl-email-intro').text(_self.config.no_operators.message)
       jQuery('#no-operator-name').hide()
       jQuery('#no-operator-emails').hide()
       jQuery('#no-operator-question').hide()
@@ -1290,16 +1297,14 @@ class window.KCWidget
     DateTime = new Date(Number(m.timestamp))
     Time = _self.pad('0', DateTime.getHours(), 2) + ':' + _self.pad('0', DateTime.getMinutes(), 2)
     json = JSON.parse(m.message.json)
-    if json.is_joined
-      jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.joined_chat}</div>")
-    else if json.is_left
-      jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.left_chat}</div>")
+    if json.is_joined || json.is_left
+      jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
     else
       if json.type is 'v'
         jQuery('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + json.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
       else
         if !json.avatar || json.avatar is ''
-          jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/1avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+          jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
         else
           jQuery('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + json.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
         jQuery('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')

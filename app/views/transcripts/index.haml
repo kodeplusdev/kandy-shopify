@@ -1,6 +1,5 @@
 :coffeescript
   window.mainPageTitle = 'Transcripts'
-  window.widgetConfig = #{raw @widget_config_json}
 
   ShopifyApp.ready ->
     ShopifyApp.Bar.initialize
@@ -17,25 +16,26 @@
           target: 'app'
 
     $('.table.clickable > tbody > tr').on 'click', (e) ->
-      $.ajax
-        url: $(this).data('href')
-        type: 'GET'
-        dataType: 'json'
-        success: (res) ->
-          $('#conversation-detail-modal').on 'show.bs.modal', (e) ->
-            $('#conversation-detail-modal').attr('data-id', res.id)
-            $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
-            html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
-              '</p><p>IP: ' + res.location.ip + ' (<a class="small" href="#" id="conversation-ban-btn">ban</a>)</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
+      if e.target.type != 'checkbox'
+        $.ajax
+          url: $(this).data('href')
+          type: 'GET'
+          dataType: 'json'
+          success: (res) ->
+            $('#conversation-detail-modal').on 'show.bs.modal', (e) ->
+              $('#conversation-detail-modal').attr('data-id', res.id)
+              $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
+              html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
+                '</p><p>IP: ' + res.location.ip + ' (<a class="small" href="#" id="conversation-ban-btn">ban</a>)</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
 
-            for m in res.messages
-              html += renderMessageHtml(m)
+              for m in res.messages
+                html += renderMessageHtml(m)
 
-            html += '</div></div>'
+              html += '</div></div>'
 
-            $('#conversation-detail-modal .modal-body').html(html)
+              $('#conversation-detail-modal .modal-body').html(html)
 
-          $('#conversation-detail-modal').modal('show')
+            $('#conversation-detail-modal').modal('show')
 
     $('#checkbox-all').change ->
       $('.checkbox-ids').prop('checked', $(this).prop('checked'))
@@ -180,10 +180,8 @@
 
   renderMessageHtml = (m) ->
     json = JSON.parse(m.message.json)
-    if json.is_joined
-      appendStatusChange(json.display_name + ' ' + widgetConfig.in_chat.joined_chat)
-    else if json.is_left
-      appendStatusChange(json.display_name + ' ' + widgetConfig.in_chat.left_chat)
+    if json.is_joined || json.is_left || json.is_closed
+      appendStatusChange(json.text)
     else if json.type == 'o'
       appendOperatorMessage(json.display_name, json.avatar, json.text, m.timestamp)
     else if json.type == 'v'
@@ -197,7 +195,7 @@
     Time = DateTime.toLocaleString()
 
     if !avatar || avatar == ''
-      avatar = "#{asset_url('avatars/1avatar-operator.png')}"
+      avatar = "#{asset_url('avatars/avatar-operator.png')}"
     '<div class="list-group-item agent-message"><div class="media"><div class="media-left">' +
     '<img class="media-object" src="' + avatar+'"></div><div class="media-body"><h4 class="media-heading">' + name+
     ' <small>- ' + Time+ '</small></h4>' + msg+ '</div></div></div>'
@@ -260,8 +258,8 @@
               %td= conversation.created_at
               %td= conversation.title
               %td= conversation.users.size > 0 ? conversation.users.first.display_name : ''
-              %td= conversation.rating == 1 ? 'Like' : (conversation.rating == -1 ? 'Dislike' : '')
-              %td= conversation.status == 1 ? 'Open' : 'Close'
+              %td= conversation.rating == 'like' ? 'Like' : (conversation.rating == 'like' ? 'Dislike' : 'None')
+              %td= conversation.status == 'open' ? 'Open' : 'Close'
     .row
       .pull-right.pad-right
         = will_paginate @conversations, class: 'digg_pagination'
