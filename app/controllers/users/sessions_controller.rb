@@ -1,6 +1,4 @@
 class Users::SessionsController < Devise::SessionsController
-  around_filter :shopify_session
-  layout 'embedded_app'
   # before_filter :configure_sign_in_params, only: [:create]
 
   # GET /resource/sign_in

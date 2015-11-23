@@ -13,10 +13,10 @@
           label: 'Preferences'
           href: "#{preferences_url}"
           target: 'new'
-        secondary:
-          label: 'Kandy.IO'
-          href: 'http://kandy.io/'
-          target: 'new'
+        secondary: [
+          {label: 'Kandy.IO', href: 'http://kandy.io/', target: 'new'}
+          {label: 'Logout', message: 'logout-form-message'}
+        ]
 
     KandyAPI.setup
       listeners:
@@ -82,3 +82,5 @@
     .row#welcome-dashboard
       .panel-body
         %h3= "Hey #{current_user.display_name}"
+
+= form_tag destroy_user_session_path, method: :delete, class: 'hide', 'data-shopify-app-submit': 'logout-form-message'

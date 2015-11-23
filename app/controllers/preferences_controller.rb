@@ -42,7 +42,6 @@ class PreferencesController < ApplicationController
       #     end
       #   end
       # else
-      @shop.save
       flash[:notice] = 'Updated successful'
       # end
     else

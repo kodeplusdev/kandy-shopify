@@ -23,10 +23,10 @@ class HomeController < ApplicationController
         else
           @shop.kandy_token = res['result']['user_access_token']
           @shop.save
-          flash[:notice] = 'Updated successfull'
+          flash[:notice] = 'Updated successfully'
         end
       else
-        flash[:notice] = 'Updated successfull'
+        flash[:notice] = 'Updated successfully'
       end
     else
       flash[:error] = @shop.errors.full_messages.first
