@@ -18,8 +18,13 @@ A Kandy plugin for shopify websites.
 #### 2. Config kandy-shopify
 - Create a `.env` file
 ```yml
-SHOPIFY_CLIENT_API_KEY=<your-app-api-key>
-SHOPIFY_CLIENT_API_SECRET=<your-app-api-secret-key>
+    SHOPIFY_CLIENT_API_KEY=<your-app-api-key>
+    SHOPIFY_CLIENT_API_SECRET=<your-app-api-secret-key>
+    MAILER_SENDER=<email-of-sender>
+    MAILER_USERNAME=<gmail-smtp-email>
+    MAILER_PASSWORD=<gmail-smtp-password>
+    DEVISE_SECRET_KEY=<secret-token>
+    APP_SECRET_TOKEN=<secret-token>
 ```
 
 - Edit [`config/environments/<enviroment>`](config/environments)
@@ -33,6 +38,7 @@ SHOPIFY_CLIENT_API_SECRET=<your-app-api-secret-key>
 
 - Run command to create and migrate new database
 ```shell
+  bundle install
   rake db:create
   rake db:migrate
 ```
@@ -43,4 +49,5 @@ SHOPIFY_CLIENT_API_SECRET=<your-app-api-secret-key>
 ```
 
 ## Troubleshooting
+
 ## License
