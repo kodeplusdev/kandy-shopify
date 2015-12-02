@@ -25,7 +25,7 @@ class ShopifyController < ApplicationController
       end
 
       @shop.template = Template.new
-      @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: false)
+      @shop.widget = Widget.new(name: 'Live Chat', color: '#000000', enabled: true)
       @shop.users.invite!(email: email, first_name: first_name, last_name: last_name, role: User::ADMIN)
       @shop.initialized = true
       session[:initialized] = 1
