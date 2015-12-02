@@ -3,6 +3,9 @@ class HomeController < ApplicationController
 
   def index
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
+    if @shop.kandy_api_key.blank? || @shop.kandy_username.blank?
+      redirect_to preferences_url, notice: 'Please config Kandy APIs, Kandy accounts to use.'
+    end
   end
 
   private
