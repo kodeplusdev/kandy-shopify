@@ -35,7 +35,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.history(email, ip)
-    where('location LIKE ? OR email LIKE ?', "%#{ip}%", "%#{email}%")
+    where('location LIKE ? AND email LIKE ?', "%#{ip}%", "%#{email}%")
   end
 
   def title
@@ -54,7 +54,7 @@ class Conversation < ActiveRecord::Base
 
 "
     messages.each do |m|
-      json = JSON.parse(m['message']['json'])
+      json = m['message']['json']
       if json['is_joined'] || json['is_left'] || json['is_closed']
         text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{json['text']}\r"
       else

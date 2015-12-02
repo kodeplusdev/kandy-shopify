@@ -15,7 +15,22 @@
 #= require bootstrap-sprockets
 #= require spectrum
 #= require select2
+#= require sweetalert.min
 #= require kandy.min.js
+
+window.displayLoadingOverlay = ->
+  $('#loader-wrapper').remove()
+  $('body').removeClass('loaded')
+  $('body').prepend '''
+    <div id="loader-wrapper">
+      <div id="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+    </div>
+  '''
+
+window.removeLoadingOverlay = ->
+  $('body').addClass('loaded')
 
 window.newModal = (path, title) ->
   ShopifyApp.Modal.open
@@ -42,6 +57,23 @@ window.setUrlParameter = (url, paramName, paramValue) ->
     else
       url += "&" + paramName + "=" + paramValue
   return url
+
+window.shopGmap = (id, location) ->
+  unless id
+    return
+  else unless location || location.latitude || location.longitude
+    location =
+        latitude: 0
+        longitude: 0
+  handler = Gmaps.build('Google')
+  handler.buildMap
+    internal:
+      id: id
+    ->
+      marker = handler.addMarker
+        lat: location.latitude
+        lng: location.longitude
+      handler.map.centerOn(marker)
 
 $(document).ready ->
   $('.select2').select2

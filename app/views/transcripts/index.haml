@@ -26,7 +26,7 @@
               $('#conversation-detail-modal').attr('data-id', res.id)
               $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
               html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
-                '</p><p>IP: ' + res.location.ip + ' (<a class="small" href="#" id="conversation-ban-btn">ban</a>)</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
+                '</p><p>IP: ' + res.location.ip + ' (' + res.location.country_name + ')</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
 
               for m in res.messages
                 html += renderMessageHtml(m)
@@ -143,22 +143,31 @@
       window.open('#{chat_download_url}?id=' + id, '_blank')
 
     $(document).on 'click', '#conversation-email-btn', ->
+      $('#conversation-detail-modal').modal('hide')
       id = $('#conversation-detail-modal').attr('data-id')
-      email = prompt('Please enter your email:')
-      if email
-        if /^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/.test(email)
-          $.ajax
-            url: '#{chat_send_mail_transcript_path}'
-            type: 'POST'
-            dataType: 'json'
-            data:
-              id: id
-              email: email
-            success: (res) ->
-              ShopifyApp.flashNotice("A email has been sent to you.")
-              $('#conversation-detail-modal').modal('hide')
-        else
-          ShopifyApp.flashError("Please enter a valid email address.")
+      swal
+        title: "An input!"
+        text: "Enter your email:"
+        type: "input"
+        showCancelButton: true
+        animation: "slide-from-top"
+        inputPlaceholder: "Your email"
+      , (email) ->
+        if email is false
+          return false
+        if email is "" || !(/^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/).test(email)
+          swal.showInputError("You need to enter a valid email!")
+          return false
+        $.ajax
+          url: "#{chat_send_mail_transcript_path}"
+          type: 'POST'
+          dataType: 'json'
+          data:
+            id: id
+            email: email
+          success: (res) ->
+            ShopifyApp.flashNotice('A email has been sent to you.')
+        $('#conversation-detail-modal').modal('show')
 
     $(document).on 'click', '#conversation-ban-btn', ->
       id = $('#conversation-detail-modal').attr('data-id')
@@ -179,7 +188,7 @@
       window.location.href = setUrlParameter(url, 'q', q)
 
   renderMessageHtml = (m) ->
-    json = JSON.parse(m.message.json)
+    json = m.message.json
     if json.is_joined || json.is_left || json.is_closed
       appendStatusChange(json.text)
     else if json.type == 'o'
@@ -265,7 +274,7 @@
         = will_paginate @conversations, class: 'digg_pagination'
 
 #conversation-detail-modal.modal.fade{tabindex: '-1', role: 'dialog', 'aria-labelledby': 'conversation-detail-modal-label'}
-  .modal-dialog{role: 'document'}
+  .modal-dialog.modal-lg{role: 'document'}
     .modal-content
       .modal-header
         %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}

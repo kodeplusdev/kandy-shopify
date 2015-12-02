@@ -15,11 +15,11 @@ class TranscriptsController < ApplicationController
       q = params[:q]
       if @archived
         @conversations = @shop.conversations.where(deleted: false)
-                             .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.full_name LIKE :q', {q: "%#{q}%"})
+                             .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.first_name LIKE :q OR users.last_name LIKE :q', {q: "%#{q}%"})
                              .paginate(page: params[:page])
       else
         @conversations = @shop.conversations.where(deleted: false, archived: @archived)
-                             .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.full_name LIKE :q', {q: "%#{q}%"})
+                             .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.first_name LIKE :q OR users.last_name LIKE :q', {q: "%#{q}%"})
                              .paginate(page: params[:page])
       end
     end

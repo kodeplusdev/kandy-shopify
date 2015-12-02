@@ -1,23 +1,20 @@
+#= require underscore-min
+#= require gmaps/google
+
+chatData = {}
+
 window.onerror = ->
   return true
 
-$(document).ready ->
-  $('#user-status-btn').click ->
-    jQuery.ajax
-      url: chatData.shop.host + 'chat/change-user-status'
-      type: 'POST'
-      dataType: 'json'
-      success: (res) ->
-        updateOperatorStatus(res.status)
-
-
-window.isConnected = ->
+window.loadAndStartChat = (url) ->
   jQuery.ajax
-    url: loadChatUrl
+    url: url
     type: 'GET'
     dataType: 'json'
     success: (res) ->
-      window.chatData = res
+      chatData = res
+
+      removeLoadingOverlay()
 
       setInterval ->
         jQuery.ajax
@@ -27,18 +24,37 @@ window.isConnected = ->
       , 15 * 1000
 
       updateOperatorStatus(res.me.status)
+      $(document).on 'click', '#user-status-btn', ->
+        jQuery.ajax
+          url: chatData.shop.host + 'chat/change-user-status'
+          type: 'POST'
+          dataType: 'json'
+          success: (res) ->
+            updateOperatorStatus(res.status)
 
       if res.users
         for u in res.users
           $('#users-online-list').append """
-            <a href='#' class='list-group-item'>#{u.display_name}</a>
+            <a href='#' class='list-group-item'>#{u.display_name} <span class="pull-right #{u.online}">•</span></a>
           """
 
       if res.conversations
-        for c in res.conversations
-          displayMessage(c)
+        for c, i in res.conversations
+          displayMessage(i)
 
-window.displayMessage = (c) ->
+updateOperatorStatus = (status) ->
+  $('#user-status-btn').removeClass('hide')
+  if status is 'available'
+    $('#user-status-btn').removeClass('btn-warning')
+    $('#user-status-btn').addClass('btn-success')
+    $('#user-status-btn').text('Available')
+  else
+    $('#user-status-btn').removeClass('btn-success')
+    $('#user-status-btn').addClass('btn-warning')
+    $('#user-status-btn').text('Unavailable')
+
+displayMessage = (idx) ->
+  c = getConversationByIndex(idx)
   time = new Date(c.created_at)
   $('#conversations-list').append """
     <a id="conversation-#{c.id}" href='#' class='list-group-item'>
@@ -47,24 +63,19 @@ window.displayMessage = (c) ->
       <div class='list-group-item-text'>#{c.location.country_name}</div>
     </a>
   """
-  if checkOperatorJoined(c.id)
-    displayConversation(c)
+  if checkOperatorJoined(chatData.me.id, c.id)
+    displayConversation(idx)
 
-  $('#conversation-' + c.id).click ->
+  $(document).on 'click', '#conversation-' + c.id, ->
     notifyOperatorJoinedChat(c.id)
-    displayConversation(c)
+    displayConversation(idx)
 
-window.displayHistoryMessages = (messages) ->
-  for m in messages
-    json = JSON.parse(m.message.json)
-    if json.is_joined || json.is_left || json.is_closed
-      appendStatusChange(json.id, json.text)
-    else if json.type == 'o'
-      appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
-    else if json.type == 'v'
-      appendVisitorMessage(json.id, json.display_name, json.text, m.timestamp)
+getConversationByIndex = (idx) ->
+  chatData.conversations[idx]
 
-window.displayConversation = (c) ->
+displayConversation = (idx) ->
+  c = getConversationByIndex(idx)
+
   $('#conversations-dashboard').show()
   $('#welcome-dashboard').hide()
 
@@ -77,9 +88,9 @@ window.displayConversation = (c) ->
           </a>
           <a class="dropdown-caret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
           <ul class="dropdown-menu">
-              <li><a href="#" onclick="notifyOperatorCloseChat(#{c.id})">End chat</a></li>
-              <li><a href="#" onclick="notifyOperatorLeftChat(#{c.id})">Leave chat</a></li>
-              <li><a href="#" onclick="inviteNewOperator(#{c.id})">Invite operator</a></li>
+              <li><a id="conversation-tabs-#{c.id}-end-btn" >End chat</a></li>
+              <li><a id="conversation-tabs-#{c.id}-leave-btn">Leave chat</a></li>
+              <li class="hide"><a id="conversation-tabs-#{c.id}-invite-btn">Invite operator</a></li>
           </ul>
       </li>
     """
@@ -110,15 +121,23 @@ window.displayConversation = (c) ->
       </div>
     """
 
-    displayHistoryMessages(c.messages)
-    displayInfoVisitor(c)
+    $(document).on 'click', "#conversation-tabs-#{c.id}-end-btn", ->
+      notifyOperatorCloseChat(c.id)
+    $(document).on 'click', "#conversation-tabs-#{c.id}-leave-btn", ->
+      notifyOperatorLeftChat(c.id)
+    $(document).on 'click', "#conversation-tabs-#{c.id}-invite-btn", ->
+      inviteNewOperator(c.id)
 
+    displayHistoryMessages(idx)
 
+    displayInfoVisitor(idx)
+    $(document).on 'click', "#conversation-tabs-#{c.id}", ->
+      if $("#conversation-tabs-#{c.id}").html()
+        displayInfoVisitor(idx)
+        elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
+        $(elems).scrollTop($(elems)[0].scrollHeight)
 
-    $("#conversation-tabs-#{c.id}").on 'show.bs.tab', ->
-      displayInfoVisitor(c)
-
-    $("#conversation-tabs-content-#{c.id} form textarea").keypress (e) ->
+    $(document).on 'keypress', "#conversation-tabs-content-#{c.id} form textarea", (e) ->
       typingChecking()
       if e.keyCode is 13
         msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
@@ -128,7 +147,7 @@ window.displayConversation = (c) ->
         removeTyping()
         return false
 
-    $("#conversation-tabs-content-#{c.id} form button").click (e) ->
+    $(document).on 'click', "#conversation-tabs-content-#{c.id} form button", (e) ->
       e.preventDefault()
       msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
       if msg isnt ''
@@ -137,18 +156,27 @@ window.displayConversation = (c) ->
 
     $('.dropdown-toggle').dropdown()
 
-  $('#conversation-tabs > .active').removeClass('active')
-  $('#conversation-tabs-content > .active').removeClass('active')
+  $("#conversation-tabs-#{c.id} > a:first-child").tab('show')
+  elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
+  $(elems).scrollTop($(elems)[0].scrollHeight)
 
-  $('#conversation-tabs-' + c.id).addClass('active')
-  $('#conversation-tabs-content-' + c.id).addClass('active')
-
-  $('#conversation-tabs a[data-toggle="tab"]').click (e) ->
+  $(document).on 'click', '#conversation-tabs a[data-toggle="tab"]', (e) ->
     e.preventDefault()
     $(this).tab('show')
 
+displayHistoryMessages = (idx) ->
+  c = getConversationByIndex(idx)
 
-window.sendNewMessageToVisitor = (id, text) ->
+  for m in c.messages
+    json = m.message.json
+    if json.is_joined || json.is_left || json.is_closed
+      appendStatusChange(json.id, json.text)
+    else if json.type == 'o'
+      appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
+    else if json.type == 'v'
+      appendVisitorMessage(json.id, json.display_name, json.text, m.timestamp)
+
+sendNewMessageToVisitor = (id, text) ->
   json =
     id: id
     type: 'o'
@@ -170,63 +198,64 @@ window.sendNewMessageToVisitor = (id, text) ->
   , (msg) ->
     displayErrorMessage(msg)
 
-window.appendOperatorMessage = (id, name, avatar, msg, time) ->
+appendOperatorMessage = (id, name, avatar, msg, time) ->
   DateTime = new Date(Number(time))
   Time = DateTime.toLocaleString()
 
   elems = "#conversation-tabs-content-#{id} .messages-display-container"
-  if !avatar || avatar == ''
-    avatar = '<%= asset_url('avatars/avatar-operator.png') %>'
-  $("#{elems}  .list-group").append """
-    <div class="list-group-item agent-message">
-      <div class="media">
-        <div class="media-left">
-          <img class="media-object" src="#{avatar}">
+  if $(elems).length
+    if !avatar || avatar == ''
+      avatar = '<%= asset_url('avatars/avatar-operator.png') %>'
+    $("#{elems}  .list-group").append """
+      <div class="list-group-item agent-message">
+        <div class="media">
+          <div class="media-left">
+            <img class="media-object" src="#{avatar}">
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
+              #{msg}
+          </div>
         </div>
-        <div class="media-body">
-          <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
+      </div>
+    """
+    $(elems).scrollTop($(elems)[0].scrollHeight)
+
+appendVisitorMessage = (id, name, msg, time) ->
+  DateTime = new Date(Number(time))
+  Time = DateTime.toLocaleString()
+
+  elems = "#conversation-tabs-content-#{id} .messages-display-container"
+  if $(elems).length
+    $("#{elems}  .list-group").append """
+      <div class="list-group-item visitor-message">
+        <div class="media">
+          <div class="media-left">
+            <img class="media-object" src="<%= asset_url('avatars/visitor-avatar-thick.png') %>">
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
             #{msg}
+          </div>
         </div>
       </div>
-    </div>
-  """
-  $(elems).scrollTop($(elems)[0].scrollHeight)
+    """
+    $(elems).scrollTop($(elems)[0].scrollHeight)
 
-window.appendVisitorMessage = (id, name, msg, time) ->
-  DateTime = new Date(Number(time))
-  Time = DateTime.toLocaleString()
-
-  elems = "#conversation-tabs-content-#{id} .messages-display-container"
-  $("#{elems}  .list-group").append """
-    <div class="list-group-item visitor-message">
-      <div class="media">
-        <div class="media-left">
-          <img class="media-object" src="<%= asset_url('avatars/visitor-avatar-thick.png') %>">
-        </div>
-        <div class="media-body">
-          <h4 class="media-heading">#{name} <small>- #{Time}</small></h4>
-          #{msg}
-        </div>
-      </div>
-    </div>
-  """
-  $(elems).scrollTop($(elems)[0].scrollHeight)
-
-window.appendStatusChange = (id, msg) ->
+appendStatusChange = (id, msg) ->
   elems = "#conversation-tabs-content-#{id} .messages-display-container"
   $("#{elems}  .list-group").append """
     <div class="pad-top pad-bottom status-message">#{msg}</div>
   """
   $(elems).scrollTop($(elems)[0].scrollHeight)
 
-window.typingChecking = ->
+typingChecking = ->
 
-window.removeTyping = ->
+removeTyping = ->
 
-window.saveMessage = (id, msg) ->
-  for c in chatData.conversations
-    if c.id == id
-      c.messages.push(msg)
+saveMessage = (id, msg) ->
+  msg.message.json = JSON.parse(msg.message.json)
+
   jQuery.ajax
     url: chatData.shop.host + 'chat/save'
     type: 'post'
@@ -236,18 +265,9 @@ window.saveMessage = (id, msg) ->
       message: msg
     success: ->
 
-window.updateOperatorStatus = (status) ->
-  $('#user-status-btn').removeClass('hide')
-  if status is 'available'
-    $('#user-status-btn').removeClass('btn-warning')
-    $('#user-status-btn').addClass('btn-success')
-    $('#user-status-btn').text('Available')
-  else
-    $('#user-status-btn').removeClass('btn-success')
-    $('#user-status-btn').addClass('btn-warning')
-    $('#user-status-btn').text('Unavailable')
+displayInfoVisitor = (idx) ->
+  conversation = getConversationByIndex(idx)
 
-window.displayInfoVisitor = (conversation) ->
   $('#conversation-detail').html """
     <div class="row">
       <b>Name: </b> #{conversation.name}
@@ -263,25 +283,27 @@ window.displayInfoVisitor = (conversation) ->
   $('#conversation-history').html ->
     html = "<ul>"
     for h in conversation.histories
-      html += "<li><a href=\'#\' target='_blank'>#{h.created_at}</a></li>"
+      if h.created_at isnt conversation.created_at
+        html += "<li><a href=\'#\' target='_blank'>#{h.created_at}</a></li>"
     html += "</ul>"
 
-  $('#conversation-location').html """
-    <iframe allowfullscreen="" frameborder="0" height="300"
-      src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d16057920.548641127!2d97.664496763505!3d10.70431336366971!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1zNzQgxJHGsOG7nW5nIDM2IHAgbGluaCDEkcO0bmcgcSB0aOG7pyDEkeG7qWMgdHAgaOG7kyBjaMOtIG1pbmg!5e0!3m2!1sen!2s!4v1446966827278"
-      style="border:0" width="270"></iframe>
-  """
+  $('#conversation-location').html('')
 
-window.checkOperatorJoined = (id) ->
-  if chatData.me.conversations
-    for c in chatData.me.conversations
-      if c.id == id
-        return true
+  shopGmap 'conversation-location',
+      latitude: conversation.location.latitude
+      longitude: conversation.location.longitude
+
+checkOperatorJoined = (userId, chatId) ->
+  for c in chatData.conversations
+    if c.id == chatId
+      for o in c.operators
+        if o.id == userId
+          return true
   return false
 
 
-window.notifyOperatorJoinedChat = (id) ->
-  unless checkOperatorJoined(id)
+notifyOperatorJoinedChat = (id) ->
+  unless checkOperatorJoined(chatData.me.id, id)
     jQuery.ajax
       url: chatData.shop.host + 'chat/join'
       type: 'POST'
@@ -289,7 +311,6 @@ window.notifyOperatorJoinedChat = (id) ->
       data:
         id: id
       success: (res) ->
-        chatData.me.conversations.push({id: id})
         for c in chatData.conversations
           if c.id == id
             c.operators.push({id: chatData.me.id})
@@ -301,6 +322,7 @@ window.notifyOperatorJoinedChat = (id) ->
           avatar: chatData.me.avatar
           role: chatData.me.role
           is_joined: true
+          user_id: chatData.me.id
           text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}"
         KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
           msg.timestamp = new Date().getTime()
@@ -314,17 +336,21 @@ window.notifyOperatorJoinedChat = (id) ->
       error: (e) ->
         console.log(e)
 
-window.notifyOperatorLeftChat = (id) ->
+notifyOperatorLeftChat = (id) ->
   $("#conversation-tabs-#{id}").remove()
   $("#conversation-tabs-content-#{id}").remove()
-  $('#conversation-detail').html('')
-  $('#conversation-location').html('')
 
-  if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
-    $('#conversations-dashboard').hide()
-    $('#welcome-dashboard').show()
+  if $('#conversation-tabs').html()
+    $('#conversation-tabs > li:last-child > a:first-child').tab('show')
+  else
+    $('#conversation-detail').html('')
+    $('#conversation-location').html('')
 
-  if checkOperatorJoined(id)
+    if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
+      $('#conversations-dashboard').hide()
+      $('#welcome-dashboard').show()
+
+  if checkOperatorJoined(chatData.me.id, id)
     jQuery.ajax
       url: chatData.shop.host + 'chat/leave'
       type: 'POST'
@@ -332,17 +358,11 @@ window.notifyOperatorLeftChat = (id) ->
       data:
         id: id
       success: (res) ->
-        for c in chatData.me.conversations
-          if c.id == id
-            idx = chatData.me.conversations.indexOf(c)
-            chatData.me.conversations.splice(idx, 1)
-            break
         for c in chatData.conversations
           if c.id == id
-            for o in c.operators
+            for o, i in c.operators
               if o.id == chatData.me.id
-                idx = c.operators.indexOf(o)
-                c.operators.splice(idx, 1)
+                c.operators.splice(i, 1)
         json =
           id: id
           display_name: chatData.me.display_name
@@ -351,6 +371,7 @@ window.notifyOperatorLeftChat = (id) ->
           avatar: chatData.me.avatar
           role: chatData.me.role
           is_left: true
+          user_id: chatData.me.id
           text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.left_chat}"
         KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
           msg.timestamp = new Date().getTime()
@@ -365,7 +386,7 @@ window.notifyOperatorLeftChat = (id) ->
       error: (e) ->
         console.log(e)
 
-window.notifyOperatorCloseChat = (id) ->
+notifyOperatorCloseChat = (id) ->
   jQuery.ajax
     url: chatData.shop.host + 'chat/close'
     type: 'POST'
@@ -390,7 +411,7 @@ window.notifyOperatorCloseChat = (id) ->
       , (msg) ->
         console.log(msg)
 
-window.closeChat = (id, msg) ->
+closeChat = (id, msg) ->
   if $("#conversation-tabs-#{id}").length
     appendStatusChange(id, msg)
     $("#conversation-tabs-content-#{id} .send-form-container").html """
@@ -398,42 +419,77 @@ window.closeChat = (id, msg) ->
         <a href="#{chatData.shop.host + '/chat/download?id=' + id}" class="btn" alt="Download">
           <i class="fa fa-cloud-download fa-2x"></i>
         </a>
-        <a href="#" class="btn" onclick="sendMailConversation(#{id})" alt="Email">
+        <a class="btn" id="conversation-tabs-#{id}-email-btn" alt="Email">
           <i class="fa fa-envelope-o fa-2x"></i>
         </a>
-        <a href="#" class="btn" onclick="banVisitorIP(#{id})" alt="Ban IP">
+        <a href="#" class="btn hide" id="conversation-tabs-#{id}-ban-btn" alt="Ban IP">
           <i class="fa fa-ban fa-2x"></i>
         </a>
-        <a href="#" class="btn" onclick="closeConversationTab(#{id})" alt="Close">
+        <a href="#" class="btn" id="conversation-tabs-#{id}-close-btn" alt="Close">
           <i class="fa fa-times fa-2x"></i>
         </a>
       </center>
     """
+    $(document).on 'click', "#conversation-tabs-#{id}-email-btn", ->
+      sendMailConversation(id)
+    $(document).on 'click', "#conversation-tabs-#{id}-ban-btn", ->
+      banVisitorIP(id)
+    $(document).on 'click', "#conversation-tabs-#{id}-close-btn", ->
+      closeConversationTab(id)
   else
     closeConversationTab(id)
 
-window.sendMailConversation = (id) ->
+sendMailConversation = (id) ->
+  swal
+    title: "An input!"
+    text: "Enter your email:"
+    type: "input"
+    showCancelButton: true
+    animation: "slide-from-top"
+    inputPlaceholder: "Your email"
+    showLoaderOnConfirm: true
+    closeOnConfirm: false
+  , (email) ->
+      if email is false
+        return false
+      if email is "" || !(/^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/).test(email)
+        swal.showInputError("You need to enter a valid email!")
+        return false
+      $.ajax
+        url: "#{chatData.shop.host}/chat/send-mail-transcript"
+        type: 'POST'
+        dataType: 'json'
+        data:
+          id: id
+          email: email
+        success: (res) ->
+          swal('Done!', 'A email has been sent to you.', 'success')
 
-window.banVisitorIP = (id) ->
 
-window.inviteNewOperator = (id) ->
+banVisitorIP = (id) ->
 
-window.closeConversationTab = (id) ->
+inviteNewOperator = (id) ->
+
+closeConversationTab = (id) ->
   $("#conversation-tabs-#{id}").remove()
   $("#conversation-tabs-content-#{id}").remove()
-  $('#conversation-detail').html('')
-  $('#conversation-location').html('')
-  $("#conversation-#{id}").remove()
-  if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
-    $('#conversations-dashboard').hide()
-    $('#welcome-dashboard').show()
 
-window.displayErrorMessage = (msg) ->
+  if $('#conversation-tabs').html()
+    $('#conversation-tabs > li:last-child > a:first-child').tab('show')
+  else
+    $('#conversation-detail').html('')
+    $('#conversation-location').html('')
+    $("#conversation-#{id}").remove()
+    if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
+      $('#conversations-dashboard').hide()
+      $('#welcome-dashboard').show()
+
+displayErrorMessage = (msg) ->
   console.log(msg)
 
 window.handleEventListeners = (data) ->
-  console.log(data)
   data.message.json = JSON.parse(data.message.json)
+
   if isValidChat (data)
     json = data.message.json
     switch json.cmd
@@ -445,8 +501,11 @@ window.handleEventListeners = (data) ->
       when 'notify_close_chat'
         closeChat(json.id, json.text)
 
-window.addNewChat = (data) ->
+addNewChat = (data) ->
   c = data.message.json
+  chatData.conversations.push(c)
+  idx = chatData.conversations.length - 1
+
   time = new Date(c.created_at)
   $('#conversations-list').append """
     <a id="conversation-#{c.id}" href='#' class='list-group-item'>
@@ -455,25 +514,26 @@ window.addNewChat = (data) ->
       <div class='list-group-item-text'>#{c.location.country_name}</div>
     </a>
   """
-  $('#conversation-' + c.id).click ->
-    notifyOperatorJoinedChat(c.id)
-    displayConversation(c)
 
-window.addNewMessage = (data) ->
+  $(document).on 'click', '#conversation-' + c.id, ->
+    notifyOperatorJoinedChat(c.id)
+    displayConversation(idx)
+
+addNewMessage = (data) ->
   json = data.message.json
 
   for c in chatData.conversations
-    if c.id == json.id
+    if Number(c.id) is Number(json.id)
       c.messages.push(data)
       break
 
-  if json.is_joined || json.is_left
+  if json.is_joined || (json.is_left && json.user_id != chatData.me.id)
     appendStatusChange(json.id, json.text)
   else if json.type == 'o' && json.user_id != chatData.me.id
     appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, data.timestamp)
   else if json.type == 'v'
     appendVisitorMessage(json.id, json.display_name, json.text, data.timestamp)
 
-window.isValidChat = (data) ->
+isValidChat = (data) ->
   json = data.message.json
   return json

@@ -29,6 +29,7 @@ gem 'therubyracer', platforms: :ruby
 gem 'pry-rails'
 
 gem 'dotenv-rails'
+gem 'gmaps4rails'
 
 group :development, :test do
   gem 'sqlite3'

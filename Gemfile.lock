@@ -81,6 +81,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     globalid (0.3.5)
       activesupport (>= 4.1.0)
+    gmaps4rails (2.1.2)
     haml (4.0.7)
       tilt
     hashie (3.4.2)
@@ -248,6 +249,7 @@ DEPENDENCIES
   devise_invitable
   devise_lastseenable
   dotenv-rails
+  gmaps4rails
   haml
   jbuilder
   jquery-rails (~> 4.0.4)

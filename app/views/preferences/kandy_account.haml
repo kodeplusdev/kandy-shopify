@@ -41,7 +41,8 @@
           = f.label :kandy_password, 'Password'
           %abbr{title: 'required'} *
           = f.password_field :kandy_password, class: 'form-control input-sm', placeholder: 'password'
-          .small.help-block Leave blank for not change.
+          - unless @shop.kandy_password.blank?
+            .small.help-block Leave blank for not change.
         .form-group
           .pull-right.help-block.hide
             %a{href: '#'} Test login
@@ -52,7 +53,8 @@
           = f.label :kandy_password_guest, 'Password Guest'
           %abbr{title: 'required'} *
           = f.password_field :kandy_password_guest, class: 'form-control input-sm', placeholder: 'password'
-          .small.help-block Leave blank for not change.
+          - unless @shop.kandy_password_guest.blank?
+            .small.help-block Leave blank for not change.
         -#.form-group
           = label_tag :kandy_access_token, 'Your access token'
           = f.text_field :kandy_access_token, class: 'form-control input-sm', readonly: ''

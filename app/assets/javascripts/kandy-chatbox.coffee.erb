@@ -360,8 +360,9 @@ class window.KCWidget
         display_name: _self.chatData.title
         text: msg
       KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
-        console.log(msg)
         msg.timestamp = new Date().getTime()
+        msg.message.json = JSON.parse(msg.message.json)
+
         _self.displayMessage(msg)
         $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
         _self.saveMessage(msg)
@@ -411,6 +412,8 @@ class window.KCWidget
             text: "#{_self.chatData.title} #{_self.config.in_chat.closed_chat}"
           KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
             msg.timestamp = new Date().getTime()
+            msg.message.json = JSON.parse(msg.message.json)
+
             _self.saveMessage(msg)
           , (msg) ->
             console.log(msg)
@@ -1296,7 +1299,7 @@ class window.KCWidget
   displayMessage: (m) ->
     DateTime = new Date(Number(m.timestamp))
     Time = _self.pad('0', DateTime.getHours(), 2) + ':' + _self.pad('0', DateTime.getMinutes(), 2)
-    json = JSON.parse(m.message.json)
+    json = m.message.json
     if json.is_joined || json.is_left
       jQuery('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
     else

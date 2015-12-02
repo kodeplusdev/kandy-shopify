@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
   end
 
   def online?
-    self.last_seen >= Time.now - 2.minutes
+    self.last_seen && self.last_seen >= Time.now - 2.minutes
   end
 
   def stamp!

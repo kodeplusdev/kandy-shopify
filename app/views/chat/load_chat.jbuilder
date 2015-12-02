@@ -1,6 +1,5 @@
 json.me do
   json.(current_user, :id, :email, :full_name, :display_name,:phone_number, :role, :status, :avatar)
-  json.conversations current_user.conversations, :id
 end
 json.shop do
   json.id @shop.id
@@ -21,5 +20,4 @@ end
 json.users @users do |user|
   json.(user, :id, :email, :full_name, :display_name, :role, :avatar)
   json.online user.online?
-  json.conversations user.conversations, :id
 end

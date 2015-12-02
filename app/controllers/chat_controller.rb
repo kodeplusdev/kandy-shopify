@@ -73,7 +73,7 @@ class ChatController < ApplicationController
 
   def rating
     @conversation = Conversation.find(params[:chat_id])
-    if %w(like dislike).include?(params[:rating])
+    if %w(like dislike).include?(params[:rating]) && (@conversation.rating == Conversation::NONE || @conversation.open? )
       @conversation.rating = params[:rating]
       @conversation.save!
     end
