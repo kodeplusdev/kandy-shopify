@@ -15,8 +15,9 @@ class Widget < ActiveRecord::Base
     {
         chat_close: {
             ask_for_rating: true,
+            downloadable: false,
             button_text: 'Sign Up Free!',
-            chat_closed: 'Thanks for chatting. Please rate how you feel about the chat session:',
+            chat_closed: 'Thanks for chatting. Please rate how you feel about the chat session',
             custom_link_button: false,
             download: 'Download chat transcript',
             rating_thanks: 'Thanks for your rating!',
@@ -26,13 +27,13 @@ class Widget < ActiveRecord::Base
         collapse: {
             custom_image_id: '',
             custom_image_url: '',
-            horizontal: 50,
+            horizontal: 40,
             image: 2,
             image_in_front_of_tabtofTab: false,
             is_custom: true,
             page_load: 'bounceIn',
-            position: 'bl',
-            scale: 50,
+            position: 'br',
+            scale: 100,
             show_widget_hide_button: true,
             title: 'Chat with us!',
             type: 'ti',
@@ -41,9 +42,9 @@ class Widget < ActiveRecord::Base
         color: '#5cb85c',
         enable: true,
         error_messages: {
-            email_valid: 'Please Enter Valid Email.',
-            name_required: 'Please Enter Name.',
-            no_operator_required: 'Please Enter Name, Email and Question.'
+            email_valid: 'Please enter valid email.',
+            name_required: 'Please enter name.',
+            no_operator_required: 'Please enter name, email and question.'
         },
         in_chat: {
             connecting: 'Connecting you to the chat now...',
@@ -62,15 +63,14 @@ class Widget < ActiveRecord::Base
             action: 'e',
             central_email: 'info@kandy.io',
             email_intro: 'There are currently no operators available, but feel free to send us an email!',
-            email_sent_text: 'email is sent and should go back to the initial page waiting for new chat sessions.',
+            email_sent_text: 'Email is sent and should go back to the initial page waiting for new chat sessions.',
             message: 'Sorry, no operators are currently available',
-            send_button: 'Send Email',
+            send_button: 'Send',
             title: 'No Operators Available',
-            email: 'enter your email here',
-            name: 'enter your name here',
+            email: 'Enter your email here',
+            name: 'Enter your name here',
             question: 'what can we help with?'
         },
-        selected_tab: 'btn-no-operator',
         start_chat: {
             ask_for_email: true,
             ask_for_email_text: 'Enter your email here',
@@ -81,7 +81,7 @@ class Widget < ActiveRecord::Base
             ask_for_department: false,
             intro_text: 'Enter your info below to begin.',
             popout_automatically: false,
-            request_button: 'Send Chat Request',
+            request_button: 'Start Chat',
             title: 'Chat with us!'
         },
         style: 'Minimal',

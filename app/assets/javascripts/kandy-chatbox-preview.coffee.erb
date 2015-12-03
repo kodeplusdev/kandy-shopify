@@ -1,16 +1,12 @@
-#= require jquery
 #= require kandy.min
 
 class window.KCWidget
   _self = undefined
 
-  KANDY_SHOPIFY_CHAT_ID = 'kandy_shopify_chat_id'
-
   constructor: (options) ->
     _self = @
-    {@domain, @operator, @visitor, @config} = options
-    _self.chatData = {messages: []}
-    _self.isSendRequest = true
+    {@config} = options
+    _self.chatData = {"id":1,"title":"anonymous","name":"anonymous","email":"anonymous@anonymous.com","status":"open","rating":"like","messages":[{"message":{"json":{"id":"1","cmd":"new_message","type":"v","display_name":"anonymous","text":"hi"}},"timestamp":"1449034496562"},{"message":{"json":{"id":"1","type":"o","text":"hi","cmd":"new_message","avatar":"","display_name":"operator","user_id":"1"}},"timestamp":"1449034504589"},{"message":{"json":{"id":"1","display_name":"operator","cmd":"new_message","type":"o","avatar":"","role":"admin","is_joined":"true","user_id":"1","text":"operator has joined the chat!"}},"timestamp":"1449036270630"},{"message":{"json":{"id":"7","display_name":"operator","cmd":"new_message","type":"o","avatar":"","role":"admin","is_left":"true","user_id":"1","text":"operator has left the chat"}},"timestamp":"1449036754421"},{"message":{"json":{"id":"7","display_name":"operator","cmd":"new_message","type":"o","avatar":"","role":"admin","is_closed":"true","user_id":"1","text":"operator has closed the chat"}},"timestamp":"1449036754421"}],"created_at":"2015-12-02T05:34:24.672Z","operators":[{"id":1,"email":"operator@operator.com","full_name":"operator","display_name":"operator","role":"operator"}],"online":true}
 
     _self.flagStartChat = false
     _self.flagInChat = false
@@ -19,494 +15,27 @@ class window.KCWidget
     _self.flagNoOperatorSuccess = false
 
     _self.renderWidget()
-    _self.createConnection()
+    _self.bindWidget()
 
-  createConnection: ->
-    _self.registerEventListeners()
-    KandyAPI.login _self.domain.apiKey, _self.visitor.username, _self.visitor.password, (msg) ->
-      _self.onConnected()
-    , (e) ->
-      console.log e
+  update: (config) ->
+    _self.config = config.json_string
+    _self.config.color = config.color
+    _self.config.enabled = config.enabled
+    _self.config.current_tab = config.current_tab
 
-  registerEventListeners: ->
-    KandyAPI.setup
-      listeners:
-        message: _self.handleEventListeners
+    _self.flagStartChat = false
+    _self.flagInChat = false
+    _self.flagCloseChat = false
+    _self.flagNoOperator = false
+    _self.flagNoOperatorSuccess = false
 
-  handleEventListeners: (data) ->
-    data.message.json = JSON.parse(data.message.json)
-    if _self.isValidRequest(data)
-      json = data.message.json
-      switch json.cmd
-        when 'message_delivery'
-          _self.notifyMessageDelivery(data)
-        when 'new_message'
-          _self.handlers.newMessageFromOperator(data)
-        when 'typing_alert'
-          _self.typingAlert(json.user_id, json.name)
-        when 'remove_typing_alert'
-          _self.removeTypingAlert()
-        when 'notify_close_chat'
-          _self.handlers.notifyCloseChat()
-
-  isValidRequest: (data) ->
-    json = data.message.json
-    return json && json.id && json.id isnt '' && json.id == _self.chatData.id
-
-  handlers:
-
-    notifyMessageDelivery: (message) ->
-
-    newMessageFromOperator: (message) ->
-        DateTime = new Date(Number(message.timestamp))
-        Time = _self.pad('0', DateTime.getHours(), 2) + ':' + _self.pad('0', DateTime.getMinutes(), 2)
-        json = message.message.json
-
-        if json.is_joined
-          if !_self.chatData.operators || !_self.chatData.operators.length
-            _self.chatData.operators.push(json)
-
-            if !json.display_name || json.display_name is ''
-              $('#operator-name').text('')
-              $('#in-chat-head').text(_self.config.start_chat.title)
-            else
-              $('#operator-name').text(json.display_name)
-              $('#in-chat-head').text("#{_self.config.in_chat.title} #{json.display_name}")
-
-            if !json.avatar || json.avatar is ''
-              $('#operator-profile-img').attr('src', '<%= asset_url('avatars/avatar-operator.png') %>')
-            else
-              $('#operator-profile-img').attr('src', json.avatar)
-
-            if !json.role || json.role is ''
-              $('#operator-role').text('')
-            else
-              $('#operator-role').text(json.role)
-
-          $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
-        else if json.is_left
-          $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
-          for o in _self.chatData.operators
-            if o.id == json.id
-              _self.chatData.operators.splice(o)
-        else
-          if json.type is 'v'
-            $('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + json.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
-          else
-            if !json.avatar || json.avatar is ''
-              $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
-            else
-              $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + json.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
-            $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
-        $('#con-chat').show()
-        $('#def-chat').hide()
-        $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
-        _self.chatData.messages.push(message);
-
-    typingAlert: (id, name) ->
-      $('#img-typing').empty()
-      $('#img-typing').show()
-      $('#img-typing').append('<p class=\'chat-message-pinned typing-' + id + '-' + _self.chatData.id + '\'>' + name + ' ' + _self.config.in_chat.typing + '<img src =\'<%= asset_url('icons/typing.gif') %>\' style=\'width: 16px;height: 16px;\' /></p>')
-      $('.typing-' + id + '-' + _self.chatData.id).show()
-      $('#conchat').scrollTop($('#con-chat')[0].scrollHeight)
-
-    removeTypingAlert: ->
-      $('#img-typing').hide()
-
-    notifyCloseChat: ->
-      $('#operator-profile-img').attr('src', '<%= asset_url('avatars/avatar-operator.png') %>')
-      $('#operator-name').text('')
-      $('#operator-role').text('')
-      $('#in-chat-head').text(_self.config.start_chat.title)
-      $('.cls-chat-msg').text(_self.config.chat_close.chat_closed);
-      $('#like').show()
-      $('#dislike').show()
-      $('#cls-chat-rating').removeClass('success')
-      _self.showTab('CloseChatTab')
-      _self.showToggle('CloseChatTab')
-      $('.mess-input').val('')
-      $('.chat-dislikes').attr('id', 'chat-dislikes')
-      $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbdown.svg') %>')
-      $('.chat-likes').attr('id', 'chat-likes')
-      $('#chat-likes').attr('src', '<%= asset_url('icons/thumbup.svg') %>')
-
-  onConnected: ->
-    _self.getLocationInfo()
-    _self.checkContinueChat()
-    _self.widgetRequest()
-
-    $(document).on 'click', '#send-request', ->
-      if _self.isSendRequest
-        $('#email-error').hide()
-        $('#name-error').hide()
-        $('#txt-emails').css('border-color', '')
-        $('#txt-name').css('border-color', '')
-        _self.isSendRequest = false
-
-        name = $.trim($('#txt-name').val())
-        name = if _self.config.start_chat.ask_for_name is false then (if name is '' then 'anonymous' else '') else name
-        email = $.trim($('#txt-emails').val())
-        question = $.trim($('#txt-question').val())
-        if _self.departmentVisible
-          if $('.drp-department').val() is null
-            _self.department = '0'
-          else
-            _self.department = $('.drp-department option:selected').val()
-        filter = /^([a-zA-Z0-9_\.\-])+@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/
-        flag = true
-        # flag = if name isnt '' then (if email isnt '' then ( if filter.test(email) then true else false) else false) else false
-        if name isnt ''
-          if email is '' || !filter.test(email)
-            $('#email-error').show()
-            $('#txt-emails').css('border-color', '#CC0000')
-            _self.isSendRequest = true
-            flag = false
-        else
-          $('#txt-name').css('border-color', '#CC0000')
-          $('#name-error').show()
-          _self.isSendRequest = true
-          flag = false
-        if flag
-          _self.visitor.name = name
-          _self.inChat(name)
-          _self.sendRequestFromWidget(name, email, question)
-          _self.showTab('MessageChatTab')
-          _self.showToggle('MessageChatTab')
-          $('#def-chat').show()
-          $('#txt-name').val('')
-          $('#txt-emails').val('')
-          $('#txt-question').val('')
-
-    $(document).on 'click', '#message-send', ->
-      $('#con-chat').show()
-      val = $.trim($('.mess-input').val())
-      if val isnt ''
-        _self.sendMessageFromVisitor(val)
-        $('.mess-input').val('')
-
-    $('.mess-input').keypress (e) ->
-      _self.typingChecking()
-      if e.keyCode is 13
-        $('#con-chat').show()
-        val = $.trim($(this).val())
-        if val isnt ''
-          _self.sendMessageFromVisitor(val)
-          $('.mess-input').val('')
-        _self.removeTyping()
-        return false
-
-    $('.mess-input').blur ->
-      _self.removeTyping()
-
-    $(document).on 'click', '.like-img', ->
-      if this.id is 'like'
-        _self.ratingFromVisitor('like')
-        $('#dislike').hide()
-      else
-        _self.ratingFromVisitor('dislike')
-        $('#like').hide()
-      $('#cls-chat-rating').addClass('success')
-      $('.cls-chat-msg').text(_self.config.chat_close.rating_thanks)
-
-    $(document).on 'click', '.chat-like', ->
-      if this.id is 'chat-likes'
-        _self.ratingFromVisitor('like')
-        $('.chat-dislikes').attr('id', 'chat-dislikes')
-        $('#chat-likes').attr('src', '<%= asset_url('icons/thumbg.svg') %>')
-        $('.chat-likes').removeAttr('id')
-        $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbdown.svg') %>')
-      else if this.id is 'chat-dislikes'
-        _self.ratingFromVisitor('dislike')
-        $('.chat-likes').attr('id', 'chat-likes')
-        $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbr.svg') %>')
-        $('.chat-dislikes').removeAttr('id')
-        $('#chat-likes').attr('src', '<%= asset_url('icons/thumbup.svg') %>')
-
-    $(document).on 'click', '#btn-send-email', ->
-      $('#email2-error').hide()
-      $('#question2-error').hide()
-      $('#no-operator-name').css('border-color', '')
-      $('#no-operator-emails').css('border-color', '')
-      $('#no-operator-question').css('border-color', '')
-      name = $.trim($('#no-operator-name').val())
-      email = $.trim($('#no-operator-emails').val())
-      question = $.trim($('#no-operator-question').val())
-      filter = /^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-      if name isnt '' && email isnt '' && question isnt ''
-        if filter.test(email)
-          _self.sendNoOperatorMailRequestFromWidget(name, email, question)
-        else
-          $('#email2-error').show()
-          $('#no-operator-emails').css('border-color', '#CC0000')
-      else
-        $('#no-operator-name').css('border-color', '#CC0000')
-        $('#no-operator-emails').css('border-color', '#CC0000')
-        $('#no-operator-question').css('border-color', '#CC0000')
-        $('#question2-error').show()
-
-    $(document).on 'click', '#refresh-send-mail', _self.refreshChat
-
-    $(document).on 'click', '#btn-close-chat', ->
-      _self.closeChatFromVisitor()
-
-    $(document).on 'click', '#refresh-after-chats', _self.refreshChat
-
-    $(document).on 'click', '.like-chat-dwld', ->
-      window.location.href = _self.domain.host + '/chat/download?id=' + _self.chatData.id
-
-  checkContinueChat: ->
-    id = localStorage.getItem(KANDY_SHOPIFY_CHAT_ID)
-    if id isnt null
-      _self.chatData.id = id
-
-  widgetRequest: ->
-    jQuery.ajax
-      url: _self.domain.host + 'chat/widget'
-      type: 'POST'
-      dataType: 'json'
-      data:
-        id: _self.domain.id
-        chat_id: _self.chatData.id
-      success: (res) ->
-        if res.status is 'close'
-          localStorage.removeItem(KANDY_SHOPIFY_CHAT_ID)
-          location.reload()
-        _self.chatData = res
-        _self.bindWidget()
-        if _self.checkOperatorAvaliableId
-          clearInterval(_self.checkOperatorAvaliableId)
-        _self.checkOperatorAvaliableId = _self.checkOperatorAvaliable()
-
-  checkOperatorAvaliable: (delay)->
-    delay = 15*1000 unless delay
-    setInterval ->
-      jQuery.ajax
-        url: _self.domain.host + 'chat/online'
-        type: 'GET'
-        data:
-          id: _self.domain.id
-        dataType: 'json'
-        success: (res) ->
-          if res.online isnt _self.chatData.online
-            _self.chatData.online = res.online
-            if res.online
-              $('.no-operator-msg-div').remove()
-            else
-              $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>');
-              $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight);
-    , delay
-
-  sendRequestFromWidget: (name, email, question) ->
-    jQuery.ajax
-      url: _self.domain.host + 'chat/request'
-      type: 'POST'
-      dataType: 'json'
-      data:
-        id: _self.domain.id
-        name: name
-        email: email
-        location: _self.location
-      success: (res) ->
-        _self.chatData = res
-
-        localStorage.setItem(KANDY_SHOPIFY_CHAT_ID, res.id)
-
-        if _self.checkingOperatorAvailable
-          clearInterval(_self.checkingOperatorAvailable)
-          _self.checkingOperatorAvailable = undefined
-        _self.checkingOperatorAvailable = _self.checkOperatorAvaliable()
-
-        if question && question isnt ''
-          json =
-            message:
-              json:
-                id: res.id
-                text: question
-                display_name: _self.chatData.title
-                type: 'v'
-            timestamp: new Date().getTime()
-          res.messages.push(json)
-          _self.displayMessage(json)
-          $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
-          _self.saveMessage(json)
-
-        _self.sendNotifyNewChatToOperator(res)
-
-        $('#con-chat').show()
-        $('#operator-img-div').show()
-        $('#def-chat').css('min-height', '40px')
-        $('#img-typing').hide()
-        _self.chatContent()
-
-        unless res.online
-          $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>')
-          $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
-
-  sendNotifyNewChatToOperator: (conversation) ->
-    json = conversation
-    json.cmd = 'new_chat'
-    json.domain_id = _self.domain.id
-
-    KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
-      console.log(msg)
-    , (msg) ->
-      console.log (msg)
-
-  sendMessageFromVisitor: (msg) ->
-    unless _self.chatData.id
-      _self.sendRequestFromWidget('anonymous', '', msg)
-    else
-      json =
-        id: _self.chatData.id
-        cmd: 'new_message'
-        type: 'v'
-        display_name: _self.chatData.title
-        text: msg
-      KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
-        msg.timestamp = new Date().getTime()
-        msg.message.json = JSON.parse(msg.message.json)
-
-        _self.displayMessage(msg)
-        $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
-        _self.saveMessage(msg)
-      , (msg) ->
-        _self.displayErrorMessage(msg)
-
-  saveMessage: (msg) ->
-    jQuery.ajax
-      url: _self.domain.host + 'chat/save'
-      type: 'post'
-      dataType: 'json'
-      data:
-        id: _self.chatData.id
-        message: msg
-      success: ->
-
-  typingChecking: ->
-    # TODO send to server
-
-  removeTyping: ->
-    # TODO: send to server
-
-  ratingFromVisitor: (val) ->
-    jQuery.ajax
-      url: _self.domain.host + 'chat/rating'
-      type: 'POST'
-      dataType: 'json'
-      data:
-        chat_id: _self.chatData.id
-        rating: val
-
-  closeChatFromVisitor: ->
-    if _self.chatData.id
-      jQuery.ajax
-        url: _self.domain.host + 'chat/close'
-        type: 'POST'
-        dataType: 'json'
-        data:
-          id: _self.chatData.id
-        success: () ->
-          json =
-            cmd: 'notify_close_chat'
-            id: _self.chatData.id
-            display_name: _self.chatData.title
-            type: 'v'
-            is_closed: true
-            text: "#{_self.chatData.title} #{_self.config.in_chat.closed_chat}"
-          KandyAPI.messaging.sendJSON _self.operator.username, json, (msg) ->
-            msg.timestamp = new Date().getTime()
-            msg.message.json = JSON.parse(msg.message.json)
-
-            _self.saveMessage(msg)
-          , (msg) ->
-            console.log(msg)
-          _self.handlers.notifyCloseChat()
-
-  sendNoOperatorMailRequestFromWidget: (name, email, question) ->
-    jQuery.ajax
-      url: _self.domain.host + 'chat/send-mail'
-      type: 'POST'
-      dataType: 'json'
-      data:
-        id: _self.domain.id
-        name: name
-        email: email
-        question: question
-      success: () ->
-        $('#no-operator-name').val('')
-        $('#no-operator-emails').val('')
-        $('#no-operator-question').val('')
-        _self.showTab('NoOperatorSuccess')
-        _self.showToggle('NoOperatorSuccess')
-
-  getLocationInfo: ->
-    # FIXME: host blocked by Adblock
-    _self.location = { # dummy
-      'ip': ''
-      'country_code': ''
-      'country_name': ''
-      'region_code': ''
-      'region_name': ''
-      'city': ''
-      'zip_code': ''
-      'time_zone': ''
-      'latitude': 0
-      'longitude': 0
-      'metro_code': 0
-    }
-    jQuery.ajax
-      url: 'https://freegeoip.net/json/'
-      type: 'GET'
-      dataType: 'jsonp'
-      async: false
-      success: (location) ->
-        _self.location = location
-
-  sendRequest: ->
-    if _self.isSendRequest
-      _self.isSendRequest = false
-      if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
-          _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
-        if _self.chatData.online
-          if !_self.chatData.id || _self.chatData.id is ''
-            _self.inChat('anonymous')
-            _self.displayStartMessage()
-            #_self.sendRequestFromWidget()
-            _self.showToggle('MessageChatTab')
-            _self.showTab('MessageChatTab')
-        else
-          if !_self.chatData.id || _self.chatData.id is ''
-            _self.noOperators()
-    else
-      _self.showToggle('MessageChatTab')
-
-  refreshChat: ->
-    localStorage.removeItem(KANDY_SHOPIFY_CHAT_ID)
-    if _self.checkingOperatorAvailable
-      clearInterval(_self.checkingOperatorAvailable)
-      _self.checkingOperatorAvailable = undefined
-    available = _self.chatData.online
-    _self.chatData = {messages: []}
-    _self.isSendRequest = true
-    $('#chat-msgs').empty()
-    if available
-      if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
-          _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
-        _self.showTab('MessageChatTab')
-        _self.hideToggle('MessageChatTab')
-      else
-        _self.showTab('StartChatTab')
-        _self.hideToggle('StartChatTab')
-      _self.hideChatable()
-    else
-      _self.hideToggle('NoOperatorTab')
-      _self.hideChatable()
-      _self.noOperators()
+    _self.renderWidget()
+    _self.bindWidget()
 
   renderWidget: ->
-    $('body').append """
-    <div id='kandy-live-widget' data-position='#{_self.config.collapse.position}' class='animate chat-window'>
-      <div id='start-chat' class='chat-window' style='display: none;'>
+    $('body').html """
+    <div class='animate chat-window'>
+      <div id='start-chat' class='chat-window minimizee' style='display: none;'>
         <img class='chat-img top-img collapse-start-chat' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
@@ -524,7 +53,7 @@ class window.KCWidget
               </td>
             </tr>
             <tr id='name-box'>
-              <td colspan='2' style='padding:0;'>
+              <td colspan='3' style='padding:0;'>
                 <div class='name-messages'>
                   <h4 class='title-info' id='lbl-intro'></h4>
                   <input id='txt-name' class='name-input' style=''>
@@ -575,7 +104,7 @@ class window.KCWidget
                   <input id='no-operator-emails' class='name-input' placeholder='#{_self.config.no_operators.email}'>
                   <div class='error-message' id='email2-error' style=''></div>
                   <textarea id='no-operator-question' class='question-input' placeholder='#{_self.config.no_operators.question}'></textarea>
-                  <div class='error-message' id='question2-error' style='display:none;'></div>
+                  <div class='error-message' id='question2-error' style=''></div>
                   <center>
                     <button id='btn-send-email'>
                       <a id='send-no-operator-text' style='text-decoration:none;color:white;'></a>
@@ -588,7 +117,7 @@ class window.KCWidget
         </table>
         <img class='chat-img bottom-img collapse-no-operator' src='' style='display:none !important;'>
       </div>
-      <div id='no-operator-sent' class='chat-window' style='display: none;'>
+      <div id='no-operator-sent' class='chat-window  ' style='display: none;'>
         <img class='chat-img top-img collapse-no-operator-success' src='' style='display:block !important;'>
         <table class='chattable' style='width: 300px;'>
           <tbody>
@@ -650,7 +179,7 @@ class window.KCWidget
                       <img class='chat-like chat-likes' id='chat-likes' style='margin-top: 4%;' src='<%= asset_url('icons/thumbup.svg') %>'>
                       |
                       <img class='chat-like chat-dislikes' id='chat-dislikes' src='<%= asset_url('icons/thumbdown.svg') %>'>
-                      <a class='chat-mail' style='display:none;'>
+                      <a style='display:none;'>
                         <img src='<%= asset_url('icons/mail-icon.png') %>'>
                       </a>
                     </div>
@@ -740,64 +269,10 @@ class window.KCWidget
       else
         $('.chattable').css('width', '300px')
 
-    $(document).on 'click', '.minimize-btn1', ->
-        $('#start-chat, #no-operator').addClass('minimize')
-
-    $(document).on 'click', '.collapse-start-chat', ->
-      if $('#start-chat').hasClass('minimize')
-        $('#start-chat, #no-operator').removeClass('minimize')
-      else
-        img = $('.start-chat-btn-mini')[0].src
-
-        if img.indexOf('minus') > -1
-          _self.hideChatable('.start-chat-btn-mini')
-          _self.hideToggle('StartChatTab')
-        else
-          _self.showChatable('.start-chat-btn-mini')
-          _self.showToggle('StartChatTab')
-
-    $(document).on 'click', '.collapse-message-chat', ->
-      img = $('.message-chat-btn-mini')[0].src
-
-      if img.indexOf('minus') > -1
-        _self.hideChatable('.message-chat-btn-mini')
-        _self.hideToggle('MessageChatTab')
-      else
-        _self.showChatable('.message-chat-btn-mini')
-        _self.sendRequest()
-
-    $(document).on 'click', '.collapse-close-chat', ->
-      img = $('.close-chat-btn-mini')[0].src
-
-      if img.indexOf('minus') > -1
-        _self.hideChatable('.close-chat-btn-mini')
-        _self.hideToggle('CloseChatTab')
-      else
-        _self.showChatable('.close-chat-btn-mini')
-        _self.showToggle('CloseChatTab')
-
-    $(document).on 'click', '.collapse-no-operator', ->
-      if $('#no-operator').hasClass('minimize')
-        $('#start-chat, #no-operator').removeClass('minimize')
-      else
-        img = $('.no-operator-btn-mini')[0].src
-
-        if img.indexOf('minus') > -1
-          _self.hideChatable('.no-operator-btn-mini')
-          _self.hideToggle('NoOperatorTab')
-        else
-          _self.showChatable('.no-operator-btn-mini')
-          _self.showToggle('NoOperatorTab')
-
-    $(document).on 'click', '.collapse-no-operator-success', ->
-      img = $('.no-operator-success-btn-mini')[0].src
-
-      if img.indexOf('minus') > -1
-        _self.hideChatable('.no-operator-success-btn-mini')
-        _self.hideToggle('NoOperatorSuccess')
-      else
-        _self.showChatable('.no-operator-success-btn-mini')
-        _self.showToggle('NoOperatorSuccess')
+    $(document).on 'mouseover', '#message-send', ->
+      $('#message-send').css('border', '0px solid ' + _self.config.color)
+    $(document).on 'mouseout', '#message-send', ->
+      $('#message-send').css('border', 'none')
 
   hideChatable: (bar) ->
     $(bar).attr('src', '<%= asset_url('icons/plus.png') %>') if bar isnt undefined
@@ -934,7 +409,7 @@ class window.KCWidget
       $('#in-chat-head').attr('style', 'background: ' + _self.config.color + ' !important')
       $('#message-send').attr('style', 'background: ' + _self.config.color + ' !important')
 
-    if _self.chatData.id && _self.chatData.id isnt ''
+    if _self.chatData.id && _self.chatData.id isnt '' && _self.config.current_tab is 'in-chat'
       if _self.chatData.rating is 'like'
         $('#chat-likes').attr('src', '<%= asset_url('icons/thumbg.svg') %>')
         $('.chat-likes').removeAttr('id')
@@ -971,30 +446,45 @@ class window.KCWidget
         _self.inChat(_self.chatData.name)
 
       _self.chatContent()
-      _self.isSendRequest = false
       _self.showTab('MessageChatTab')
       _self.showToggle('MessageChatTab')
       $('.chattable').show()
       $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
       $('.top-img').hide()
       $('.bottom-img').hide()
-      unless _self.chatData.online
-        $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>')
-        $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
+      $('#chat-msgs').append('<div class=\'in-chat-msg no-operator-msg-div\'>' + _self.config.in_chat.no_operators + '</div>')
+      $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
     else
-      if _self.chatData.online
+      if _self.chatData.online && _self.config.current_tab isnt 'no-operator' && _self.config.current_tab isnt 'error'
         if _self.config.collapse.position is 'bl' || _self.config.collapse.position is 'br'
           $('.top-img').show() if _self.config.collapse.type is 'i' || _self.config.collapse.type is 'ti'
         else
           $('.bottom-img').show() if _self.config.collapse.type is 'i' || _self.config.collapse.type is 'ti'
         $('.chattable').hide() if _self.config.collapse.type is 'i'
+
         if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
             _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
           _self.showTab('MessageChatTab')
         else
-          _self.showTab('StartChatTab')
+            _self.showTab('StartChatTab')
+
+        if _self.config.current_tab is 'start-chat'
+          _self.showChatable('.start-chat-btn-mini')
+          _self.showToggle('StartChatTab')
+        else if _self.config.current_tab is 'chat-closed'
+          $('#in-chat-head').text(_self.config.start_chat.title)
+          $('.top-img').hide()
+          _self.showTab('CloseChatTab')
+          _self.showToggle('CloseChatTab')
       else
         _self.noOperators()
+        _self.showChatable('.no-operator-btn-mini')
+        _self.showToggle('NoOperatorTab')
+        if _self.config.current_tab is 'error'
+          $('#email2-error').show()
+          $('#name2-error').show()
+          $('#question2-error').show()
+          $('#btn-send-email').hide()
 
   showTab: (CurrentTab) ->
     switch (CurrentTab)
@@ -1281,7 +771,6 @@ class window.KCWidget
       $('.like-chat-dwld').text(_self.config.chat_close.download);
     else
       $('.like-chat-dwld').hide()
-
   pad: (padString, value, length) ->
     str = value.toString()
     while (str.length < length)
@@ -1308,8 +797,12 @@ class window.KCWidget
     DateTime = new Date(Number(m.timestamp))
     Time = _self.pad('0', DateTime.getHours(), 2) + ':' + _self.pad('0', DateTime.getMinutes(), 2)
     json = m.message.json
-    if json.is_joined || json.is_left
-      $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.text}</div>")
+    if json.is_joined
+      $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.joined_chat}</div>")
+    else if json.is_left
+      $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.left_chat}</div>")
+    else if json.is_closed
+      $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{json.display_name} #{_self.config.in_chat.closed_chat}</div>")
     else
       if json.type is 'v'
         $('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + json.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
@@ -1319,10 +812,6 @@ class window.KCWidget
         else
           $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + json.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + json.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
         $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
-
-
-  displayErrorMessage: (m) ->
-    console.log(m)
 
   setImgPosition: ->
     if _self.config.collapse.image isnt '0'
@@ -1378,8 +867,7 @@ class window.KCWidget
         $('.chat-img').css('margin-left', '' + first + '%')
 
   widgetAnimate: ->
-    if _self.config.collapse.page_load isnt 'none'
-      classes = $('.chat-window').attr('class')
+    if _self.config.collapse.page_load isnt 'none' && _self.config.current_tab is 'collapsed'
       $('.chat-window').removeClass().addClass(_self.config.collapse.page_load + ' animated').one 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', ->
         $(this).removeClass()
-        $(this).addClass(classes)
+        $(this).addClass('chat-window')

@@ -1,11 +1,31 @@
 :coffeescript
+
+  window.updateWidget = (config) ->
+    KcWidget.update(config)
+
   done = false
+
   script = document.createElement('script')
   script.async = true
   script.type = 'text/javascript'
-  script.src = '#{asset_url("kandy-chatbox.js")}'
+  script.src = '#{asset_url('kandy-chatbox-preview.js')}'
   document.getElementsByTagName('HEAD').item(0).appendChild(script)
+
+  style = document.createElement('link')
+  style.rel = 'stylesheet'
+  style.href = '#{asset_url('kandy-chatbox.css')}'
+  style.type = 'text/css'
+  document.getElementsByTagName('HEAD').item(0).appendChild(style)
+
+  widgetConfig = #{raw @shop.widget.json_string.to_json}
+  if widgetConfig is null then widgetConfig = {}
+  widgetConfig.color = '#{@shop.widget.color}'
+  widgetConfig.enabled = #{raw @shop.widget.enabled}
+  widgetConfig.current_tab = 'collapsed'
+
   script.onreadystatechange = script.onload = (e) ->
-    if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete'))
-      # TODO: something here...
+    if (widgetConfig.enabled && !done && (!this.readyState || this.readyState is 'loaded' || this.readyState is 'complete'))
+      window.KcWidget = new window.KCWidget
+        config: widgetConfig
+      window.parent.triggerFrameLoaded()
       done = true

@@ -412,7 +412,7 @@ notifyOperatorCloseChat = (id) ->
         console.log(msg)
 
 closeChat = (id, msg) ->
-  if $("#conversation-tabs-#{id}").length
+  if $("#conversation-tabs-#{id}").html()
     appendStatusChange(id, msg)
     $("#conversation-tabs-content-#{id} .send-form-container").html """
       <center>

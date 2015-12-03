@@ -9,7 +9,6 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
- *= require_tree .
  */
 @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
 @import "bootstrap-sprockets";
@@ -19,6 +18,7 @@
 @import "select2-bootstrap";
 @import "pagination";
 @import "sweetalert";
+@import "sweetalert.twitter.theme";
 
 body {
   @extend .jumbotron;
@@ -177,7 +177,7 @@ body {
   }
 }
 
-table.clickable tbody tr {
+table.clickable tbody tr, .chat-like, .like-img {
   cursor: pointer
 }
 

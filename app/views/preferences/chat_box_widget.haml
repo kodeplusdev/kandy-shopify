@@ -43,6 +43,20 @@
     h = $('.tab-content .tab-pane.active').height()
     updatePreviewPanelHeight(h)
 
+  window.triggerFrameLoaded = ->
+    sendWidgetConfigsToFrame()
+
+  window.sendWidgetConfigsToFrame = ->
+    json = $('form.edit_shop').serializeObject()
+    json.shop.widget_attributes.current_tab = $('#myTabs > li.active > a').attr('aria-controls')
+    $('#preview-panel-iframe')[0].contentWindow.updateWidget(json.shop.widget_attributes)
+    return true
+
+  $(document).on 'input click change', 'form.edit_shop input, form.edit_shop textarea, form.edit_shop select, #myTabs > li', (e) ->
+    if e.type isnt 'click' || e.target.type is 'checkbox' || e.target.type is ''
+      sendWidgetConfigsToFrame()
+
+
 .panel.jumbotron
   .panel-body
     = form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
@@ -282,6 +296,14 @@
                             .col-sm-8
                               = json_chat_close.text_field :download, class: 'form-control'
                           .form-group
+                            = json_chat_close.label :rating_thanks, 'Rating Thanks:', class: 'col-sm-4 control-label'
+                            .col-sm-8
+                              = json_chat_close.text_field :rating_thanks, class: 'form-control'
+                          .form-group
+                            .col-sm-8.col-sm-offset-4
+                              = json_chat_close.check_box :downloadable
+                              = json_chat_close.label :downloadable, 'Downloadable'
+                          .form-group
                             .col-sm-8.col-sm-offset-4
                               = json_chat_close.check_box :ask_for_rating
                               = json_chat_close.label :ask_for_rating, 'Ask for Rating'
@@ -304,4 +326,4 @@
                               = json_error_messages.text_field :no_operator_required, class: 'form-control'
               .col-sm-7
                 #preview-panel
-                  %iframe{src: chat_box_widget_preview_path, onload: 'previewPanelLoaded()'}
+                  %iframe#preview-panel-iframe{src: chat_box_widget_preview_path, onload: 'previewPanelLoaded()'}
