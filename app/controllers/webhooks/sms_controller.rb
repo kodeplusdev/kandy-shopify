@@ -78,11 +78,20 @@ class Webhooks::SmsController < WebhooksController
 
   def send_sms_notify(from, to, template)
     template = Liquid::Template.parse(template)
+    params[:host] = @shop.shopify_domain
     text = template.render(params)
-
+    from = from.split('+').last
+    to = to.split('+').last
     unless text.blank?
-      kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret, access_token: @shop.kandy_access_token)
-      kandy.send_sms(from: from, to: to, text: text)
+      kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
+      kandy_username = @shop.kandy_username.split('@').first
+      res = kandy.get_user_access_token(kandy_username, @shop.kandy_password)
+      if res['status'] == 1
+        puts res['message']
+      else
+        kandy.access_token = res['result']['user_access_token']
+        kandy.send_sms(from: from, to: to, text: text)
+      end
       return true
     end
 

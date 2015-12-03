@@ -25,10 +25,19 @@
   .row
     .col-sm-3
       %h5 SMS templates
-      %span.help-block You must have a valid phone number to active this feature.
+      %span.help-block
+        You must have
+        %a{href: edit_user_registration_path, target: '_blank'}
+          %u a valid phone number
+        to active this feature.
+      %span.help-block
+        We use
+        %a{href: 'https://github.com/Shopify/liquid/wiki/Liquid-for-Designers', target: '_blank'}
+          %u Liquid Templating language
+        to render templates.
       %span.help-block
         %a{href: '#', onclick: "newModal('#{variables_url}', 'Template variables')"}
-          %u View a list of variables you can use
+          %u View a list of variables you can use.
     .col-sm-9.panel
       .panel-body
       = f.fields_for :template do |t|
