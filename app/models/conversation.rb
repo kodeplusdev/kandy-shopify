@@ -64,6 +64,14 @@ class Conversation < ActiveRecord::Base
     text
   end
 
+  def self.today
+    where(created_at: Time.now.utc)
+  end
+
+  def self.yesterday
+    where(created_at: Time.now.utc - 1.day)
+  end
+
   RATING.each do |rating|
     define_method "#{rating}?" do
       self.rating == rating

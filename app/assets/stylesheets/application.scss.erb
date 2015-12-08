@@ -187,6 +187,17 @@ table.clickable tbody tr, .chat-like, .like-img {
   margin-top: -18px;
 }
 
+th.center, td.center {
+  text-align: center;
+}
+
+table.table > tfoot > tr > td {
+  @extend th;
+  border-bottom: 0;
+  border-top: 2px solid #ddd;
+  font-weight: bold;
+}
+
 /*----------------------------------------
     Pre Loader
 ------------------------------------------*/

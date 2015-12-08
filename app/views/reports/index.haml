@@ -1,0 +1,73 @@
+:coffeescript
+  window.mainPageTitle = 'Reports'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      breadcrumb:
+          label: 'Preferences'
+          href: "#{preferences_path}"
+          target: 'app'
+      buttons:
+        secondary:
+          label: 'Preferences'
+          href: "#{preferences_url}"
+          target: 'app'
+
+.panel
+  .panel-body
+    .row.pad
+      %table.table.table-hover
+        %thead
+          %tr
+            %th.center{rowspan: 2} Operator
+            %th.center{colspan: 3} Today
+            %th.center{colspan: 3} Yesterday
+            %th.center{colspan: 3} All Time
+        %tbody
+          %tr
+            %td.center
+              %i.fa.fa-user
+            %td.center
+              %i.fa.fa-comments-o
+            %td.center
+              %i.fa.fa-smile-o
+            %td.center
+              %i.fa.fa-frown-o
+            %td.center
+              %i.fa.fa-comments-o
+            %td.center
+              %i.fa.fa-smile-o
+            %td.center
+              %i.fa.fa-frown-o
+            %td.center
+              %i.fa.fa-comments-o
+            %td.center
+              %i.fa.fa-smile-o
+            %td.center
+              %i.fa.fa-frown-o
+          - @users.each do |u|
+            %tr
+              %td= u.display_name
+              %td.center= u.conversations.today.size
+              %td.center= u.conversations.today.like.size
+              %td.center= u.conversations.today.dislike.size
+              %td.center= u.conversations.yesterday.size
+              %td.center= u.conversations.yesterday.like.size
+              %td.center= u.conversations.yesterday.dislike.size
+              %td.center= u.conversations.all.size
+              %td.center= u.conversations.all.like.size
+              %td.center= u.conversations.all.dislike.size
+        %tfoot
+          %tr
+            %td.center Totals
+            %td.center= @conversations.today.size
+            %td.center= @conversations.today.like.size
+            %td.center= @conversations.today.dislike.size
+            %td.center= @conversations.yesterday.size
+            %td.center= @conversations.yesterday.like.size
+            %td.center= @conversations.yesterday.dislike.size
+            %td.center= @conversations.all.size
+            %td.center= @conversations.all.like.size
+            %td.center= @conversations.all.dislike.size

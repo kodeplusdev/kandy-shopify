@@ -61,6 +61,9 @@ KandyApp::Application.routes.draw do
       delete 'transcripts' => :destroy
       match 'transcripts' => :archive, via: [:put, :patch]
     end
+    controller :reports do
+      get '/reports' => :index
+    end
   end
 
   scope '/help' do
