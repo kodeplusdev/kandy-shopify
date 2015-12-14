@@ -170,7 +170,8 @@
             email: email
           success: (res) ->
             ShopifyApp.flashNotice('A email has been sent to you.')
-        $('#conversation-detail-modal').modal('show')
+            $('#conversation-detail-modal').modal('show')
+            swal.close()
 
     $(document).on 'click', '#conversation-ban-btn', ->
       id = $('#conversation-detail-modal').attr('data-id')
@@ -191,13 +192,12 @@
       window.location.href = setUrlParameter(url, 'q', q)
 
   renderMessageHtml = (m) ->
-    json = m.message.json
-    if json.is_joined || json.is_left || json.is_closed
-      appendStatusChange(json.text)
-    else if json.type == 'o'
-      appendOperatorMessage(json.display_name, json.avatar, json.text, m.timestamp)
-    else if json.type == 'v'
-      appendVisitorMessage(json.display_name, json.text, m.timestamp)
+    if m.is_joined || m.is_left || m.is_closed
+      appendStatusChange(m.text)
+    else if m.type == 'o'
+      appendOperatorMessage(m.display_name, m.avatar, m.text, m.timestamp)
+    else if m.type == 'v'
+      appendVisitorMessage(m.display_name, m.text, m.timestamp)
 
   window.appendStatusChange = (msg) ->
     '<div class="pad-top pad-bottom status-message">' + msg + '</div>'

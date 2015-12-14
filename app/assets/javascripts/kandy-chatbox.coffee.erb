@@ -433,11 +433,12 @@ class window.KCWidget
         name: name
         email: email
         question: question
-    $('#no-operator-name').val('')
-    $('#no-operator-emails').val('')
-    $('#no-operator-question').val('')
-    _self.showTab('NoOperatorSuccess')
-    _self.showToggle('NoOperatorSuccess')
+      success: ->
+        $('#no-operator-name').val('')
+        $('#no-operator-emails').val('')
+        $('#no-operator-question').val('')
+        _self.showTab('NoOperatorSuccess')
+        _self.showToggle('NoOperatorSuccess')
 
 
   getLocationInfo: ->

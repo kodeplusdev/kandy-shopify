@@ -1,5 +1,5 @@
 class ChatController < ApplicationController
-  skip_before_filter :verify_authenticity_token, only: [:widget, :save_message]
+  skip_before_filter :verify_authenticity_token, only: [:widget, :save_message, :send_mail]
   skip_filter :shopify_session, except: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat, :download]
   before_action :authenticate_user!, only: [:load_chat, :ping, :change_user_status, :join_chat, :leave_chat, :send_mail_transcript]
 
@@ -84,10 +84,15 @@ class ChatController < ApplicationController
   end
 
   def send_mail
-    render nothing: true
+    @shop = Shop.find(params[:id])
+    OperatorMailer.notify_no_operator_mail_request(shop: @shop, name: params[:name], email: params[:email], question: params[:question]).deliver_later
+    @status = true
+    render layout: false, action: :join_chat
   end
 
   def send_mail_transcript
+    @conversation = Conversation.find(params[:id])
+    OperatorMailer.send_transcript(email: params[:email], transcript: @conversation).deliver_later
     render layout: false, json: {status: true}
   end
 

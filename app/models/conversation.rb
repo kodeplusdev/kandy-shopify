@@ -60,10 +60,10 @@ class Conversation < ActiveRecord::Base
 
 "
     messages.each do |m|
-      if json['is_joined'] || json['is_left'] || json['is_closed']
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['text']}\r"
+      if m['is_joined'] || m['is_left'] || m['is_closed']
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['text']}\n"
       else
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['display_name']} said: #{m['text']}\r"
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['display_name']} said: #{m['text']}\n"
       end
     end
     text

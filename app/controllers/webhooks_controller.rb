@@ -1,5 +1,4 @@
 class WebhooksController < ApplicationController
-  include ShopifyApp::WebhooksController
   skip_before_filter :verify_authenticity_token
   skip_filter :shopify_session
   before_action :get_account_information
