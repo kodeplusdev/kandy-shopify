@@ -25,6 +25,7 @@
   .col-sm-9.panel
     .panel-body
       = form_for resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, role: 'form', 'data-shopify-app-submit': 'save-profile-form-message'} do |f|
+        = devise_error_messages!
         .row.form-group
           .col-sm-12
             = f.label :email
@@ -43,6 +44,10 @@
           .col-sm-12
             = f.label :phone_number
             = f.text_field :phone_number, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = f.label :avatar, 'Avatar URL'
+            = f.text_field :avatar, class: 'form-control'
         .row.form-group
           .col-sm-12
             = f.label :password

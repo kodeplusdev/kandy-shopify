@@ -1,0 +1,31 @@
+:coffeescript
+  window.mainPageTitle = 'Setup (1/2)'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Next'
+          message: 'save-form-message'
+    ShopifyApp.Bar.loadingOff()
+
+= form_for @shop, url: app_installed_kandy_account_path, method: :post, html: {'data-shopify-app-submit': 'save-form-message'} do |f|
+  .row
+    .col-sm-3
+      %h5 Kandy Domain Keys
+      %span.help-block
+        If you haven’t already registered with your app with Kandy, you should
+        %a{href: 'https://developer.kandy.io/'} register
+        with Kandy to start.
+    .col-sm-9.panel
+      .panel-body
+        .form-group
+          = f.label :kandy_api_key, 'Domain Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_key, class: 'form-control input-sm', placeholder: 'ABC123DEF...'
+        .form-group
+          = f.label :kandy_api_secret, 'Domain Secret Key'
+          %abbr{title: 'required'} *
+          = f.text_field :kandy_api_secret, class: 'form-control input-sm', placeholder: 'ABC123DEF...'

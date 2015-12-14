@@ -11,7 +11,7 @@
           target: 'app'
       buttons:
         primary:
-          label: 'Save'
+          label: 'Update'
           message: 'save-preferences-form-message'
         secondary:
           label: 'Back'
@@ -27,8 +27,11 @@
       %h5 Kandy Domain Key
       %span.help-block
         If you haven’t already registered with your app with Kandy, you should
-        %a{href: 'https://developer.kandy.io/'} register
-        with Kandy to start
+        %a{href: 'https://developer.kandy.io/', target: '_blank'} register
+        with Kandy to start.
+      %span.help-block
+        %b Notice:
+        This action will re-sync all kandy users and you have to map from kandy users to operators again!
     .col-sm-9.panel
       .panel-body
         .form-group

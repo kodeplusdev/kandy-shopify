@@ -1,0 +1,77 @@
+:coffeescript
+  window.mainPageTitle = 'Setup (2/2)'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Finish'
+          message: 'save-form-message'
+    ShopifyApp.Bar.loadingOff()
+
+    $(document).on 'change', '#kandy_user_id', ->
+      $('#kandy_user_guest_id option[value="'+this.value+'"]').attr('disabled', true).siblings().removeAttr('disabled')
+      $('#kandy_user_guest_id option:eq(0)').removeAttr('disabled')
+      #$('#kandy_user_guest_id option:eq(0)').attr('selected', true)
+      renderSelect2()
+
+    $(document).on 'change', '#kandy_user_guest_id', ->
+      $('#kandy_user_id option[value="'+this.value+'"]').attr('disabled', true).siblings().removeAttr('disabled')
+      $('#kandy_user_id option:eq(0)').removeAttr('disabled')
+      #$('#kandy_user_id option:eq(0)').attr('selected', true)
+      renderSelect2()
+
+    # $('#kandy_user_guest_id option:eq(0), #kandy_user_id option:eq(1)').attr('disabled', true).siblings().removeAttr('disabled')
+    # $('#kandy_user_guest_id option:eq(1)').attr('selected', true)
+    # renderSelect2()
+
+= form_tag app_installed_admin_account_path, method: :post, 'data-shopify-app-submit': 'save-form-message' do
+  = hidden_field_tag :step, '2'
+  .row
+    .col-sm-3
+      %h5 Admin account
+    .col-sm-9.panel
+      .panel-body
+        .row.form-group
+          .col-sm-6
+            = label_tag :first_name, 'First name'
+            = text_field_tag :first_name, params[:first_name], class: 'form-control'
+          .col-sm-6
+            = label_tag :last_name, 'Last name'
+            = text_field_tag :last_name, params[:last_name], class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = label_tag :phone_number, 'Phone number'
+            = text_field_tag :phone_number, params[:phone_number], autofocus: true,  class: 'form-control input-sm'
+        .row.form-group
+          .col-sm-12
+            = label_tag :email, 'Email'
+            %abbr{title: 'required'} *
+            = email_field_tag :email, params[:email], autofocus: true,  class: 'form-control input-sm'
+        .row.form-group
+          .col-sm-12
+            = label_tag :password, 'Password'
+            %abbr{title: 'required'} *
+            = password_field_tag :password, '', autofocus: true,  class: 'form-control input-sm'
+        .row.form-group
+          .col-sm-12
+            = label_tag :password_confirmation, 'Password Confirmation'
+            %abbr{title: 'required'} *
+            = password_field_tag :password_confirmation, '', autofocus: true,  class: 'form-control input-sm'
+        .row.form-group
+          .col-sm-12
+            = label_tag :kandy_user_id, 'Kandy user'
+            %abbr{title: 'required'} *
+            = select_tag :kandy_user_id, options_from_collection_for_select(@kandy_users, :id, :username), {class: 'select2 form-control', prompt: 'Select an account'}
+  .row
+    .col-sm-3
+      %h5 Kandy user guest
+    .col-sm-9.panel
+      .panel-body
+        .row.form-group
+          .col-sm-12
+            = label_tag :kandy_user_guest_id, 'Kandy user'
+            %abbr{title: 'required'} *
+            = select_tag :kandy_user_guest_id, options_from_collection_for_select(@kandy_users, :id, :username), {class: 'select2 form-control', prompt: 'Select an account'}

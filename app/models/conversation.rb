@@ -50,15 +50,20 @@ class Conversation < ActiveRecord::Base
   Email: #{email}
   IP Address: #{location['ip']}
   Status: #{status == 'open' ? 'Open' : 'Close'}
-  Rating: #{rating == 'like' ? 'Like' : rating == 'dislike' ? 'Dislike' : 'None'}
+  Rating: #{
+            if rating == 'like'
+              'Like'
+            else
+              rating == 'dislike' ? 'Dislike' : 'None'
+            end
+          }
 
 "
     messages.each do |m|
-      json = m['message']['json']
       if json['is_joined'] || json['is_left'] || json['is_closed']
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{json['text']}\r"
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['text']}\r"
       else
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{json['display_name']} said: #{json['text']}\r"
+        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['display_name']} said: #{m['text']}\r"
       end
     end
     text

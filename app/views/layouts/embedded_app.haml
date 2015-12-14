@@ -2,6 +2,7 @@
 %html{lang: "en"}
   %head
     %title Kandy Shopify App
+    %link{rel: 'shortcut icon', type: 'image/x-icon', href: 'favicon.ico'}
     %script{src: "//cdn.shopify.com/s/assets/external/app.js?#{Time.now.strftime('%Y%m%d%H')}"}
     :coffeescript
       ShopifyApp.init
@@ -10,14 +11,13 @@
         debug: true
 
       ShopifyApp.ready ->
-        if "#{flash[:notice]}" != ""
-          ShopifyApp.flashNotice("#{flash[:notice]}")
-        if "#{flash.now[:notice]}" != ""
-          ShopifyApp.flashNotice("#{flash.now[:notice]}")
-        if "#{flash[:error]}" != ""
-          ShopifyApp.flashError("#{flash[:error]}")
-        if "#{flash.now[:error]}" != ""
-          ShopifyApp.flashError("#{flash.now[:error]}")
+        for e in ["#{flash[:notice]}", "#{flash.now[:notice]}"]
+          if e != ""
+            ShopifyApp.flashNotice(e)
+        for e in ["#{flash[:error]}", "#{flash.now[:error]}", "#{flash[:alert]}", "#{flash.now[:alert]}"]
+          if e != ""
+            ShopifyApp.flashError(e)
+
     = stylesheet_link_tag 'application'
     = javascript_include_tag 'application'
     = csrf_meta_tags

@@ -36,3 +36,7 @@
           .col-sm-6
             = label_tag :last_name, 'Last name'
             = text_field_tag :last_name, nil, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = label_tag :kandy_user_id, 'Kandy user'
+            = select_tag :kandy_user_id, options_from_collection_for_select(@kandy_users, :id, :username), {class: 'select2 form-control'}

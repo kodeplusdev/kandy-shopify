@@ -32,6 +32,6 @@ KandyApp::Application.configure do
   config.assets.debug = true
 
   # Set an explicit asset host for each environment
-  config.action_controller.asset_host = 'https://kandy-shopify.ngrok.io'
-  config.action_mailer.default_url_options = { host: 'https://kandy-shopify.ngrok.io', port: 443 }
+  config.action_controller.asset_host = ENV['KANDY_SHOPIFY_HOST']
+  config.action_mailer.default_url_options = { host: ENV['KANDY_SHOPIFY_HOST'], port: 443 }
 end

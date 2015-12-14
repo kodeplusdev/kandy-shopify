@@ -16,6 +16,7 @@
     .row
       .col-sm-4
         = form_for resource, as: resource_name, url: session_path(resource_name), html: {'data-shopify-app-submit': 'login-form-message'} do |f|
+          = devise_error_messages!
           .form-group
             = f.label :email
             = f.email_field :email, autofocus: true, class: 'form-control'

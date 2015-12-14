@@ -75,6 +75,7 @@ getConversationByIndex = (idx) ->
 
 displayConversation = (idx) ->
   c = getConversationByIndex(idx)
+  console.log(c)
 
   $('#conversations-dashboard').show()
   $('#welcome-dashboard').hide()
@@ -168,16 +169,15 @@ displayHistoryMessages = (idx) ->
   c = getConversationByIndex(idx)
 
   for m in c.messages
-    json = m.message.json
-    if json.is_joined || json.is_left || json.is_closed
-      appendStatusChange(json.id, json.text)
-    else if json.type == 'o'
-      appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, m.timestamp)
-    else if json.type == 'v'
-      appendVisitorMessage(json.id, json.display_name, json.text, m.timestamp)
+    if m.is_joined || m.is_left || m.is_closed
+      appendStatusChange(m.id, m.text)
+    else if m.type == 'o'
+      appendOperatorMessage(m.id, m.display_name, m.avatar, m.text, m.timestamp)
+    else if m.type == 'v'
+      appendVisitorMessage(m.id, m.display_name, m.text, m.timestamp)
 
 sendNewMessageToVisitor = (id, text) ->
-  json =
+  message =
     id: id
     type: 'o'
     text: text
@@ -185,18 +185,11 @@ sendNewMessageToVisitor = (id, text) ->
     avatar: chatData.me.avatar
     display_name: chatData.me.display_name
     user_id: chatData.me.id
+    timestamp: new Date().getTime()
 
-  KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
-    msg.timestamp = new Date().getTime()
-    appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, msg.timestamp)
-    saveMessage(id, msg)
-  , (msg) ->
-    displayErrorMessage(msg)
-
-  KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
-    console.log(msg)
-  , (msg) ->
-    displayErrorMessage(msg)
+  appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, message.timestamp)
+  sendMessageToGuestAndOperators(message)
+  saveMessage(id, message)
 
 appendOperatorMessage = (id, name, avatar, msg, time) ->
   DateTime = new Date(Number(time))
@@ -253,9 +246,15 @@ typingChecking = ->
 
 removeTyping = ->
 
-saveMessage = (id, msg) ->
-  msg.message.json = JSON.parse(msg.message.json)
+sendMessageToGuestAndOperators = (message) ->
+  KandyAPI.messaging.sendJSON chatData.shop.kandy_user_guest, message, undefined, (msg) ->
+    displayErrorMessage(msg)
 
+  for o in chatData.users
+    KandyAPI.messaging.sendJSON o.kandy_username, message, undefined, (msg) ->
+      displayErrorMessage(msg)
+
+saveMessage = (id, msg) ->
   jQuery.ajax
     url: chatData.shop.host + 'chat/save'
     type: 'post'
@@ -284,7 +283,7 @@ displayInfoVisitor = (idx) ->
     html = "<ul>"
     for h in conversation.histories
       if h.created_at isnt conversation.created_at
-        html += "<li><a href=\'#\' target='_blank'>#{h.created_at}</a></li>"
+        html += "<li><a href=\'#\' target='_blank'>#{new Date(h.created_at).toLocaleString()}</a></li>"
     html += "</ul>"
 
   $('#conversation-location').html('')
@@ -314,25 +313,21 @@ notifyOperatorJoinedChat = (id) ->
         for c in chatData.conversations
           if c.id == id
             c.operators.push({id: chatData.me.id})
-        json =
+        message =
           id: id
-          display_name: chatData.me.display_name
           cmd: 'new_message'
           type: 'o'
+          username: chatData.me.kandy_username
+          display_name: chatData.me.display_name
           avatar: chatData.me.avatar
           role: chatData.me.role
           is_joined: true
           user_id: chatData.me.id
-          text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.joined_chat}"
-        KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
-          msg.timestamp = new Date().getTime()
-          saveMessage(id, msg)
-        , (msg) ->
-          displayErrorMessage(msg)
-        KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
-          console.log(msg)
-        , (msg) ->
-          displayErrorMessage(msg)
+          text: "#{chatData.me.display_name} #{chatData.shop.widget.joined_chat}"
+          timestamp: new Date().getTime()
+
+        sendMessageToGuestAndOperators(message)
+        saveMessage(id, message)
       error: (e) ->
         console.log(e)
 
@@ -363,26 +358,18 @@ notifyOperatorLeftChat = (id) ->
             for o, i in c.operators
               if o.id == chatData.me.id
                 c.operators.splice(i, 1)
-        json =
+        message =
           id: id
-          display_name: chatData.me.display_name
           cmd: 'new_message'
           type: 'o'
-          avatar: chatData.me.avatar
-          role: chatData.me.role
+          display_name: chatData.me.display_name
           is_left: true
           user_id: chatData.me.id
-          text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.left_chat}"
-        KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
-          msg.timestamp = new Date().getTime()
-          saveMessage(id, msg)
-          console.log(msg)
-        , (msg) ->
-          displayErrorMessage(msg)
-        KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
-          console.log(msg)
-        , (msg) ->
-          displayErrorMessage(msg)
+          text: "#{chatData.me.display_name} #{chatData.shop.widget.left_chat}"
+          timestamp: new Date().getTime()
+
+        sendMessageToGuestAndOperators(message)
+        saveMessage(id, message)
       error: (e) ->
         console.log(e)
 
@@ -394,22 +381,17 @@ notifyOperatorCloseChat = (id) ->
     data:
       id: id
     success: () ->
-      json =
+      message =
         cmd: 'notify_close_chat'
         id: id
-        display_name: chatData.me.display_name
         type: 'o'
         is_closed: true
-        text: "#{chatData.me.display_name} #{chatData.shop.widget.json.in_chat.closed_chat}"
-      KandyAPI.messaging.sendJSON chatData.shop.operator_username, json, (msg) ->
-        msg.timestamp = new Date().getTime()
-        saveMessage(id, msg)
-      , (msg) ->
-        console.log(msg)
-      KandyAPI.messaging.sendJSON chatData.shop.guest_username, json, (msg) ->
-        console.log(msg)
-      , (msg) ->
-        console.log(msg)
+        display_name: chatData.me.display_name
+        text: "#{chatData.me.display_name} #{chatData.shop.widget.closed_chat}"
+        timestamp: new Date().getTime()
+
+      sendMessageToGuestAndOperators(message)
+      saveMessage(id, message)
 
 closeChat = (id, msg) ->
   if $("#conversation-tabs-#{id}").html()
@@ -488,52 +470,46 @@ displayErrorMessage = (msg) ->
   console.log(msg)
 
 window.handleEventListeners = (data) ->
-  data.message.json = JSON.parse(data.message.json)
-
-  if isValidChat (data)
-    json = data.message.json
+  json = JSON.parse(data.message.json)
+  if isValidChat(json)
     switch json.cmd
       when 'new_chat'
         if json.domain_id && json.domain_id isnt '' && Number(json.domain_id) == chatData.shop.id
-          addNewChat(data)
+          addNewChat(json)
       when 'new_message'
-        addNewMessage(data)
+        addNewMessage(json)
       when 'notify_close_chat'
         closeChat(json.id, json.text)
 
-addNewChat = (data) ->
-  c = data.message.json
-  chatData.conversations.push(c)
+addNewChat = (conversation) ->
+  chatData.conversations.push(conversation)
   idx = chatData.conversations.length - 1
 
-  time = new Date(c.created_at)
+  time = new Date(conversation.created_at)
   $('#conversations-list').append """
-    <a id="conversation-#{c.id}" href='#' class='list-group-item'>
+    <a id="conversation-#{conversation.id}" href='#' class='list-group-item'>
       <span class='badge'>#{time.toLocaleTimeString()}</span>
-      <h5 class='list-group-item-heading'>#{c.title}</h5>
-      <div class='list-group-item-text'>#{c.location.country_name}</div>
+      <h5 class='list-group-item-heading'>#{conversation.title}</h5>
+      <div class='list-group-item-text'>#{conversation.location.country_name}</div>
     </a>
   """
 
-  $(document).on 'click', '#conversation-' + c.id, ->
-    notifyOperatorJoinedChat(c.id)
+  $(document).on 'click', '#conversation-' + conversation.id, ->
+    notifyOperatorJoinedChat(conversation.id)
     displayConversation(idx)
 
-addNewMessage = (data) ->
-  json = data.message.json
-
+addNewMessage = (message) ->
   for c in chatData.conversations
-    if Number(c.id) is Number(json.id)
-      c.messages.push(data)
+    if Number(c.id) is Number(message.id)
+      c.messages.push(message)
       break
 
-  if json.is_joined || (json.is_left && json.user_id != chatData.me.id)
-    appendStatusChange(json.id, json.text)
-  else if json.type == 'o' && json.user_id != chatData.me.id
-    appendOperatorMessage(json.id, json.display_name, json.avatar,json.text, data.timestamp)
-  else if json.type == 'v'
-    appendVisitorMessage(json.id, json.display_name, json.text, data.timestamp)
+  if message.is_joined || (message.is_left && message.user_id != chatData.me.id)
+    appendStatusChange(message.id, message.text)
+  else if message.type == 'o' && message.user_id != chatData.me.id
+    appendOperatorMessage(message.id, message.display_name, message.avatar,message.text, message.timestamp)
+  else if message.type == 'v'
+    appendVisitorMessage(message.id, message.display_name, message.text, message.timestamp)
 
-isValidChat = (data) ->
-  json = data.message.json
+isValidChat = (json) ->
   return json

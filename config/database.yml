@@ -25,5 +25,5 @@ production:
   database: kandy-shopify-production
   adapter: postgresql
   encoding: unicode
-  username: username
-  password: password
+  username: ENV['PG_USERNAME']
+  password: ENV['PG_PASSWORD']

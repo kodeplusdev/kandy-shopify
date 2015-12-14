@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.2'
 
-gem 'shopify_app', '~> 6.0.0'
+gem 'shopify_app', '~> 6.2.0'
 gem 'jquery-rails', '~> 4.0.4'
 gem 'quiet_assets'
 gem 'haml'

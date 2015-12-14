@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
          :lastseenable, :invitable
 
   has_and_belongs_to_many :conversations
+  has_one :kandy_user
   attr_readonly :display_name, :full_name
 
   ROLE = [
@@ -48,7 +49,11 @@ class User < ActiveRecord::Base
   end
 
   def display_name
-    full_name || email
+    if full_name != ' '
+      full_name
+    else
+      email
+    end
   end
 
   def full_name
@@ -56,7 +61,7 @@ class User < ActiveRecord::Base
   end
 
   def online?
-    self.last_seen && self.last_seen >= Time.now - 2.minutes
+    self.available? && self.last_seen && self.last_seen >= Time.now - 2.minutes
   end
 
   def stamp!

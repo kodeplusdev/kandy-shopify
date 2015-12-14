@@ -45,7 +45,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_account_update_params
-    devise_parameter_sanitizer.for(:account_update) << :first_name << :last_name << :phone_number
+    devise_parameter_sanitizer.for(:account_update) << :first_name << :last_name << :phone_number << :avatar
   end
 
   # The default url to be used after updating a resource

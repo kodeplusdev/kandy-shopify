@@ -25,7 +25,7 @@
       listeners:
         message: handleEventListeners
 
-    KandyAPI.login "#{@shop.kandy_api_key}", "#{@shop.kandy_username}", "#{@shop.kandy_password}", (msg) ->
+    KandyAPI.login "#{@shop.kandy_api_key}", "#{current_user.kandy_user.username}", "#{current_user.kandy_user.password}", (msg) ->
       loadAndStartChat('#{chat_load_url}')
     , (e) ->
       ShopifyApp.flashError("Error occurred while connecting to Kandy server. Press F5 to refresh.")

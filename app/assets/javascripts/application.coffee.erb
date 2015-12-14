@@ -76,7 +76,9 @@ window.shopGmap = (id, location) ->
         lng: location.longitude
       handler.map.centerOn(marker)
 
-$(document).ready ->
+window.renderSelect2 = ->
   $('.select2').select2
     minimumResultsForSearch: Infinity
     theme: 'bootstrap'
+$(document).ready ->
+  renderSelect2()

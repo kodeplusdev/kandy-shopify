@@ -49,7 +49,6 @@ KandyApp::Application.routes.draw do
     controller :preferences do
       get '/' => :index, as: :preferences
       get 'api-keys' => :api_keys, as: 'api_keys'
-      get 'kandy-account' => :kandy_account, as: 'kandy_account'
       get 'sms-alert-templates' => :sms_alert_templates, as: 'sms_alert_templates'
       get 'chat-box-widget' => :chat_box_widget, as: 'chat_box_widget'
       get 'chat-box-widget-preview' => :chat_box_widget_preview, as: 'chat_box_widget_preview'
@@ -66,13 +65,13 @@ KandyApp::Application.routes.draw do
     end
   end
 
-  scope '/help' do
+  scope 'help' do
     controller :help do
       get 'variables' => :variables
     end
   end
 
-  scope '/chat' do
+  scope 'chat' do
     controller :chat do
       post 'widget' => :widget, as: 'chat_widget'
       get 'online' => :check, as: 'chat_check_online'
@@ -92,11 +91,16 @@ KandyApp::Application.routes.draw do
     end
   end
 
-  scope '/app' do
+  scope 'app' do
     controller :shopify do
-      get 'installed' => :installed
-      post 'installed' => :setup
       get 'script-tags' => :script_tags
+    end
+    scope 'installed' do
+      controller :installed do
+        get '/' => :index, as: 'app_installed'
+        post 'kandy_account' => :set_kandy_account, as: 'app_installed_kandy_account'
+        post 'admin_account' => :set_admin_account, as: 'app_installed_admin_account'
+      end
     end
   end
 

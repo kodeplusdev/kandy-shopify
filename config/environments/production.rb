@@ -28,10 +28,10 @@ KandyApp::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = true
 
   # See everything in the log (default is :info)
-  config.log_level = :info
+  config.log_level = :debug
 
   # Prepend all log lines with the following tags
   # config.log_tags = [ :subdomain, :uuid ]
@@ -69,6 +69,6 @@ KandyApp::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   # Set an explicit asset host for each environment
-  config.action_controller.asset_host = 'https://kandy-shopify.ngrok.io'
-  config.action_mailer.default_url_options = { host: 'https://kandy-shopify.ngrok.io', port: 443 }
+  config.action_controller.asset_host = ENV['KANDY_SHOPIFY_HOST']
+  config.action_mailer.default_url_options = { host: ENV['KANDY_SHOPIFY_HOST'], port: 443 }
 end

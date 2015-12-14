@@ -1,50 +1,31 @@
 class PreferencesController < ApplicationController
   before_action :authenticate_user!
-  before_action :shop, except: [:index, :update]
+  before_action :load_shop, except: [:index, :update]
   before_action :admin_only!, except: [:index]
 
   def index
   end
 
   def update
-    if params[:shop][:kandy_password].blank?
-      params[:shop].delete :kandy_password
-    end
-    if params[:shop][:kandy_password_guest].blank?
-      params[:shop].delete :kandy_password_guest
-    end
     @shop = Shop.find(params[:shop][:id])
     if @shop.update_attributes(shop_params)
-      # unless @shop.kandy_password.blank?
-      #   kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
-      #
-      #   @shop.kandy_username = @shop.kandy_username.split('@').first unless @shop.kandy_username.blank?
-      #   res = kandy.get_user_access_token(@shop.kandy_username, @shop.kandy_password)
-      #
-      #   if res['status'] == 1
-      #     flash[:error] = res['message']
-      #   else
-      #     unless @shop.kandy_password_test.blank?
-      #       kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
-      #
-      #       @shop.kandy_username_test = @shop.kandy_username_test.split('@').first unless @shop.kandy_username_test.blank?
-      #       res = kandy.get_user_access_token(@shop.kandy_username_test, @shop.kandy_password_test)
-      #
-      #       if res['status'] == 1
-      #         flash[:error] = res['message']
-      #       else
-      #         @shop.kandy_access_token_test = res['result']['user_access_token']
-      #         @shop.save
-      #         flash[:notice] = 'Updated successful'
-      #       end
-      #     else
-      #       @shop.save
-      #       flash[:notice] = 'Updated successful'
-      #     end
-      #   end
-      # else
       flash[:notice] = 'Updated successful'
-      # end
+      unless params[:shop][:kandy_api_key].blank?
+        kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
+        users = kandy.domain_users
+        if users.blank? || users.size == 0
+          flash[:error] = 'Your kandy account should have least 2 users.'
+        else
+          users.each do |u|
+            @shop.kandy_users.create(username: u.user_id, email: u.user_email, password: u.user_password,
+                                     first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
+                                     api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
+          end
+          session[:step] = 1
+          redirect_to action: :index, step: 2 and return
+        end
+        render :index
+      end
     else
       flash[:error] = @shop.errors.full_messages.first
     end
@@ -54,16 +35,10 @@ class PreferencesController < ApplicationController
   def api_keys
   end
 
-  def kandy_account
-  end
-
   def sms_alert_templates
   end
 
   def chat_box_widget
-    if @shop.widget.json_string.blank?
-      @shop.widget.json_string = Widget.DEFAULT
-    end
   end
 
   def chat_box_widget_preview
@@ -73,7 +48,7 @@ class PreferencesController < ApplicationController
 
   private
 
-  def shop
+  def load_shop
     @shop = Shop.find_by_shopify_domain(params[:shop] || @shop_session.url)
   end
 

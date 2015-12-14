@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151120140430) do
+ActiveRecord::Schema.define(version: 20151212104338) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
@@ -39,6 +39,26 @@ ActiveRecord::Schema.define(version: 20151120140430) do
   add_index "conversations_users", ["conversation_id"], name: "index_conversations_users_on_conversation_id"
   add_index "conversations_users", ["user_id"], name: "index_conversations_users_on_user_id"
 
+  create_table "kandy_users", force: :cascade do |t|
+    t.string   "username"
+    t.string   "email"
+    t.string   "password"
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "phone_number"
+    t.string   "api_key"
+    t.string   "api_secret"
+    t.string   "country_code"
+    t.string   "domain_name"
+    t.integer  "shop_id"
+    t.integer  "user_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "kandy_users", ["shop_id"], name: "index_kandy_users_on_shop_id"
+  add_index "kandy_users", ["user_id"], name: "index_kandy_users_on_user_id"
+
   create_table "settings", force: :cascade do |t|
     t.string   "var",                   null: false
     t.text     "value"
@@ -51,17 +71,14 @@ ActiveRecord::Schema.define(version: 20151120140430) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "shops", force: :cascade do |t|
-    t.string   "shopify_domain",                       null: false
-    t.string   "shopify_token",                        null: false
+    t.string   "shopify_domain",                      null: false
+    t.string   "shopify_token",                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "kandy_api_key"
     t.string   "kandy_api_secret"
-    t.string   "kandy_username"
-    t.string   "kandy_password"
-    t.string   "kandy_username_guest"
-    t.string   "kandy_password_guest"
-    t.boolean  "initialized",          default: false
+    t.integer  "kandy_user_guest_id"
+    t.boolean  "initialized",         default: false
   end
 
   add_index "shops", ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
@@ -107,12 +124,14 @@ ActiveRecord::Schema.define(version: 20151120140430) do
     t.string   "phone_number"
     t.string   "avatar"
     t.string   "status",                 default: "unavailable"
+    t.integer  "kandy_user_id"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true
   add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count"
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id"
+  add_index "users", ["kandy_user_id"], name: "index_users_on_kandy_user_id"
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   add_index "users", ["shop_id"], name: "index_users_on_shop_id"
 

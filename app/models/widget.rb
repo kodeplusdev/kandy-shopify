@@ -2,7 +2,9 @@ class Widget < ActiveRecord::Base
   belongs_to :shop
   serialize :json_string, JSON
   validates_presence_of :name
+  validates_uniqueness_of :shop_id
   validates_length_of :color, minimum: 7, maximum: 7
+  before_validation :set_default
 
   def json_string_open_struct
     unless @json_string_open_struct
@@ -11,14 +13,18 @@ class Widget < ActiveRecord::Base
     @json_string_open_struct
   end
 
-  def self.DEFAULT
-    {
+  def set_default
+    puts 'set_default'
+    self.name ||= 'Live Chat'
+    self.color ||= '#000000'
+    self.enabled ||= true
+    self.json_string ||= {
         chat_close: {
-            ask_for_rating: true,
-            downloadable: false,
+            ask_for_rating: '1',
+            downloadable: '0',
             button_text: 'Sign Up Free!',
             chat_closed: 'Thanks for chatting. Please rate how you feel about the chat session',
-            custom_link_button: false,
+            custom_link_button: '0',
             download: 'Download chat transcript',
             rating_thanks: 'Thanks for your rating!',
             title: 'Chat Closed',
@@ -27,20 +33,18 @@ class Widget < ActiveRecord::Base
         collapse: {
             custom_image_id: '',
             custom_image_url: '',
-            horizontal: 40,
-            image: 2,
-            image_in_front_of_tabtofTab: false,
-            is_custom: true,
+            horizontal: '40',
+            image: '2',
+            image_in_front_of_tabtofTab: '0',
+            is_custom: '1',
             page_load: 'bounceIn',
             position: 'br',
-            scale: 100,
-            show_widget_hide_button: true,
+            scale: '100',
+            show_widget_hide_button: '1',
             title: 'Chat with us!',
             type: 'ti',
-            vertical: 50
+            vertical: '50'
         },
-        color: '#5cb85c',
-        enable: true,
         error_messages: {
             email_valid: 'Please enter valid email.',
             name_required: 'Please enter name.',
@@ -72,20 +76,18 @@ class Widget < ActiveRecord::Base
             question: 'what can we help with?'
         },
         start_chat: {
-            ask_for_email: true,
+            ask_for_email: '1',
             ask_for_email_text: 'Enter your email here',
-            ask_for_name: true,
+            ask_for_name: '1',
             ask_for_name_text: 'Enter your name here',
-            ask_for_question: false,
+            ask_for_question: '0',
             ask_for_question_text: 'Enter your question here',
-            ask_for_department: false,
+            ask_for_department: '0',
             intro_text: 'Enter your info below to begin.',
-            popout_automatically: false,
+            popout_automatically: '0',
             request_button: 'Start Chat',
             title: 'Chat with us!'
-        },
-        style: 'Minimal',
-        name: 'Default'
+        }
     }
   end
 end
