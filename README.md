@@ -25,13 +25,9 @@ A Kandy plugin for shopify websites.
     MAILER_PASSWORD=<gmail-smtp-password>
     DEVISE_SECRET_KEY=<secret-token>
     APP_SECRET_TOKEN=<secret-token>
-```
-
-- Edit [`config/environments/<enviroment>`](config/environments)
-```rb
-  # Set an explicit asset host for each environment
-  config.action_controller.asset_host = 'https://your-awesome-app.com'
-  config.action_mailer.default_url_options = { host: 'https://your-awesome-app.com', port: 443 }
+    KANDY_SHOPIFY_HOST=https://your-awesome-app.com
+    PG_USERNAME=<postgresql-username>
+    PG_PASSWORD=<postgresql-password>
 ```
 
 - Open ['config/database.yml'](config/database.yml) and put setup for database your application use.
