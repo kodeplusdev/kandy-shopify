@@ -28,7 +28,7 @@ class Webhooks::SmsController < WebhooksController
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin.phone_number, phone, @shop.template.order_creation
+      if send_sms_notify admin, phone, @shop.template.order_creation
         puts "Order updated notify has been sent to #{phone}" and return
       else
         puts s 'Order updated notify template was empty' and return
@@ -44,7 +44,7 @@ class Webhooks::SmsController < WebhooksController
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin.phone_number, admin.phone_number, @shop.template.order_payment
+      if send_sms_notify admin, admin.phone_number, @shop.template.order_payment
         puts "Order payment notify has been sent to #{admin.phone_number}" and return
       else
         puts 'Order payment notify template was empty' and return
@@ -60,7 +60,7 @@ class Webhooks::SmsController < WebhooksController
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin.phone_number, admin.phone_number, @shop.template.customer_creation
+      if send_sms_notify admin, admin.phone_number, @shop.template.customer_creation
         puts "New customer notify has been sent to #{admin.phone_number}" and return
       else
         puts 'New customer template was empty' and return
@@ -83,8 +83,8 @@ class Webhooks::SmsController < WebhooksController
     from = admin.phone_number.split('+').last
     to = to.split('+').last
     unless text.blank?
-      kandy = Kandy.new(api_key: @shop.kandy_api_key, api_secret: @shop.kandy_api_secret)
-      kandy.send_sms(username: admin.kandy_user.user_id, password: admin.kandy_user.password, source: from, destination: to, text: text)
+      kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
+      kandy.send_sms(username: admin.kandy_user.username, password: admin.kandy_user.password, source: from, destination: to, text: text)
       return true
     end
 
