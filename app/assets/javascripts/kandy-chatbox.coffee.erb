@@ -142,7 +142,7 @@ class window.KCWidget
         _self.isSendRequest = false
 
         name = $.trim($('#txt-name').val())
-        name = if _self.config.start_chat.ask_for_name is false then (if name is '' then 'anonymous' else '') else name
+        name = if _self.config.start_chat.ask_for_name is '0' then (if name is '' then 'anonymous' else '') else name
         email = $.trim($('#txt-emails').val())
         question = $.trim($('#txt-question').val())
         if _self.departmentVisible
@@ -154,7 +154,7 @@ class window.KCWidget
         flag = true
         # flag = if name isnt '' then (if email isnt '' then ( if filter.test(email) then true else false) else false) else false
         if name isnt ''
-          if email is '' || !filter.test(email)
+          if _self.config.start_chat.ask_for_email is '1' && (email is '' || !filter.test(email))
             $('#email-error').show()
             $('#txt-emails').css('border-color', '#CC0000')
             _self.isSendRequest = true

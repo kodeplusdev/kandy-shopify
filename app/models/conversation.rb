@@ -74,11 +74,11 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.today
-    where(created_at: Time.now.utc)
+    where('created_at >= ?', Time.now.utc.beginning_of_day)
   end
 
   def self.yesterday
-    where(created_at: Time.now.utc - 1.day)
+    where('created_at >= ? AND created_at < ?', Time.now.utc.beginning_of_day - 1, Time.now.utc.beginning_of_day)
   end
 
   RATING.each do |rating|
