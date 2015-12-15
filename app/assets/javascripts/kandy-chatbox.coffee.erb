@@ -59,7 +59,7 @@ class window.KCWidget
 
     newMessageFromOperator: (message) ->
       DateTime = new Date(Number(message.timestamp))
-      Time = DateTime.toLocaleTimeString()
+      Time = DateTime.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
 
       if message.is_joined
         _self.chatData.operators.push(message)
@@ -365,7 +365,7 @@ class window.KCWidget
         text: msg
         timestamp: new Date().getTime()
 
-      for o in _self.chatData.operators
+      for o in _self.operators
         KandyAPI.messaging.sendJSON  o.username, message, undefined, (msg) ->
           _self.displayErrorMessage(msg)
 
@@ -1264,13 +1264,13 @@ class window.KCWidget
   displayStartMessage: ->
     text = _self.config.in_chat.start_message
     if text && text isnt ''
-      time = new Date().toLocaleTimeString()
+      time = new Date().toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
       $('#chat-msgs').append('<div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + text + '<label class=\'left-time\'>' + time + '</label></span><div class=\'clear\'></div></div>')
       $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
 
   displayMessage: (message) ->
     DateTime = new Date(Number(message.timestamp))
-    Time = DateTime.toLocaleTimeString()
+    Time = DateTime.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
 
     if message.is_joined || message.is_left
       $('#chat-msgs').append("<div class=\'in-chat-msg\'>#{message.text}</div>")
