@@ -37,6 +37,9 @@ class ChatController < ApplicationController
 
   def join_chat
     @conversation = Conversation.find(params[:id])
+    unless @conversation.first_operator_id
+      @conversation.first_operator_id = current_user.id
+    end
     @conversation.users << current_user
     @conversation.save!
   rescue ActiveRecord::RecordNotFound

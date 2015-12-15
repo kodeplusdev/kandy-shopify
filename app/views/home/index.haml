@@ -37,11 +37,9 @@
       .panel.panel-default
         .panel-heading
           .pull-right
-            .row.pad-right
-              %b You are:
-              %button#user-status-btn.btn.btn-xs.btn-warning.hide Unavailable
-          %i.fa.fa-commenting
-          Incoming chat
+            %button#user-status-btn.btn.btn-xs.btn-warning.hide{'data-toggle': 'tooltip', 'data-placement': 'bottom'} Unavailable
+          %i.fa.fa-comment
+          Incoming Chats
         .panel-body
           .list-group#conversations-list
     .row

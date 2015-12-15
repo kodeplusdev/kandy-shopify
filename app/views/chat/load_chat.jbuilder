@@ -14,7 +14,7 @@ json.shop do
 end
 json.conversations @conversations do |conversation|
   json.(conversation, :id, :title, :name, :email, :status, :rating, :messages, :location, :created_at)
-  json.histories @shop.conversations.history(conversation.email, conversation.location['ip']), :created_at
+  json.histories @shop.conversations.history(conversation.email, conversation.location['ip']), :id, :created_at
   json.operators conversation.users do |u|
     json.id u.id
     json.kandy_username u.kandy_user.kandy_username

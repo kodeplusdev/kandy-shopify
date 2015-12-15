@@ -64,15 +64,19 @@ class Users::ManageController < DeviseController
   end
 
   def destroy
-    @user = User.find(params[:id])
+    @shop = Shop.find_by_shopify_domain(@shop_session.url)
+    @user = @shop.user.find(params[:id])
     @kandy_user = @user.kandy_user
 
     @user.destroy
 
     @kandy_user.user = nil
     @kandy_user.save
-
-    redirect_to action: :index, notice: 'User deleted.'
+    flash[:error] = 'User deleted.'
+  rescue ActiveRecord::RecordNotFound
+      flash[:error] = 'User not found.'
+  ensure
+    redirect_to action: :index
   end
 
   private

@@ -31,11 +31,18 @@ window.loadAndStartChat = (url) ->
           dataType: 'json'
           success: (res) ->
             updateOperatorStatus(res.status)
+            json =
+              cmd: 'update_status'
+              id: chatData.me.id
+              status: res.status
+            for o in chatData.users
+              KandyAPI.messaging.sendJSON o.kandy_username, json, undefined, (msg) ->
+                displayErrorMessage(msg)
 
       if res.users
         for u in res.users
           $('#users-online-list').append """
-            <a href='#' class='list-group-item'>#{u.display_name} <span class="pull-right #{u.online}">•</span></a>
+            <a href='#' data-operator-id="#{u.id}" class='list-group-item'>#{u.display_name} <span class="pull-right #{u.online}">•</span></a>
           """
 
       if res.conversations
@@ -48,10 +55,16 @@ updateOperatorStatus = (status) ->
     $('#user-status-btn').removeClass('btn-warning')
     $('#user-status-btn').addClass('btn-success')
     $('#user-status-btn').text('Available')
+    $('#user-status-btn').attr('data-original-title', 'You are available to chat')
   else
     $('#user-status-btn').removeClass('btn-success')
     $('#user-status-btn').addClass('btn-warning')
     $('#user-status-btn').text('Unavailable')
+    $('#user-status-btn').attr('data-original-title', 'You are unavailable to chat')
+  $('[data-toggle="tooltip"]').tooltip()
+
+updateOnlineStatus = (operator) ->
+  $("#users-online-list a[data-operator-id=#{operator.id}] span").removeClass('true false').addClass("#{operator.status is 'available'}")
 
 displayMessage = (idx) ->
   c = getConversationByIndex(idx)
@@ -290,7 +303,7 @@ displayInfoVisitor = (idx) ->
     html = "<ul>"
     for h in conversation.histories
       if h.created_at isnt conversation.created_at
-        html += "<li><a href=\'#\' target='_blank'>#{new Date(h.created_at).toLocaleString()}</a></li>"
+        html += "<li><a href='#{chatData.shop.host + '/preferences/transcripts?id=' + h.id}' target='_blank'>#{new Date(h.created_at).toLocaleString()}</a></li>"
     html += "</ul>"
 
   $('#conversation-location').html('')
@@ -489,6 +502,9 @@ window.handleEventListeners = (data) ->
         addNewMessage(json)
       when 'notify_close_chat'
         closeChat(json.id, json.text)
+      when 'update_status'
+        updateOnlineStatus(json)
+
 
 addNewChat = (conversation) ->
   chatData.conversations.push(conversation)

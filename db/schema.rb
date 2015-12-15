@@ -11,21 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151212104338) do
+ActiveRecord::Schema.define(version: 20151215072119) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
-    t.string   "status",     default: "open"
-    t.text     "messages",   default: "[]"
-    t.string   "rating",     default: "none"
+    t.string   "status",            default: "open"
+    t.text     "messages",          default: "[]"
+    t.string   "rating",            default: "none"
     t.integer  "shop_id"
     t.integer  "visitor_id"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.string   "email"
-    t.text     "location",   default: "{}"
-    t.boolean  "deleted",    default: false
-    t.boolean  "archived",   default: false
+    t.text     "location",          default: "{}"
+    t.boolean  "deleted",           default: false
+    t.boolean  "archived",          default: false
+    t.integer  "first_operator_id"
   end
 
   add_index "conversations", ["shop_id"], name: "index_conversations_on_shop_id"

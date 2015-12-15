@@ -14,10 +14,8 @@ class Widget < ActiveRecord::Base
   end
 
   def set_default
-    puts 'set_default'
     self.name ||= 'Live Chat'
     self.color ||= '#000000'
-    self.enabled ||= true
     self.json_string ||= {
         chat_close: {
             ask_for_rating: '1',

@@ -42,6 +42,10 @@ class Conversation < ActiveRecord::Base
     name || 'anonymous'
   end
 
+  def first_operator
+    User.where(shop_id: shop_id).find(first_operator_id)
+  end
+
   def download
     text =
 "Details:

@@ -17,25 +17,7 @@
 
     $('.table.clickable > tbody > tr').on 'click', (e) ->
       if e.target.type != 'checkbox'
-        $.ajax
-          url: $(this).data('href')
-          type: 'GET'
-          dataType: 'json'
-          success: (res) ->
-            $('#conversation-detail-modal').on 'show.bs.modal', (e) ->
-              $('#conversation-detail-modal').attr('data-id', res.id)
-              $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
-              html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
-                '</p><p>IP: ' + res.location.ip + ' (' + res.location.country_name + ')</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
-
-              for m in res.messages
-                html += renderMessageHtml(m)
-
-              html += '</div></div>'
-
-              $('#conversation-detail-modal .modal-body').html(html)
-
-            $('#conversation-detail-modal').modal('show')
+        showConversationDetail($(this).data('href'))
 
     $('#checkbox-all').change ->
       $('.checkbox-ids').prop('checked', $(this).prop('checked'))
@@ -184,12 +166,35 @@
         success: (res) ->
           $('#conversation-detail-modal').modal('hide')
 
+    if "#{params[:id]}" isnt ""
+      showConversationDetail("#{chat_transcripts_path}/#{params[:id]}")
+
+  showConversationDetail = (href) ->
+    $.ajax
+      url: href
+      type: 'GET'
+      dataType: 'json'
+      success: (res) ->
+        $('#conversation-detail-modal').on 'show.bs.modal', (e) ->
+          $('#conversation-detail-modal').attr('data-id', res.id)
+          $('#conversation-detail-modal .modal-header .modal-title').text('Chat with ' + res.title + ' on ' + new Date(res.created_at).toLocaleString())
+          html = '<div class="row pad-left pad-right"><p>Name: ' + res.title + '</p><p>Email:' + res.email +
+            '</p><p>IP: ' + res.location.ip + ' (' + res.location.country_name + ')</p></div><hr/><div class="row messages-display-container"><div class="list-group">'
+
+          for m in res.messages
+            html += renderMessageHtml(m)
+
+          html += '</div></div>'
+
+          $('#conversation-detail-modal .modal-body').html(html)
+
+        $('#conversation-detail-modal').modal('show')
+
 
   searchConversations = () ->
     q = $('#conversations-search input').val()
-    if q isnt ''
-      url = window.location.href
-      window.location.href = setUrlParameter(url, 'q', q)
+    url = window.location.href
+    window.location.href = setUrlParameter(url, 'q', q)
 
   renderMessageHtml = (m) ->
     if m.is_joined || m.is_left || m.is_closed
@@ -220,7 +225,6 @@
     '<img class="media-object" src="#{asset_url('avatars/visitor-avatar-thick.png')}"></div>' +
     ' <div class="media-body"><h4 class="media-heading">' + name +
     ' <small>- ' + Time + '</small></h4>' + msg + '</div></div></div>'
-
 
 .panel
   .panel-body
@@ -269,9 +273,9 @@
                 %input.checkbox-ids{type: 'checkbox', value: conversation.id}
               %td= conversation.created_at
               %td= conversation.title
-              %td= conversation.users.size > 0 ? conversation.users.first.display_name : ''
-              %td= conversation.rating == 'like' ? 'Like' : (conversation.rating == 'like' ? 'Dislike' : 'None')
-              %td= conversation.status == 'open' ? 'Open' : 'Close'
+              %td= conversation.first_operator_id ? conversation.first_operator.display_name : ''
+              %td= conversation.rating == 'like' ? 'Like' : (conversation.rating == 'dislike' ? 'Dislike' : 'None')
+              %td= conversation.status == 'open' ? 'Open' : (conversation.first_operator_id ? 'Close' : 'Missed')
     .row
       .pull-right.pad-right
         = will_paginate @conversations, class: 'digg_pagination'

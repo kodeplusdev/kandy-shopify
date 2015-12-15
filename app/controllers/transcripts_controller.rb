@@ -5,6 +5,9 @@ class TranscriptsController < ApplicationController
   def index
     @widget_config_json = @shop.widget.json_string.to_json
     @archived = !(params[:archived].blank? || params[:archived] == 'false')
+    unless params[:q].blank? && params[:archived].blank? && params[:page].blank?
+      params.delete :id
+    end
     if params[:q].blank?
       if @archived
         @conversations = @shop.conversations.where(deleted: false).paginate(page: params[:page])

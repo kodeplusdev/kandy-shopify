@@ -36,17 +36,6 @@
   .row
     .panel
       .panel-body
-        .col-sm-4.col-sm-offset-1
-          .widget.style1
-            .row.vertical-align
-              .col-xs-3
-                %i.fa.fa-send.fa-3x
-              .col-xs-9
-                %a{href: sms_alert_templates_path}
-                  %h3.font-bold SMS Alert
-  .row
-    .panel
-      .panel-body
         .row
           .col-sm-4.col-sm-offset-1
             .widget.style1
@@ -82,8 +71,8 @@
                 .col-xs-9
                   %a{href: reports_path}
                     %h3.font-bold Reports
-        %br/
-        .row
+        %br.hide/
+        .row.hide
           .col-sm-4.col-sm-offset-1
             .widget.style1
               .row.vertical-align
@@ -95,12 +84,19 @@
   .row
     .panel
       .panel-body
-        .row
-          .col-sm-4.col-sm-offset-1
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-phone.fa-3x
-                .col-xs-9
-                  %a{href: '#'}
-                    %h3.font-bold Kandy Call
+        .col-sm-4.col-sm-offset-1
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-send.fa-3x
+              .col-xs-9
+                %a{href: sms_alert_templates_path}
+                  %h3.font-bold SMS Notifications
+        .col-sm-4.col-sm-offset-1.hide
+          .widget.style1
+            .row.vertical-align
+              .col-xs-3
+                %i.fa.fa-phone.fa-3x
+              .col-xs-9
+                %a{href: '#'}
+                  %h3.font-bold Kandy Call
