@@ -37,7 +37,9 @@
       .panel.panel-default
         .panel-heading
           .pull-right
-            %button#user-status-btn.btn.btn-xs.btn-warning.hide Unavailable
+            .row.pad-right
+              %b You are:
+              %button#user-status-btn.btn.btn-xs.btn-warning.hide Unavailable
           %i.fa.fa-commenting
           Incoming chat
         .panel-body
@@ -46,7 +48,7 @@
       .panel.panel-default
         .panel-heading
           %i.fa.fa-users
-          Online
+          Operators
         .panel-body
           .list-group#users-online-list
 

@@ -72,7 +72,7 @@ class Users::ManageController < DeviseController
     @kandy_user.user = nil
     @kandy_user.save
 
-    flash[:notice] = 'User deleted.'
+    redirect_to action: :index, notice: 'User deleted.'
   end
 
   private

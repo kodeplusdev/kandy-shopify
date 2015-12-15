@@ -110,9 +110,16 @@ displayConversation = (idx) ->
                     <textarea class="form-control" rows="3" placeholder="Type and press [enter]"></textarea>
                   </div>
                   <div class="col-sm-2">
-                    <button class="btn btn-sm btn-success">
-                      <i class="fa fa-send"></i>
-                    </button>
+                    <div class="row">
+                      <button class="btn btn-sm btn-success">
+                        <i class="fa fa-send"></i>
+                      </button>
+                    </div>
+                    <div class="row pad-top hide">
+                      <button class="btn btn-sm btn-primary">
+                        <i class="fa fa-phone"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -398,20 +405,22 @@ closeChat = (id, msg) ->
     appendStatusChange(id, msg)
     $("#conversation-tabs-content-#{id} .send-form-container").html """
       <center>
-        <a href="#{chatData.shop.host + '/chat/download?id=' + id}" class="btn" alt="Download">
+        <a href="#{chatData.shop.host + '/chat/download?id=' + id}" class="btn" alt="Download" data-toggle="tooltip" data-placement="bottom" title="Download">
           <i class="fa fa-cloud-download fa-2x"></i>
         </a>
-        <a class="btn" id="conversation-tabs-#{id}-email-btn" alt="Email">
+        <a class="btn" id="conversation-tabs-#{id}-email-btn" alt="Email"  data-toggle="tooltip" data-placement="bottom" title="Email">
           <i class="fa fa-envelope-o fa-2x"></i>
         </a>
-        <a href="#" class="btn hide" id="conversation-tabs-#{id}-ban-btn" alt="Ban IP">
+        <a href="#" class="btn hide" id="conversation-tabs-#{id}-ban-btn" alt="Ban IP"  data-toggle="tooltip" data-placement="bottom" title="Ban IP">
           <i class="fa fa-ban fa-2x"></i>
         </a>
-        <a href="#" class="btn" id="conversation-tabs-#{id}-close-btn" alt="Close">
+        <a href="#" class="btn" id="conversation-tabs-#{id}-close-btn" alt="Close"  data-toggle="tooltip" data-placement="bottom" title="Close">
           <i class="fa fa-times fa-2x"></i>
         </a>
       </center>
     """
+    $('[data-toggle="tooltip"]').tooltip()
+
     $(document).on 'click', "#conversation-tabs-#{id}-email-btn", ->
       sendMailConversation(id)
     $(document).on 'click', "#conversation-tabs-#{id}-ban-btn", ->
@@ -453,6 +462,7 @@ banVisitorIP = (id) ->
 inviteNewOperator = (id) ->
 
 closeConversationTab = (id) ->
+  $("#conversation-#{id}").remove()
   $("#conversation-tabs-#{id}").remove()
   $("#conversation-tabs-content-#{id}").remove()
 
@@ -461,7 +471,6 @@ closeConversationTab = (id) ->
   else
     $('#conversation-detail').html('')
     $('#conversation-location').html('')
-    $("#conversation-#{id}").remove()
     if !$('#conversation-tabs').html() || $('#conversation-tabs').html() is ''
       $('#conversations-dashboard').hide()
       $('#welcome-dashboard').show()

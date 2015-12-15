@@ -62,7 +62,7 @@ class PreferencesController < ApplicationController
                                                          start_chat: [:title, :intro_text, :request_button, :ask_for_name, :ask_for_name_text, :ask_for_email, :ask_for_email_text, :ask_for_question, :ask_for_question_text, :ask_for_department],
                                                          no_operators: [:title, :action, :message, :central_email, :email_intro, :name, :email, :question, :email_sent_text, :send_button],
                                                          in_chat: [:title, :message, :no_operators, :greeting, :connecting, :typing, :joined_chat, :left_chat, :closed_chat, :start_message, :send_message],
-                                                         chat_close: [:title, :chat_closed, :download, :ask_for_rating, :rating_thanks],
+                                                         chat_close: [:title, :chat_closed, :download, :downloadable, :ask_for_rating, :rating_thanks],
                                                          error_messages: [:name_required, :email_valid, :no_operator_required]
                                                      ]])
   end
