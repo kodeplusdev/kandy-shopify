@@ -16,7 +16,7 @@
     .col-sm-3
       %h5 Kandy Domain Keys
       %span.help-block
-        If you haven’t already registered with your app with Kandy, you should
+        If you don't have a Kandy account, please
         %a{href: 'https://developer.kandy.io/'} register
         with Kandy to start.
     .col-sm-9.panel
@@ -24,8 +24,8 @@
         .form-group
           = f.label :kandy_api_key, 'Domain Key'
           %abbr{title: 'required'} *
-          = f.text_field :kandy_api_key, class: 'form-control input-sm', placeholder: 'ABC123DEF...'
+          = f.text_field :kandy_api_key, class: 'form-control input-sm', placeholder: 'DAK24d0f137128846f8ba12204f3502****'
         .form-group
           = f.label :kandy_api_secret, 'Domain Secret Key'
           %abbr{title: 'required'} *
-          = f.text_field :kandy_api_secret, class: 'form-control input-sm', placeholder: 'ABC123DEF...'
+          = f.text_field :kandy_api_secret, class: 'form-control input-sm', placeholder: 'DAS7828b8cda2c04335923311b97284****'
