@@ -68,19 +68,30 @@ updateOnlineStatus = (operator) ->
 
 displayMessage = (idx) ->
   c = getConversationByIndex(idx)
+
   time = new Date(c.created_at)
-  $('#conversations-list').append """
-    <a id="conversation-#{c.id}" href='#' class='list-group-item'>
-      <span class='badge'>#{time.toLocaleTimeString()}</span>
-      <h5 class='list-group-item-heading'>#{c.title}</h5>
-      <div class='list-group-item-text'>#{c.location.country_name}</div>
-    </a>
-  """
+
   if checkOperatorJoined(chatData.me.id, c.id)
     displayConversation(idx)
+  else if c.operators.length > 0
+    $('#other-active-conversations-list').append """
+      <a id="conversation-#{c.id}" href='#' class='list-group-item'>
+        <span class='badge'>#{time.toLocaleTimeString()}</span>
+        <h5 class='list-group-item-heading'>#{c.title}</h5>
+        <div class='list-group-item-text'>#{c.location.country_name}</div>
+      </a>
+    """
+  else
+    $('#conversations-list').append """
+      <a id="conversation-#{c.id}" href='#' class='list-group-item'>
+        <span class='badge'>#{time.toLocaleTimeString()}</span>
+        <h5 class='list-group-item-heading'>#{c.title}</h5>
+        <div class='list-group-item-text'>#{c.location.country_name}</div>
+      </a>
+    """
 
   $(document).on 'click', '#conversation-' + c.id, ->
-    notifyOperatorJoinedChat(c.id)
+    notifyOperatorJoinedChat(idx)
     displayConversation(idx)
 
 getConversationByIndex = (idx) ->
@@ -88,8 +99,8 @@ getConversationByIndex = (idx) ->
 
 displayConversation = (idx) ->
   c = getConversationByIndex(idx)
-  console.log(c)
 
+  $('#conversation-' + c.id).hide()
   $('#conversations-dashboard').show()
   $('#welcome-dashboard').hide()
 
@@ -143,11 +154,11 @@ displayConversation = (idx) ->
     """
 
     $(document).on 'click', "#conversation-tabs-#{c.id}-end-btn", ->
-      notifyOperatorCloseChat(c.id)
+      notifyOperatorCloseChat(idx)
     $(document).on 'click', "#conversation-tabs-#{c.id}-leave-btn", ->
-      notifyOperatorLeftChat(c.id)
+      notifyOperatorLeftChat(idx)
     $(document).on 'click', "#conversation-tabs-#{c.id}-invite-btn", ->
-      inviteNewOperator(c.id)
+      inviteNewOperator(idx)
 
     displayHistoryMessages(idx)
 
@@ -207,7 +218,7 @@ sendNewMessageToVisitor = (id, text) ->
     user_id: chatData.me.id
     timestamp: new Date().getTime()
 
-  appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, message.timestamp)
+  #appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, message.timestamp)
   sendMessageToGuestAndOperators(message)
   saveMessage(id, message)
 
@@ -268,10 +279,12 @@ removeTyping = ->
 
 sendMessageToGuestAndOperators = (message) ->
   KandyAPI.messaging.sendJSON chatData.shop.kandy_user_guest, message, undefined, (msg) ->
+    console.log(message)
     displayErrorMessage(msg)
 
   for o in chatData.users
     KandyAPI.messaging.sendJSON o.kandy_username, message, undefined, (msg) ->
+      console.log(message)
       displayErrorMessage(msg)
 
 saveMessage = (id, msg) ->
@@ -321,8 +334,13 @@ checkOperatorJoined = (userId, chatId) ->
   return false
 
 
-notifyOperatorJoinedChat = (id) ->
-  unless checkOperatorJoined(chatData.me.id, id)
+notifyOperatorJoinedChat = (idx) ->
+  c = getConversationByIndex(idx)
+  if c.status is 'close'
+    return
+  id = c.id
+
+  unless checkOperatorJoined(chatData.me.id, c.id)
     jQuery.ajax
       url: chatData.shop.host + 'chat/join'
       type: 'POST'
@@ -330,9 +348,6 @@ notifyOperatorJoinedChat = (id) ->
       data:
         id: id
       success: (res) ->
-        for c in chatData.conversations
-          if c.id == id
-            c.operators.push({id: chatData.me.id})
         message =
           id: id
           cmd: 'new_message'
@@ -349,9 +364,14 @@ notifyOperatorJoinedChat = (id) ->
         sendMessageToGuestAndOperators(message)
         saveMessage(id, message)
       error: (e) ->
-        console.log(e)
+        displayErrorMessage(e)
 
-notifyOperatorLeftChat = (id) ->
+notifyOperatorLeftChat = (idx) ->
+  c = getConversationByIndex(idx)
+  if c.status is 'close'
+    return
+  id = c.id
+
   $("#conversation-tabs-#{id}").remove()
   $("#conversation-tabs-content-#{id}").remove()
 
@@ -373,11 +393,6 @@ notifyOperatorLeftChat = (id) ->
       data:
         id: id
       success: (res) ->
-        for c in chatData.conversations
-          if c.id == id
-            for o, i in c.operators
-              if o.id == chatData.me.id
-                c.operators.splice(i, 1)
         message =
           id: id
           cmd: 'new_message'
@@ -393,7 +408,11 @@ notifyOperatorLeftChat = (id) ->
       error: (e) ->
         console.log(e)
 
-notifyOperatorCloseChat = (id) ->
+notifyOperatorCloseChat = (idx) ->
+  c = getConversationByIndex(idx)
+  if c.status is 'close'
+    return
+  id = c.id
   jQuery.ajax
     url: chatData.shop.host + 'chat/close'
     type: 'POST'
@@ -414,6 +433,11 @@ notifyOperatorCloseChat = (id) ->
       saveMessage(id, message)
 
 closeChat = (id, msg) ->
+  for c in chatData.conversations
+    if c.id is id
+      c.status = 'close'
+      break
+
   if $("#conversation-tabs-#{id}").html()
     appendStatusChange(id, msg)
     $("#conversation-tabs-content-#{id} .send-form-container").html """
@@ -520,21 +544,41 @@ addNewChat = (conversation) ->
   """
 
   $(document).on 'click', '#conversation-' + conversation.id, ->
-    notifyOperatorJoinedChat(conversation.id)
+    notifyOperatorJoinedChat(idx)
     displayConversation(idx)
 
 addNewMessage = (message) ->
   for c in chatData.conversations
     if Number(c.id) is Number(message.id)
       c.messages.push(message)
+      if message.is_joined
+        c.operators.push
+          id: message.user_id
+          kandy_username: message.username
+        if checkOperatorJoined(chatData.me.id, c.id)
+          appendStatusChange(message.id, message.text)
+        else
+          $('#other-active-conversations-list').prepend($('#conversation-' + c.id))
+      else if message.is_left
+        for o, i in c.operators
+          if o.id == message.user_id
+            c.operators.splice(i, 1)
+            break
+        if checkOperatorJoined(chatData.me.id, c.id)
+          appendStatusChange(message.id, message.text)
+        else
+          $('#conversation-' + c.id).show()
+          if c.operators.length > 0
+            $('#other-active-conversations-list').prepend($('#conversation-' + c.id))
+          else
+            $('#conversations-list').prepend($('#conversation-' + c.id))
       break
 
-  if message.is_joined || (message.is_left && message.user_id != chatData.me.id)
-    appendStatusChange(message.id, message.text)
-  else if message.type == 'o' && message.user_id != chatData.me.id
-    appendOperatorMessage(message.id, message.display_name, message.avatar,message.text, message.timestamp)
-  else if message.type == 'v'
-    appendVisitorMessage(message.id, message.display_name, message.text, message.timestamp)
+  if !message.is_joined && !message.is_left
+    if message.type == 'o'
+      appendOperatorMessage(message.id, message.display_name, message.avatar,message.text, message.timestamp)
+    else if message.type == 'v'
+      appendVisitorMessage(message.id, message.display_name, message.text, message.timestamp)
 
 isValidChat = (json) ->
   return json

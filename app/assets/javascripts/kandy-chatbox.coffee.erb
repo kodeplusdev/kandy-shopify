@@ -62,8 +62,8 @@ class window.KCWidget
       Time = DateTime.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
 
       if message.is_joined
-        _self.chatData.operators.push(message)
-        if !_self.chatData.operators || !_self.chatData.operators.length
+        if _self.chatData.operators.length == 0
+          _self.chatData.operators.push(message)
           if !message.display_name || message.display_name is ''
             $('#operator-name').text('')
             $('#in-chat-head').text(_self.config.start_chat.title)
@@ -299,6 +299,7 @@ class window.KCWidget
     , delay
 
   sendRequestFromWidget: (name, email, question) ->
+    _self.isSendRequest = false
     jQuery.ajax
       url: _self.domain.host + 'chat/request'
       type: 'POST'
@@ -354,7 +355,7 @@ class window.KCWidget
         console.log (msg)
 
   sendMessageFromVisitor: (msg) ->
-    unless _self.chatData.id
+    if !_self.chatData.id || _self.isSendRequest
       _self.sendRequestFromWidget('anonymous', '', msg)
     else
       message =
@@ -466,7 +467,6 @@ class window.KCWidget
 
   sendRequest: ->
     if _self.isSendRequest
-      _self.isSendRequest = false
       if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
           _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
         if _self.chatData.online

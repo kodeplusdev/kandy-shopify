@@ -28,7 +28,7 @@ class Webhooks::SmsController < WebhooksController
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin, phone, @shop.template.order_creation
+      if send_sms_notify admin, phone, @shop.template.order_update
         puts "Order updated notify has been sent to #{phone}" and return
       else
         puts s 'Order updated notify template was empty' and return
