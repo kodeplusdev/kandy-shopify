@@ -5,7 +5,7 @@ class TranscriptsController < ApplicationController
   def index
     @widget_config_json = @shop.widget.json_string.to_json
     @archived = !(params[:archived].blank? || params[:archived] == 'false')
-    unless params[:q].blank? && params[:archived].blank? && params[:page].blank?
+    if params[:q] || params[:archived] || params[:page]
       params.delete :id
     end
     if params[:q].blank?
