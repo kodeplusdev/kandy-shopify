@@ -2,9 +2,44 @@
 #= require gmaps/google
 
 chatData = {}
+_isIncall = false
+callId = null
 
 window.onerror = ->
-  return true
+  return false
+
+# Create audio objects to play incoming calls and outgoing calls sound
+audioRingIn = $('<audio>', { loop: 'loop', id: 'ring-in' })
+audioRingOut = $('<audio>', { loop: 'loop', id: 'ring-out' })
+
+# Load audio source to DOM to indicate call events
+audioSource =
+  ringIn: [
+    { src: 'https://kandy-portal.s3.amazonaws.com/public/sounds/ringin.mp3', type: 'audio/mp3' }
+    { src: 'https://kandy-portal.s3.amazonaws.com/public/sounds/ringin.ogg', type: 'audio/ogg' }
+  ]
+  ringOut: [
+    { src: 'https://kandy-portal.s3.amazonaws.com/public/sounds/ringout.mp3', type: 'audio/mp3' }
+    { src: 'https://kandy-portal.s3.amazonaws.com/public/sounds/ringout.ogg', type: 'audio/ogg' }
+  ]
+
+audioSource.ringIn.forEach (entry) ->
+  source = $('<source>').attr('src', entry.src)
+  audioRingIn.append(source)
+
+audioSource.ringOut.forEach (entry) ->
+  source = $('<source>').attr('src', entry.src)
+  audioRingOut.append(source)
+
+$(window).on 'resize', ->
+  for e in $('.outgoing-video')
+    $(e).css('margin-top': -$(e).height())
+
+updateVideoViews = ->
+  setTimeout ->
+    for e in $('.outgoing-video')
+      $(e).css('margin-top': -$(e).height())
+  , 2000
 
 window.loadAndStartChat = (url) ->
   jQuery.ajax
@@ -108,7 +143,7 @@ displayConversation = (idx) ->
     $('#conversation-tabs').append """
       <li class="dropdown dropdown-li" id="conversation-tabs-#{c.id}" role='presentation'>
           <a class="dropdown-link disabled" href="#conversation-tabs-content-#{c.id}"
-          aria-controls="conversation-tabs-content-#{c.id}" role="tab" data-toggle="tab">
+          aria-controls="conversation-tabs-content-#{c.id}" role="tab" data-toggle="tab" data-idx="#{idx}">
             #{c.title}
           </a>
           <a class="dropdown-caret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
@@ -123,6 +158,20 @@ displayConversation = (idx) ->
       <div class="tab-pane" id="conversation-tabs-content-#{c.id}" role="tabpanel">
         <div class="panel">
           <div class="panel-body">
+            <div class="row in-call-box" id="in-call-box-#{c.id}" style="display:none">
+              <div class="row">
+                <div class='video incoming-video'>
+                  <video id="incoming-video-#{c.id}" width="100%" height="100%"></video>
+                </div>
+                <div class='video outgoing-video'>
+                  <video id="outgoing-video-#{c.id}" width="100%" height="100%"></video>
+                </div>
+              </div>
+              <div class="row pull-right">
+                <button class="btn btn-xs btn-danger" id="end-btn-#{c.id}">End</button>
+                <button class="btn btn-xs btn-warning" id="hold-btn-#{c.id}">Hold</button>
+              </div>
+            </div>
             <div class="row messages-display-container">
               <div class="list-group">
               </div>
@@ -130,19 +179,27 @@ displayConversation = (idx) ->
             <div class="row send-form-container">
               <form>
                 <div class="form-group">
-                  <div class="col-sm-10">
+                  <div class="col-md-10 col-sm-9">
                     <textarea class="form-control" rows="3" placeholder="Type and press [enter]"></textarea>
                   </div>
-                  <div class="col-sm-2">
-                    <div class="row">
-                      <button class="btn btn-sm btn-success">
+                  <div class="col-md-2 col-sm-3 col-xs-12">
+                    <div class="pad-top hidden-lg hidden-md pull-right">
+                      <button class="btn btn-sm btn-success send-btn-#{c.id}">
                         <i class="fa fa-send"></i>
                       </button>
-                    </div>
-                    <div class="row pad-top hide">
-                      <button class="btn btn-sm btn-primary">
-                        <i class="fa fa-phone"></i>
+                      <button class="btn btn-sm btn-primary call-btn-#{c.id}">
+                        <i class="fa fa-video-camera"></i>
                       </button>
+                    </div>
+                    <div class="hidden-xs hidden-sm">
+                      <button class="btn btn-sm btn-success send-btn-#{c.id}">
+                        <i class="fa fa-send"></i>
+                      </button>
+                      <div class="pad-top">
+                        <button class="btn btn-sm btn-primary call-btn-#{c.id}">
+                          <i class="fa fa-video-camera"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -179,12 +236,28 @@ displayConversation = (idx) ->
         removeTyping()
         return false
 
-    $(document).on 'click', "#conversation-tabs-content-#{c.id} form button", (e) ->
+    $(document).on 'click', ".send-btn-#{c.id}", (e) ->
       e.preventDefault()
       msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
       if msg isnt ''
         sendNewMessageToVisitor(c.id, msg)
       $("#conversation-tabs-content-#{c.id} form textarea").val('')
+
+    $(document).on 'click', ".call-btn-#{c.id}", (e) ->
+      e.preventDefault()
+      $('#conversation-tabs').hide()
+      notifyAndCreateCall(c.id)
+
+    $(document).on 'click', "#end-btn-#{c.id}", ->
+      KandyAPI.call.endCall(callId)
+
+    $(document).on 'click', "#hold-btn-#{c.id}", ->
+      if $(this).text() == 'Hold'
+        KandyAPI.call.holdCall(callId)
+        $(this).text('Resume')
+      else
+        KandyAPI.call.unHoldCall(callId)
+        $(this).text('Hold')
 
     $('.dropdown-toggle').dropdown()
 
@@ -194,7 +267,21 @@ displayConversation = (idx) ->
 
   $(document).on 'click', '#conversation-tabs a[data-toggle="tab"]', (e) ->
     e.preventDefault()
-    $(this).tab('show')
+    unless (isIncall())
+      $(this).tab('show')
+
+window.isIncall = ->
+  _isIncall
+
+notifyAndCreateCall = (id) ->
+  message =
+    id: id
+    type: 'o'
+    cmd: 'new_call'
+    user_id: chatData.me.id
+    username: chatData.me.kandy_username
+  sendMessageToGuestAndOperators(message)
+  KandyAPI.call.makeCall(chatData.shop.kandy_user_guest, true)
 
 displayHistoryMessages = (idx) ->
   c = getConversationByIndex(idx)
@@ -529,7 +616,6 @@ window.handleEventListeners = (data) ->
       when 'update_status'
         updateOnlineStatus(json)
 
-
 addNewChat = (conversation) ->
   chatData.conversations.push(conversation)
   idx = chatData.conversations.length - 1
@@ -582,3 +668,70 @@ addNewMessage = (message) ->
 
 isValidChat = (json) ->
   return json
+
+window.onCallInitiate = (call) ->
+  _isIncall = true
+
+  callId = call.getId()
+
+  audioRingIn[0].pause()
+  audioRingOut[0].play()
+
+  console.log(call.getId())
+
+  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
+  c = getConversationByIndex(idx)
+  $(".call-btn-#{c.id}").addClass('disabled')
+  $("#in-call-box-#{c.id}").show()
+
+  $("#outgoing-video-#{c.id}").attr('src', null)
+  $("#incoming-video-#{c.id}").attr('src', call.localStreamURL)
+  call.onStreamAdded = (url) ->
+    $("#incoming-video-#{c.id}").attr('src', url)
+    $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
+    updateVideoViews()
+  updateVideoViews()
+  appendStatusChange(c.id, "Calling #{c.title}...")
+
+window.onCallInitiateFail = ->
+  _isIncall = false
+  console.debug('call initiate fail');
+  audioRingOut[0].pause();
+  callId = null
+
+  $('#conversation-tabs').show()
+  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
+  c = getConversationByIndex(idx)
+  $(".call-btn-#{c.id}").removeClass('disabled')
+  $("#in-call-box-#{c.id}").hide()
+  appendStatusChange(c.id, "Error: call initiate failed.")
+
+window.onCall = (call) ->
+  console.debug('oncall');
+  audioRingOut[0].pause();
+  $('#conversation-tabs').show()
+
+window.onCallTerminate = ->
+  _isIncall = false
+  console.debug('callended');
+  callId = null
+  audioRingOut[0].pause();
+  audioRingIn[0].pause();
+
+  $('#conversation-tabs').show()
+  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
+  c = getConversationByIndex(idx)
+  $(".call-btn-#{c.id}").removeClass('disabled')
+  $("#in-call-box-#{c.id}").hide()
+  appendStatusChange(c.id, "Call terminated.")
+
+window.onCallEndedFailed = ->
+  _isIncall = false
+  console.debug('callendfailed')
+  callId = null
+  $('#conversation-tabs').show()
+  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
+  c = getConversationByIndex(idx)
+  $(".call-btn-#{c.id}").removeClass('disabled')
+  $("#in-call-box-#{c.id}").hide()
+  appendStatusChange(c.id, "Call end failed.")

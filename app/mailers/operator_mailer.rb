@@ -4,8 +4,7 @@ class OperatorMailer < ApplicationMailer
     @name = params[:name]
     @email = params[:email]
     @question = params[:question]
-    @emails = @shop.users.collect(&:email).join(',')
-    mail(from: "#{@name} <#{@email}>", bcc: @emails, subject: "New question from #{@name}")
+    mail(from: "#{@name} <#{@email}>", bcc: @shop.email, subject: "New question from #{@name}")
   end
 
   def send_transcript(params)

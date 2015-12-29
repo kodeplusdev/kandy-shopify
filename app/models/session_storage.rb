@@ -9,7 +9,7 @@ class SessionStorage
   def self.retrieve(id)
     return unless id
     shop = Shop.find(id)
-    ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token)
+    Session.new(shop)
   rescue ActiveRecord::RecordNotFound
     nil
   end

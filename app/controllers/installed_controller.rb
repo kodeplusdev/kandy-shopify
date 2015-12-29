@@ -8,6 +8,11 @@ class InstalledController < ApplicationController
       redirect_to root_url
     else
       if @shop.users.size > 0
+        update_shop_details
+
+        @shop.phone = @shop_details.phone
+        @shop.save
+
         setup_webhooks
         setup_script_tags
 
@@ -65,10 +70,10 @@ class InstalledController < ApplicationController
           @shop.widget = Widget.new
           @kandy_user.user = @shop.users.create!(email: email, first_name: params[:first_name], last_name: params[:last_name], password: password, role: User::ADMIN,
                                                  phone_number: params[:phone_number], kandy_user_id: params[:kandy_user_id], invitation_accepted_at: Time.now.utc)
-          @shop.initialized = true
-          session[:initialized] = 1
-          @shop.save!
-          @kandy_user.save!
+          update_shop_details
+
+          @shop.save
+          @kandy_user.save
 
           setup_webhooks
           setup_script_tags
@@ -84,6 +89,14 @@ class InstalledController < ApplicationController
 
   private
 
+  def update_shop_details
+    @shop.initialized = true
+    @shop_details = ShopifyAPI::Shop.current
+    @shop.time_zone = @shop_details.timezone.match(/\(.*\) (.*)/)[1]
+    @shop.email = @shop_details.email
+    @shop.phone = @shop_details.phone
+  end
+
   def setup_webhooks
     begin
       webhooks = ShopifyAPI::Webhook.find :all
@@ -95,7 +108,8 @@ class InstalledController < ApplicationController
           {url: webhooks_order_creation_url, topic: 'orders/create'},
           {url: webhooks_order_update_url, topic: 'orders/updated'},
           {url: webhooks_order_payment_url, topic: 'orders/paid'},
-          {url: webhooks_customer_creation_url, topic: 'customers/create'}
+          {url: webhooks_customer_creation_url, topic: 'customers/create'},
+          {url: webhooks_shop_update_url, topic: 'shop/update'}
       ].each do |webhook|
         ShopifyAPI::Webhook.create(address: webhook[:url], topic: webhook[:topic], format: 'json')
       end

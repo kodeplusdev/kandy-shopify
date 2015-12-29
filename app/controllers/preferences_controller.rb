@@ -13,7 +13,7 @@ class PreferencesController < ApplicationController
       unless params[:shop][:kandy_api_key].blank?
         kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
         users = kandy.domain_users
-        if users.blank? || users.size == 0
+        if users.blank? || users.size < 2
           flash[:error] = 'Your kandy account should have least 2 users.'
         else
           users.each do |u|
@@ -24,12 +24,11 @@ class PreferencesController < ApplicationController
           session[:step] = 1
           redirect_to action: :index, step: 2 and return
         end
-        render :index
       end
     else
       flash[:error] = @shop.errors.full_messages.first
     end
-    redirect_to params[:back_url]
+    redirect_to params[:back_url] and return
   end
 
   def api_keys

@@ -40,11 +40,11 @@ class Webhooks::SmsController < WebhooksController
     render nothing: true, status: 200
     Thread.new do
       admin = @shop.users.admin.first
-      unless admin
+      unless @shop.phone.blank?
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin, admin.phone_number, @shop.template.order_payment
+      if send_sms_notify admin, @shop.phone, @shop.template.order_payment
         puts "Order payment notify has been sent to #{admin.phone_number}" and return
       else
         puts 'Order payment notify template was empty' and return
@@ -56,11 +56,11 @@ class Webhooks::SmsController < WebhooksController
     render nothing: true, status: 200
     Thread.new do
       admin = @shop.users.admin.first
-      unless admin
+      unless @shop.phone
         puts 'Unknown phone number' and return
       end
 
-      if send_sms_notify admin, admin.phone_number, @shop.template.customer_creation
+      if send_sms_notify admin, @shop.phone, @shop.template.customer_creation
         puts "New customer notify has been sent to #{admin.phone_number}" and return
       else
         puts 'New customer template was empty' and return

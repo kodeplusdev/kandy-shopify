@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151215072119) do
+ActiveRecord::Schema.define(version: 20151223055654) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
@@ -80,6 +80,9 @@ ActiveRecord::Schema.define(version: 20151215072119) do
     t.string   "kandy_api_secret"
     t.integer  "kandy_user_guest_id"
     t.boolean  "initialized",         default: false
+    t.string   "email"
+    t.string   "phone"
+    t.string   "time_zone"
   end
 
   add_index "shops", ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
