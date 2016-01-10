@@ -23,10 +23,25 @@ class window.KCWidget
 
   createConnection: ->
     _self.registerEventListeners()
-    KandyAPI.login _self.domain.apiKey, _self.visitor.username, _self.visitor.password, (msg) ->
+    _self.getAnonymousUser _self.domain.accessToken, (user) ->
+      _self.visitor = user
       _self.onConnected()
+#      KandyAPI.login _self.domain.apiKey, _self.visitor.user_name, _self.visitor.user_password, undefined , (e) ->
+#        console.log(e)
     , (e) ->
-      console.log e
+      console.log(e)
+
+  getAnonymousUser: (domainAccessToken, success, failure) ->
+    $.ajax
+      url: 'https://api.kandy.io/v1.2/domains/access_token/users/user/anonymous'
+      type: 'GET'
+      data:
+        key: domainAccessToken
+      dataType: 'json'
+      success: (res) ->
+        success(res.result)
+      error: failure
+
 
   registerEventListeners: ->
     KandyAPI.setup
@@ -37,6 +52,9 @@ class window.KCWidget
         callanswered: _self.onCallAnswer
         callended: _self.onCallTerminate
         callrejected: _self.onCallRejected
+
+        callinitiated: _self.onCallInitiate
+        callinitiatefailed: _self.onCallInitiateFail
 
   handleEventListeners: (data) ->
     data.message.json = JSON.parse(data.message.json)
@@ -53,8 +71,6 @@ class window.KCWidget
           _self.removeTypingAlert()
         when 'notify_close_chat'
           _self.handlers.notifyCloseChat()
-        when 'new_call'
-          _self.calling_from = json.username
 
 
   isValidCall: (call) ->
@@ -64,23 +80,28 @@ class window.KCWidget
         return o.display_name
     return false
 
-  onCallIncoming: (call, isAnonymous) ->
-    console.log call
-    user = _self.isValidCall(call)
-    if _self.calling_from == call.callerNumber && user
-      _self.audioRingIn[0].play()
-      _self.callId = call.getId()
+  onCallInitiate: (call) ->
 
-      $('#chat-control').hide()
-      $('#incoming-call-control').show()
-      $('#incoming-call-control .operator-name').text(user + ' is calling...')
-      call.onStreamAdded = (url) ->
-        $('#incoming-video video').attr('src', url)
-      call.onLocalStreamAdded = (url) ->
-        $('#outgoing-video video').attr('src', url)
+  onCallInitiateFail: (call) ->
+
+  onCallIncoming: (call, isAnonymous) ->
+    user = _self.isValidCall(call)
+    if user
+      if _self.callId
+        KandyAPI.call.rejectCall(call.getId())
+      else
+        _self.audioRingIn[0].play()
+        _self.callId = call.getId()
+
+        $('#chat-control').hide()
+        $('#incoming-call-control').show()
+        $('#incoming-call-control .operator-name').text(user + ' is calling...')
+        call.onStreamAdded = (url) ->
+          $('#incoming-video video').attr('src', url)
+        call.onLocalStreamAdded = (url) ->
+          $('#outgoing-video video').attr('src', url)
 
   onCall: (call) ->
-    console.log call
     _self.audioRingIn[0].pause()
 
     $('#operator-img-div').addClass('in-call')
@@ -89,23 +110,22 @@ class window.KCWidget
     $('#video-call-switch').click()
 
   onCallAnswer: (call) ->
-    console.log call
-    _self.calling_from = null
 
   onCallTerminate: (call) ->
-    if _self.isValidCall(call)
+    if _self.callId == call.getId()
+      _self.callId = undefined
       _self.audioRingOut[0].pause()
       _self.audioRingIn[0].pause()
-      _self.calling_from = null
       $('#chat-switch').click()
       $('#incoming-call-control').hide()
       $('#operator-img-div').removeClass('in-call')
 
-  onCallRejected: ->
-    _self.audioRingIn[0].pause()
-    _self.calling_from = null
-    $('#chat-control').show()
-    $('#incoming-call-control').hide()
+  onCallRejected: (call) ->
+    if _self.callId == call.getId()
+      _self.callId = undefined
+      _self.audioRingIn[0].pause()
+      $('#chat-control').show()
+      $('#incoming-call-control').hide()
 
   isValidRequest: (data) ->
     json = data.message.json
@@ -122,6 +142,7 @@ class window.KCWidget
       if message.is_joined
         _self.chatData.operators.push(message)
         if _self.chatData.operators.length == 1
+          $('#operator-img-div').show()
           if !message.display_name || message.display_name is ''
             $('#operator-name').text('')
             $('#in-chat-head').text(_self.config.start_chat.title)
@@ -150,10 +171,10 @@ class window.KCWidget
           $('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + message.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
         else
           if !message.avatar || message.avatar is ''
-            $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+            $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'><label><b>' + message.display_name + '</b></label>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
           else
-            $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + message.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
-          $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
+            $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + message.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'><label><b>' + message.display_name + '</b></label>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+          #$('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
       $('#con-chat').show()
       $('#def-chat').hide()
       $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
@@ -331,11 +352,25 @@ class window.KCWidget
           localStorage.removeItem(KANDY_SHOPIFY_CHAT_ID)
           location.reload()
 
-        _self.bindWidget()
+        if _self.chatData.user_name
+          _self.visitor =
+              full_user_id: _self.chatData.full_user_id
+              user_name: _self.chatData.user_name
+              user_password: _self.chatData.user_password
+              user_access_token: _self.chatData.user_access_token
 
-        if _self.checkOperatorAvaliableId
-          clearInterval(_self.checkOperatorAvaliableId)
-        _self.checkOperatorAvaliableId = _self.checkOperatorAvaliable()
+        KandyAPI.loginSSO _self.visitor.user_access_token, ->
+          _self.checkOperatorAvaliableAndBindWidget()
+        , (e) ->
+          console.log(e)
+        , _self.visitor.user_password
+
+  checkOperatorAvaliableAndBindWidget: ->
+    if _self.checkOperatorAvaliableId
+      clearInterval(_self.checkOperatorAvaliableId)
+    _self.checkOperatorAvaliableId = _self.checkOperatorAvaliable()
+
+    _self.bindWidget()
 
   checkOperatorAvaliable: (delay)->
     delay = 15*1000 unless delay
@@ -366,6 +401,10 @@ class window.KCWidget
         id: _self.domain.id
         name: name
         email: email
+        full_user_id: _self.visitor.full_user_id
+        user_name: _self.visitor.user_name
+        user_password: _self.visitor.user_password
+        user_access_token: _self.visitor.user_access_token
         location: _self.location
       success: (res) ->
         _self.chatData = res
@@ -542,14 +581,18 @@ class window.KCWidget
 
   refreshChat: ->
     localStorage.removeItem(KANDY_SHOPIFY_CHAT_ID)
+
     if _self.checkingOperatorAvailable
       clearInterval(_self.checkingOperatorAvailable)
       _self.checkingOperatorAvailable = undefined
-    available = _self.chatData.online
-    _self.chatData = {messages: []}
+
+    _self.chatData =
+      messages: []
+      online: _self.chatData.online
     _self.isSendRequest = true
     $('#chat-msgs').empty()
-    if available
+    $('#operator-img-div').show()
+    if _self.chatData.online
       if _self.config.start_chat.ask_for_name is '0' && _self.config.start_chat.ask_for_email is '0' &&
           _self.config.start_chat.ask_for_question is '0' && _self.config.start_chat.ask_for_department is '0'
         _self.showTab('MessageChatTab')
@@ -695,7 +738,7 @@ class window.KCWidget
             </tr>
             <tr id='message-box'>
               <td colspan='3' style='padding:0;'>
-                <div id='operator-img-div' class='name-messages' style='height: 56px;overflow: hidden;border-bottom: 5px solid #dcdcdc;'>
+                <div id='operator-img-div' class='name-messages' style='height: 56px;overflow: hidden;border-bottom: 5px solid #dcdcdc;display:none'>
                   <div style='float:left;'>
                     <div style='float:left;'>
                       <img id='operator-profile-img' style='height: 40px;width: 40px;margin: 8px;' src='<%= asset_url('icons/customer_support-128.png') %>'>
@@ -719,11 +762,13 @@ class window.KCWidget
                     <div id='chat-msgs'></div>
                     <div id='in-call' style="display:none">
                       <div class='video' id='incoming-video'>
-                        <video width="100%" height="100%"></video>
+                        <video width="100%" height="100%" autoplay></video>
                       </div>
                       <div class='video' id='outgoing-video'>
-                        <video width="100%" height="100%"></video>
+                        <video width="100%" height="100%" autoplay></video>
                       </div>
+                    </div>
+                    <div id='make-call' style="display:none">
                     </div>
                   </div>
                 </div>
@@ -900,12 +945,14 @@ class window.KCWidget
       $('#video-call-switch').removeClass('active')
 
     $(document).on 'click', '#video-call-switch', ->
-      $('#in-call').show()
       $('#chat-msgs').hide()
       $('#chat-control').hide()
-      $('#in-call-control').show()
       $('#chat-switch').removeClass('active')
       $('#video-call-switch').addClass('active')
+      if _self.callId
+        $('#in-call').show()
+        $('#in-call-control').show()
+
 
     # Create audio objects to play incoming calls and outgoing calls sound
     _self.audioRingIn = $('<audio>', { loop: 'loop', id: 'ring-in' })
@@ -1075,7 +1122,7 @@ class window.KCWidget
 
       if _self.chatData.operators && _self.chatData.operators.length
         op = _self.chatData.operators[0]
-
+        $('#operator-img-div').show()
         if !op.display_name || op.display_name is ''
           $('#operator-name').text('')
           $('#in-chat-head').text(_self.config.start_chat.title)
@@ -1395,7 +1442,7 @@ class window.KCWidget
     if text && text isnt ''
       time = new Date().toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
       $('#chat-msgs').append('<div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + text + '<label class=\'left-time\'>' + time + '</label></span><div class=\'clear\'></div></div>')
-      $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
+      #$('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
 
   displayMessage: (message) ->
     DateTime = new Date(Number(message.timestamp))
@@ -1408,10 +1455,10 @@ class window.KCWidget
         $('#chat-msgs').append('<div><span class=\'right\' style=\'word-break: break-word;\'>' + message.text + '<label class=\'right-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
       else
         if !message.avatar || message.avatar is ''
-          $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+          $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'<%= asset_url('avatars/avatar-operator.png') %>\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'><label><b>' + message.display_name + '</b></label>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
         else
-          $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + message.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
-        $('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
+          $('#chat-msgs').append('<div><div style=\'float: left;height: auto;margin-bottom: 0px;\'><img style=\'width:35px;\' src=\'' + message.avatar + '\'></div><span class=\'left\' style=\'word-break: break-word;background:' + _self.config.color + '\'><label><b>' + message.display_name + '</b></label>' + message.text + '<label class=\'left-time\'>' + Time + '</label></span><div class=\'clear\'></div></div>')
+        #$('.left').append('<style>.left:after{border-right: 8px solid' + _self.config.color + '}</style>')
 
 
   displayErrorMessage: (m) ->

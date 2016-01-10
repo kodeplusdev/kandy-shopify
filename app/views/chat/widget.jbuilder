@@ -1,6 +1,6 @@
 json.chatData do
   if @conversation
-    json.(@conversation, :id, :name, :title, :status, :rating, :messages, :created_at)
+    json.(@conversation, :id, :name, :title, :user_name, :user_password, :full_user_id, :user_access_token , :status, :rating, :messages, :created_at)
     json.operators @conversation.users do |u|
       json.username u.kandy_user.kandy_username
       json.(u, :id, :display_name, :avatar, :role)

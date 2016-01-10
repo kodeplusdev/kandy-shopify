@@ -24,8 +24,6 @@ script.onreadystatechange = script.onload = (e) ->
         id: '<%= @shop.id %>'
         host: '<%= root_url %>'
         apiKey: '<%= @shop.kandy_api_key %>'
-      visitor:
-        username: '<%= @shop.kandy_user_guest.username %>'
-        password: '<%= @shop.kandy_user_guest.password %>'
+        accessToken: '<%= @shop.kandy_domain_access_token %>'
       config: widgetConfig
     done = true

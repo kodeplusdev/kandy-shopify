@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151223055654) do
+ActiveRecord::Schema.define(version: 20151229055437) do
 
   create_table "conversations", force: :cascade do |t|
     t.string   "name"
@@ -27,6 +27,10 @@ ActiveRecord::Schema.define(version: 20151223055654) do
     t.boolean  "deleted",           default: false
     t.boolean  "archived",          default: false
     t.integer  "first_operator_id"
+    t.string   "full_user_id"
+    t.string   "user_password"
+    t.string   "user_name"
+    t.string   "user_access_token"
   end
 
   add_index "conversations", ["shop_id"], name: "index_conversations_on_shop_id"
@@ -72,17 +76,17 @@ ActiveRecord::Schema.define(version: 20151223055654) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "shops", force: :cascade do |t|
-    t.string   "shopify_domain",                      null: false
-    t.string   "shopify_token",                       null: false
+    t.string   "shopify_domain",                            null: false
+    t.string   "shopify_token",                             null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "kandy_api_key"
     t.string   "kandy_api_secret"
-    t.integer  "kandy_user_guest_id"
-    t.boolean  "initialized",         default: false
+    t.boolean  "initialized",               default: false
     t.string   "email"
     t.string   "phone"
     t.string   "time_zone"
+    t.string   "kandy_domain_access_token"
   end
 
   add_index "shops", ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true

@@ -5,7 +5,7 @@ class ChatController < ApplicationController
 
   def widget
     @shop = Shop.find(params[:id])
-    @conversation = Conversation.open.find(params[:chat_id])
+    @conversation = @shop.conversations.open.find(params[:chat_id])
   rescue ActiveRecord::RecordNotFound
   ensure
     render layout: false
@@ -13,8 +13,9 @@ class ChatController < ApplicationController
 
   def request_chat
     @shop = Shop.find(params[:id])
-    @conversation = @shop.conversations.create(name: params[:name], email: params[:email], location: params[:location], messages: [])
-    @users = @shop.users.online
+    @conversation = @shop.conversations.create(name: params[:name], email: params[:email], user_name: params[:user_name],
+                                               full_user_id: params[:full_user_id], user_access_token: params[:user_access_token],
+                                               user_password: params[:user_password], location: params[:location], messages: [])
     render layout: false
   end
 
@@ -76,7 +77,7 @@ class ChatController < ApplicationController
 
   def rating
     @conversation = Conversation.find(params[:chat_id])
-    if %w(like dislike).include?(params[:rating]) && (@conversation.rating == Conversation::NONE || @conversation.open? )
+    if %w(like dislike).include?(params[:rating]) && (@conversation.rating == Conversation::NONE || @conversation.open?)
       @conversation.rating = params[:rating]
       @conversation.save!
     end

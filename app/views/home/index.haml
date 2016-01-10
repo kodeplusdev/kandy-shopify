@@ -30,7 +30,6 @@
         callinitiatefailed: onCallInitiateFail
         oncall: onCall
         callended: onCallTerminate
-        callendfailed: onCallEndedFailed
 
     KandyAPI.login "#{@shop.kandy_api_key}", "#{current_user.kandy_user.username}", "#{current_user.kandy_user.password}", (msg) ->
       loadAndStartChat('#{chat_load_url}')

@@ -9,8 +9,6 @@ class InstalledController < ApplicationController
     else
       if @shop.users.size > 0
         update_shop_details
-
-        @shop.phone = @shop_details.phone
         @shop.save
 
         setup_webhooks
@@ -36,13 +34,15 @@ class InstalledController < ApplicationController
     if @shop.update_attributes(shop_params)
       kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
       users = kandy.domain_users
-      if users.blank? || users.size < 2
-        flash[:error] = 'Your kandy account should have least 2 users.'
+      if users.blank? || users.size < 1
+        flash[:error] = 'Your kandy account should have least 1 user.'
       else
         users.each do |u|
           @shop.kandy_users.create(username: u.user_id, email: u.user_email, password: u.user_password,
                                    first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
                                    api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
+          @shop.kandy_domain_access_token = kandy.domain_access_token
+          @shop.save
         end
         session[:step] = 1
         redirect_to action: :index, step: 2 and return
@@ -61,25 +61,20 @@ class InstalledController < ApplicationController
       if password.blank? || password.length < 8 || password != params[:password_confirmation]
         flash[:error] = 'A valid password is required (8-min)'
       else
-        if params[:kandy_user_id].blank? || params[:kandy_user_guest_id].blank? || params[:kandy_user_id] == params[:kandy_user_guest_id]
-          flash[:error] = 'Two kandy users have to be different and not be empty'
-        else
-          @kandy_user = @shop.kandy_users.find(params[:kandy_user_id])
-          @shop.kandy_user_guest_id = params[:kandy_user_guest_id]
-          @shop.template = Template.new
-          @shop.widget = Widget.new
-          @kandy_user.user = @shop.users.create!(email: email, first_name: params[:first_name], last_name: params[:last_name], password: password, role: User::ADMIN,
-                                                 phone_number: params[:phone_number], kandy_user_id: params[:kandy_user_id], invitation_accepted_at: Time.now.utc)
-          update_shop_details
+        @kandy_user = @shop.kandy_users.find(params[:kandy_user_id])
+        @shop.template = Template.new
+        @shop.widget = Widget.new
+        @kandy_user.user = @shop.users.create!(email: email, first_name: params[:first_name], last_name: params[:last_name], password: password, role: User::ADMIN,
+                                               phone_number: params[:phone_number], kandy_user_id: params[:kandy_user_id], invitation_accepted_at: Time.now.utc)
+        update_shop_details
 
-          @shop.save
-          @kandy_user.save
+        @shop.save
+        @kandy_user.save
 
-          setup_webhooks
-          setup_script_tags
+        setup_webhooks
+        setup_script_tags
 
-          redirect_to session['return_url'] || root_url and return
-        end
+        redirect_to session['return_url'] || root_url and return
       end
     end
 
@@ -140,4 +135,5 @@ class InstalledController < ApplicationController
   def load_shop
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
   end
+
 end

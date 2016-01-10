@@ -2,8 +2,6 @@
 #= require gmaps/google
 
 chatData = {}
-_isIncall = false
-callId = null
 
 window.onerror = ->
   return false
@@ -35,11 +33,11 @@ $(window).on 'resize', ->
   for e in $('.outgoing-video')
     $(e).css('margin-top': -$(e).height())
 
-updateVideoViews = ->
+updateVideoViews = (delay)->
   setTimeout ->
     for e in $('.outgoing-video')
       $(e).css('margin-top': -$(e).height())
-  , 2000
+  , delay
 
 window.loadAndStartChat = (url) ->
   jQuery.ajax
@@ -161,10 +159,10 @@ displayConversation = (idx) ->
             <div class="row in-call-box" id="in-call-box-#{c.id}" style="display:none">
               <div class="row">
                 <div class='video incoming-video'>
-                  <video id="incoming-video-#{c.id}" width="100%" height="100%"></video>
+                  <video id="incoming-video-#{c.id}" autoplay width="100%" height="100%"></video>
                 </div>
                 <div class='video outgoing-video'>
-                  <video id="outgoing-video-#{c.id}" width="100%" height="100%"></video>
+                  <video id="outgoing-video-#{c.id}" autoplay width="100%" height="100%"></video>
                 </div>
               </div>
               <div class="row pull-right">
@@ -223,6 +221,7 @@ displayConversation = (idx) ->
     $(document).on 'click', "#conversation-tabs-#{c.id}", ->
       if $("#conversation-tabs-#{c.id}").html()
         displayInfoVisitor(idx)
+        updateVideoViews(0)
         elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
         $(elems).scrollTop($(elems)[0].scrollHeight)
 
@@ -231,7 +230,7 @@ displayConversation = (idx) ->
       if e.keyCode is 13
         msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
         if msg isnt ''
-          sendNewMessageToVisitor(c.id, msg)
+          sendNewMessageToVisitor(idx, msg)
         $("#conversation-tabs-content-#{c.id} form textarea").val('')
         removeTyping()
         return false
@@ -240,23 +239,22 @@ displayConversation = (idx) ->
       e.preventDefault()
       msg = $.trim($("#conversation-tabs-content-#{c.id} form textarea").val())
       if msg isnt ''
-        sendNewMessageToVisitor(c.id, msg)
+        sendNewMessageToVisitor(idx, msg)
       $("#conversation-tabs-content-#{c.id} form textarea").val('')
 
     $(document).on 'click', ".call-btn-#{c.id}", (e) ->
       e.preventDefault()
-      $('#conversation-tabs').hide()
-      notifyAndCreateCall(c.id)
+      KandyAPI.call.makeCall(c.full_user_id, true)
 
     $(document).on 'click', "#end-btn-#{c.id}", ->
-      KandyAPI.call.endCall(callId)
+      KandyAPI.call.endCall(c.callId)
 
     $(document).on 'click', "#hold-btn-#{c.id}", ->
       if $(this).text() == 'Hold'
-        KandyAPI.call.holdCall(callId)
+        KandyAPI.call.holdCall(c.callId)
         $(this).text('Resume')
       else
-        KandyAPI.call.unHoldCall(callId)
+        KandyAPI.call.unHoldCall(c.callId)
         $(this).text('Hold')
 
     $('.dropdown-toggle').dropdown()
@@ -264,24 +262,6 @@ displayConversation = (idx) ->
   $("#conversation-tabs-#{c.id} > a:first-child").tab('show')
   elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
   $(elems).scrollTop($(elems)[0].scrollHeight)
-
-  $(document).on 'click', '#conversation-tabs a[data-toggle="tab"]', (e) ->
-    e.preventDefault()
-    unless (isIncall())
-      $(this).tab('show')
-
-window.isIncall = ->
-  _isIncall
-
-notifyAndCreateCall = (id) ->
-  message =
-    id: id
-    type: 'o'
-    cmd: 'new_call'
-    user_id: chatData.me.id
-    username: chatData.me.kandy_username
-  sendMessageToGuestAndOperators(message)
-  KandyAPI.call.makeCall(chatData.shop.kandy_user_guest, true)
 
 displayHistoryMessages = (idx) ->
   c = getConversationByIndex(idx)
@@ -294,7 +274,10 @@ displayHistoryMessages = (idx) ->
     else if m.type == 'v'
       appendVisitorMessage(m.id, m.display_name, m.text, m.timestamp)
 
-sendNewMessageToVisitor = (id, text) ->
+sendNewMessageToVisitor = (idx, text) ->
+  c = getConversationByIndex(idx)
+  id = c.id
+
   message =
     id: id
     type: 'o'
@@ -306,7 +289,7 @@ sendNewMessageToVisitor = (id, text) ->
     timestamp: new Date().getTime()
 
   #appendOperatorMessage(id, chatData.me.display_name, chatData.me.avatar, text, message.timestamp)
-  sendMessageToGuestAndOperators(message)
+  sendMessageToGuestAndOperators(idx, message)
   saveMessage(id, message)
 
 appendOperatorMessage = (id, name, avatar, msg, time) ->
@@ -364,8 +347,10 @@ typingChecking = ->
 
 removeTyping = ->
 
-sendMessageToGuestAndOperators = (message) ->
-  KandyAPI.messaging.sendJSON chatData.shop.kandy_user_guest, message, undefined, (msg) ->
+sendMessageToGuestAndOperators = (idx, message) ->
+  c = getConversationByIndex(idx)
+
+  KandyAPI.messaging.sendJSON c.full_user_id, message, undefined, (msg) ->
     console.log(message)
     displayErrorMessage(msg)
 
@@ -448,7 +433,7 @@ notifyOperatorJoinedChat = (idx) ->
           text: "#{chatData.me.display_name} #{chatData.shop.widget.joined_chat}"
           timestamp: new Date().getTime()
 
-        sendMessageToGuestAndOperators(message)
+        sendMessageToGuestAndOperators(idx, message)
         saveMessage(id, message)
       error: (e) ->
         displayErrorMessage(e)
@@ -490,7 +475,7 @@ notifyOperatorLeftChat = (idx) ->
           text: "#{chatData.me.display_name} #{chatData.shop.widget.left_chat}"
           timestamp: new Date().getTime()
 
-        sendMessageToGuestAndOperators(message)
+        sendMessageToGuestAndOperators(idx, message)
         saveMessage(id, message)
       error: (e) ->
         console.log(e)
@@ -516,7 +501,7 @@ notifyOperatorCloseChat = (idx) ->
         text: "#{chatData.me.display_name} #{chatData.shop.widget.closed_chat}"
         timestamp: new Date().getTime()
 
-      sendMessageToGuestAndOperators(message)
+      sendMessageToGuestAndOperators(idx, message)
       saveMessage(id, message)
 
 closeChat = (id, msg) ->
@@ -670,17 +655,12 @@ isValidChat = (json) ->
   return json
 
 window.onCallInitiate = (call) ->
-  _isIncall = true
-
-  callId = call.getId()
-
   audioRingIn[0].pause()
   audioRingOut[0].play()
 
-  console.log(call.getId())
-
   idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
   c = getConversationByIndex(idx)
+  c.callId = call.getId()
   $(".call-btn-#{c.id}").addClass('disabled')
   $("#in-call-box-#{c.id}").show()
 
@@ -689,19 +669,15 @@ window.onCallInitiate = (call) ->
   call.onStreamAdded = (url) ->
     $("#incoming-video-#{c.id}").attr('src', url)
     $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
-    updateVideoViews()
+    updateVideoViews(1500)
   updateVideoViews()
   appendStatusChange(c.id, "Calling #{c.title}...")
 
 window.onCallInitiateFail = ->
-  _isIncall = false
-  console.debug('call initiate fail');
   audioRingOut[0].pause();
-  callId = null
-
-  $('#conversation-tabs').show()
   idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
   c = getConversationByIndex(idx)
+  c.callId = undefined
   $(".call-btn-#{c.id}").removeClass('disabled')
   $("#in-call-box-#{c.id}").hide()
   appendStatusChange(c.id, "Error: call initiate failed.")
@@ -709,29 +685,15 @@ window.onCallInitiateFail = ->
 window.onCall = (call) ->
   console.debug('oncall');
   audioRingOut[0].pause();
-  $('#conversation-tabs').show()
 
-window.onCallTerminate = ->
-  _isIncall = false
-  console.debug('callended');
-  callId = null
+window.onCallTerminate = (call)->
   audioRingOut[0].pause();
   audioRingIn[0].pause();
 
-  $('#conversation-tabs').show()
-  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
-  c = getConversationByIndex(idx)
-  $(".call-btn-#{c.id}").removeClass('disabled')
-  $("#in-call-box-#{c.id}").hide()
-  appendStatusChange(c.id, "Call terminated.")
-
-window.onCallEndedFailed = ->
-  _isIncall = false
-  console.debug('callendfailed')
-  callId = null
-  $('#conversation-tabs').show()
-  idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
-  c = getConversationByIndex(idx)
-  $(".call-btn-#{c.id}").removeClass('disabled')
-  $("#in-call-box-#{c.id}").hide()
-  appendStatusChange(c.id, "Call end failed.")
+  for c in chatData.conversations
+    if c.callId == call.getId()
+      c.callId = undefined
+      $(".call-btn-#{c.id}").removeClass('disabled')
+      $("#in-call-box-#{c.id}").hide()
+      appendStatusChange(c.id, "Call terminated.")
+      break
