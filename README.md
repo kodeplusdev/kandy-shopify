@@ -17,7 +17,7 @@ A Kandy plugin for shopify websites.
 
 #### 2. Config kandy-shopify
 - Create a `.env` file
-```yml
+```ini
     SHOPIFY_CLIENT_API_KEY=<your-app-api-key>
     SHOPIFY_CLIENT_API_SECRET=<your-app-api-secret-key>
     MAILER_SENDER=<email-of-sender>
