@@ -22,8 +22,8 @@ test:
 
 production:
   <<: *base
-  database: db/production.sqlite3
-  adapter: sqlite3 #postgresql
+  database: kandy_shopify_production
+  adapter: postgresql
   encoding: unicode
-  #username: ENV['PG_USERNAME']
-  #password: ENV['PG_PASSWORD']
+  username: <%= ENV['PG_USERNAME'] %>
+  password: <%= ENV['PG_PASSWORD'] %>

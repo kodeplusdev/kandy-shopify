@@ -8,7 +8,7 @@ class window.KCWidget
 
   constructor: (options) ->
     _self = @
-    {@domain, @visitor, @config} = options
+    {@kandyVideoCallEnabled, @domain, @visitor, @config} = options
     _self.chatData = {messages: []}
     _self.isSendRequest = true
 
@@ -81,8 +81,25 @@ class window.KCWidget
     return false
 
   onCallInitiate: (call) ->
+    _self.audioRingOut[0].play()
+    _self.callId = call.getId()
+    $('#make-call').hide()
+    $('#in-call-control').show()
+    $('.hold-btn').hide()
+
+    $('#in-call-control .operator-name').text('Calling to ' + _self.callingOperator.display_name + ' ...')
+    call.onStreamAdded = (url) ->
+      $('#incoming-video video').attr('src', url)
+    call.onLocalStreamAdded = (url) ->
+      $('#outgoing-video video').attr('src', url)
 
   onCallInitiateFail: (call) ->
+    _self.audioRingOut[0].pause()
+    _self.callId = undefined
+    _self.callingOperator = undefined
+    $('#make-call').show()
+    $('#in-call-control').hide()
+    $('.hold-btn').show()
 
   onCallIncoming: (call, isAnonymous) ->
     user = _self.isValidCall(call)
@@ -92,28 +109,37 @@ class window.KCWidget
       else
         _self.audioRingIn[0].play()
         _self.callId = call.getId()
-
+        $('#make-call').hide()
         $('#chat-control').hide()
+        $('#in-call-control').hide()
+        $('.chat-box-control').hide()
         $('#incoming-call-control').show()
         $('#incoming-call-control .operator-name').text(user + ' is calling...')
+
         call.onStreamAdded = (url) ->
           $('#incoming-video video').attr('src', url)
         call.onLocalStreamAdded = (url) ->
           $('#outgoing-video video').attr('src', url)
 
   onCall: (call) ->
-    _self.audioRingIn[0].pause()
-
+    _self.audioRingOut[0].pause()
+    $('.hold-btn').show()
+    $('#make-call').hide()
+    $('#in-call-control').hide()
+    $('#in-call-control .operator-name').text('')
     $('#operator-img-div').addClass('in-call')
     $('#incoming-call-control').hide()
     $('#outgoing-video video').attr('src', call.localStreamURL)
     $('#video-call-switch').click()
 
   onCallAnswer: (call) ->
+    _self.audioRingIn[0].pause()
+    $('.chat-box-control').show()
 
   onCallTerminate: (call) ->
     if _self.callId == call.getId()
       _self.callId = undefined
+      _self.callingOperator = undefined
       _self.audioRingOut[0].pause()
       _self.audioRingIn[0].pause()
       $('#chat-switch').click()
@@ -123,9 +149,15 @@ class window.KCWidget
   onCallRejected: (call) ->
     if _self.callId == call.getId()
       _self.callId = undefined
+      _self.callingOperator = undefined
       _self.audioRingIn[0].pause()
-      $('#chat-control').show()
       $('#incoming-call-control').hide()
+      $('.chat-box-control').show()
+      if $('#chat-switch').hasClass('active')
+        $('#chat-control').show()
+        $('#make-call').hide()
+      else
+        $('#make-call').show()
 
   isValidRequest: (data) ->
     json = data.message.json
@@ -617,7 +649,7 @@ class window.KCWidget
               <td id='start-head' class='header-text collapse-start-chat'></td>
               <td class='header-btn minimize-btn#{_self.config.collapse.show_widget_hide_button}'>
                 <a style='padding-left: 5px;'>
-                  <img id='minimize' class="btn-img" style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/minus.png') %>'>
+                  <img id='minimize' class='btn-img' style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/minus.png') %>'>
                 </a>
               </td>
               <td class='header-btn'>
@@ -660,7 +692,7 @@ class window.KCWidget
               <td id='no-operator-head' class='header-text collapse-no-operator'></td>
               <td class='header-btn minimize-btn#{_self.config.collapse.show_widget_hide_button}'>
                 <a style='padding-left: 5px;'>
-                  <img id='minimize' class="btn-img" style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/minus.png') %>'>
+                  <img id='minimize' class='btn-img' style='margin:auto;vertical-align: middle;' src='<%= asset_url('icons/minus.png') %>'>
                 </a>
               </td>
               <td class='header-btn'>
@@ -760,35 +792,46 @@ class window.KCWidget
                 <div id='con-chat' class='name-messages' style='min-height: 220px;max-height: 220px; border-bottom: white;border-top: none; word-break: break-all;overflow-y: auto; display:block!important;'>
                   <div class='messages'>
                     <div id='chat-msgs'></div>
-                    <div id='in-call' style="display:none">
+                    <div id='in-call' style='display:none'>
                       <div class='video' id='incoming-video'>
-                        <video width="100%" height="100%" autoplay></video>
+                        <video width='100%' height='100%' autoplay></video>
                       </div>
                       <div class='video' id='outgoing-video'>
-                        <video width="100%" height="100%" autoplay></video>
+                        <video width='100%' height='100%' autoplay></video>
                       </div>
                     </div>
-                    <div id='make-call' style="display:none">
+                    <div id='make-call' style='display:none'>
+                      <select id="make-call-operator-selector"></select>
+                      <div class="controls" style="text-align: center;">
+                        <label id="make-call-start-with-video-label">
+                          <input type="checkbox" id="make-call-start-with-video-checkbox"> Video enabled
+                        </label>
+                        <button class='call-btn'>Call</button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div id='img-typing' class='name-messages' style='border-top-color: white; display: none;'></div>
-                <div id="chat-control" class='name-messages send-mess' style='border-top-width:5px;'>
+                <div id='chat-control' class='name-messages send-mess' style='border-top-width:5px;'>
                   <textarea id='send-msg-text' style='max-width:225px; float:left' class='mess-input' rows='2' placeholder='#{_self.config.in_chat.send_message}'></textarea>
                   <a href='javascript:void(0)'>
                     <img id='message-send' src='<%= asset_url('icons/send.png') %>' style='margin-top: 8%;float:left;'>
                   </a>
                 </div>
-                <div id="incoming-call-control" class='name-messages send-mess' style='border-top-width:5px;display:none'>
+                <div id='incoming-call-control' class='name-messages send-mess' style='border-top-width:5px;display:none'>
                   <div class='operator-name'>letranloc is calling...</div>
                   <div class='controls'>
+                    <label>
+                      <input type="checkbox" id="start-with-video-checkbox"> Video enabled
+                    </label>
                     <button class='answer-btn'>Answer</button>
                     <button class='reject-btn'>Reject</button>
                   </div>
                 </div>
-                <div id="in-call-control" class='name-messages send-mess' style='border-top-width:5px;display:none'>
-                  <button class="end-btn">End</button>
-                  <button class="hold-btn">Hold</button>
+                <div id='in-call-control' class='name-messages send-mess' style='border-top-width:5px;display:none'>
+                  <div class='operator-name'></div>
+                  <button class='end-btn'>End</button>
+                  <button class='hold-btn'>Hold</button>
                 </div>
               </td>
             </tr>
@@ -822,8 +865,8 @@ class window.KCWidget
                     <img class='like-img' id='like' src='<%= asset_url('icons/thumbup.svg') %>' style='margin-left: 35%;'>
                     <img style='margin-left: 7%;' class='like-img' id='dislike' src='<%= asset_url('icons/thumbdown.svg') %>'>
                     <br>
-                    <p style="text-align: center; padding: 0px;">
-                      <a class="like-chat-dwld" style="cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;"></a>
+                    <p style='text-align: center; padding: 0px;'>
+                      <a class='like-chat-dwld' style='cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;'></a>
                     </p>
                     <br>
                     <br>
@@ -921,7 +964,8 @@ class window.KCWidget
         _self.showToggle('NoOperatorSuccess')
 
     $(document).on 'click', '#incoming-call-control .answer-btn', ->
-      KandyAPI.call.answerCall(_self.callId, true)
+      videoEnabled = $('#start-with-video-checkbox').prop('checked')
+      KandyAPI.call.answerCall(_self.callId, videoEnabled)
 
     $(document).on 'click', '#incoming-call-control .reject-btn', ->
       KandyAPI.call.rejectCall(_self.callId)
@@ -939,20 +983,42 @@ class window.KCWidget
     $(document).on 'click', '#chat-switch', ->
       $('#in-call').hide()
       $('#chat-msgs').show()
+      $('#make-call').hide()
       $('#chat-control').show()
       $('#in-call-control').hide()
       $('#chat-switch').addClass('active')
       $('#video-call-switch').removeClass('active')
+      $('#con-chat').scrollTop($('#con-chat')[0].scrollHeight)
 
     $(document).on 'click', '#video-call-switch', ->
-      $('#chat-msgs').hide()
-      $('#chat-control').hide()
-      $('#chat-switch').removeClass('active')
-      $('#video-call-switch').addClass('active')
-      if _self.callId
-        $('#in-call').show()
-        $('#in-call-control').show()
+      if _self.chatData.operators.length
+        $('#chat-msgs').hide()
+        $('#chat-control').hide()
+        $('#chat-switch').removeClass('active')
+        $('#video-call-switch').addClass('active')
+        if _self.callId
+          $('#in-call').show()
+          $('#in-call-control').show()
+        else
+          $('#make-call-operator-selector').html('')
+          for o in _self.chatData.operators
+            $('#make-call-operator-selector').append """
+              <option value="#{o.username}">#{o.display_name}</option>
+            """
+          $('#make-call').show()
 
+
+    $(document).on 'click', '.call-btn', ->
+      operator = $('#make-call-operator-selector :selected').val()
+      startWithVideo = $('#make-call-start-with-video-checkbox').prop('checked')
+      KandyAPI.call.makeCall(operator, startWithVideo)
+      _self.callingOperator =
+        username: operator
+        display_name: $('#make-call-operator-selector :selected').text()
+
+    unless _self.kandyVideoCallEnabled
+      $('#incoming-call-control label').hide()
+      $('#make-call-start-with-video-label').hide()
 
     # Create audio objects to play incoming calls and outgoing calls sound
     _self.audioRingIn = $('<audio>', { loop: 'loop', id: 'ring-in' })

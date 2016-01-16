@@ -157,7 +157,7 @@ displayConversation = (idx) ->
         <div class="panel">
           <div class="panel-body">
             <div class="row in-call-box" id="in-call-box-#{c.id}" style="display:none">
-              <div class="row">
+              <div class="row" id="video-call-views-#{c.id}">
                 <div class='video incoming-video'>
                   <video id="incoming-video-#{c.id}" autoplay width="100%" height="100%"></video>
                 </div>
@@ -194,7 +194,7 @@ displayConversation = (idx) ->
                         <i class="fa fa-send"></i>
                       </button>
                       <div class="pad-top">
-                        <button class="btn btn-sm btn-primary call-btn-#{c.id}">
+                        <button type="button" class="btn btn-sm btn-primary" id="call-popover-btn-#{c.id}" data-toggle="popover">
                           <i class="fa fa-video-camera"></i>
                         </button>
                       </div>
@@ -207,6 +207,32 @@ displayConversation = (idx) ->
         </div>
       </div>
     """
+
+    if kandyVideoCallEnabled
+      $("#call-popover-btn-#{c.id}").popover
+        html: true
+        placement: 'bottom'
+        container: 'body'
+        content: ->
+          return """
+          <div class="form-inline" style="min-width: 156px">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="start-with-video-checkbox-#{c.id}"> Video enabled
+              </label>
+            </div>
+            <button class="btn btn-sm btn-primary" id="call-btn-#{c.id}">Call</button>
+          </div>
+          """
+      $(document).on 'click', "#call-btn-#{c.id}", (e) ->
+        e.preventDefault()
+        startWithVideo = $("#start-with-video-checkbox-#{c.id}").prop('checked')
+        KandyAPI.call.makeCall(c.full_user_id, startWithVideo)
+        $("#call-popover-btn-#{c.id}").popover('hide')
+    else
+      $(document).on 'click', "#call-popover-btn-#{c.id}", (e) ->
+        e.preventDefault()
+        KandyAPI.call.makeCall(c.full_user_id, false)
 
     $(document).on 'click', "#conversation-tabs-#{c.id}-end-btn", ->
       notifyOperatorCloseChat(idx)
@@ -241,10 +267,6 @@ displayConversation = (idx) ->
       if msg isnt ''
         sendNewMessageToVisitor(idx, msg)
       $("#conversation-tabs-content-#{c.id} form textarea").val('')
-
-    $(document).on 'click', ".call-btn-#{c.id}", (e) ->
-      e.preventDefault()
-      KandyAPI.call.makeCall(c.full_user_id, true)
 
     $(document).on 'click', "#end-btn-#{c.id}", ->
       KandyAPI.call.endCall(c.callId)
@@ -658,11 +680,16 @@ window.onCallInitiate = (call) ->
   audioRingIn[0].pause()
   audioRingOut[0].play()
 
+  console.log call
+  console.log call.getRemoteVideoState()
+
   idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
   c = getConversationByIndex(idx)
   c.callId = call.getId()
   $(".call-btn-#{c.id}").addClass('disabled')
   $("#in-call-box-#{c.id}").show()
+  unless kandyVideoCallEnabled
+    $("#video-call-views-#{c.id}").hide()
 
   $("#outgoing-video-#{c.id}").attr('src', null)
   $("#incoming-video-#{c.id}").attr('src', call.localStreamURL)
@@ -671,7 +698,13 @@ window.onCallInitiate = (call) ->
     $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
     updateVideoViews(1500)
   updateVideoViews()
-  appendStatusChange(c.id, "Calling #{c.title}...")
+  #appendStatusChange(c.id, "Calling #{c.title}...")
+  swal
+    title: "Calling #{c.title}..."
+    confirmButtonColor: "#DD6B55"
+    confirmButtonText: "End"
+    , ->
+      KandyAPI.call.endCall(call.getId())
 
 window.onCallInitiateFail = ->
   audioRingOut[0].pause();
@@ -680,20 +713,83 @@ window.onCallInitiateFail = ->
   c.callId = undefined
   $(".call-btn-#{c.id}").removeClass('disabled')
   $("#in-call-box-#{c.id}").hide()
-  appendStatusChange(c.id, "Error: call initiate failed.")
+  swal('Oops...', 'call initiate failed!', 'error')
+  #appendStatusChange(c.id, "Error: call initiate failed.")
+
+getVisitorFromCall = (call) ->
+  callee = call.callerNumber
+  for c in chatData.conversations
+    if c.full_user_id is callee
+      return c
+  return undefined
+
+window.onCallIncoming = (call) ->
+  c = getVisitorFromCall(call)
+  if c.callId
+    KandyAPI.call.reject(call.getId())
+  else
+    audioRingIn[0].play();
+    c.callId = call.getId()
+    call.onStreamAdded = (url) ->
+      $("#incoming-video-#{c.id}").attr('src', url)
+      updateVideoViews(1500)
+    call.onLocalStreamAdded = (url) ->
+      $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
+      updateVideoViews(1500)
+
+    swal
+      title: "#{c.title} is calling..."
+      showCancelButton: true
+      confirmButtonColor: "#DD6B55"
+      confirmButtonText: "Accept"
+      cancelButtonText: "Reject"
+      closeOnConfirm: false
+    , (isConfirm)->
+        if isConfirm
+          if kandyVideoCallEnabled
+            swal
+              title: "Video Call"
+              text: "Accept this call with video sharing enabled?"
+              showCancelButton: true
+              confirmButtonColor: "#DD6B55"
+              confirmButtonText: "Yes"
+              cancelButtonText: "No"
+            , (isConfirm2)->
+              KandyAPI.call.answerCall(c.callId, isConfirm2)
+          else
+            KandyAPI.call.answerCall(c.callId, false)
+          $('#conversation-tabs-10').tab('show')
+        else
+          KandyAPI.call.rejectCall(c.callId)
+
+window.onCallAnswer = (call) ->
+  c = getVisitorFromCall(call)
+  audioRingIn[0].pause();
+  $("#in-call-box-#{c.id}").show()
+  unless kandyVideoCallEnabled
+    $("#video-call-views-#{c.id}").hide()
+
+window.onCallRejected = (call) ->
+  c = getVisitorFromCall(call)
+  c.callId = undefined
+  audioRingIn[0].pause();
+  swal.close()
 
 window.onCall = (call) ->
-  console.debug('oncall');
+  console.log call
+  console.log call.canReceiveVideo()
+
   audioRingOut[0].pause();
+  swal.close()
 
 window.onCallTerminate = (call)->
   audioRingOut[0].pause();
   audioRingIn[0].pause();
-
+  swal.close()
   for c in chatData.conversations
     if c.callId == call.getId()
       c.callId = undefined
       $(".call-btn-#{c.id}").removeClass('disabled')
       $("#in-call-box-#{c.id}").hide()
-      appendStatusChange(c.id, "Call terminated.")
+      #appendStatusChange(c.id, "Call terminated.")
       break

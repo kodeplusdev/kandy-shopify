@@ -20,6 +20,7 @@ widgetConfig.enabled = <%= raw @shop.widget.enabled %>
 script.onreadystatechange = script.onload = (e) ->
   if (widgetConfig.enabled && !done && (!this.readyState || this.readyState is 'loaded' || this.readyState is 'complete'))
     new window.KCWidget
+      kandyVideoCallEnabled: <%= raw ENV['KANDY_VIDEO_CALL_ENABLED'] %>
       domain:
         id: '<%= @shop.id %>'
         host: '<%= root_url %>'

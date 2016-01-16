@@ -4,6 +4,7 @@
 
 :coffeescript
   window.mainPageTitle = 'Home Page'
+  window.kandyVideoCallEnabled = #{ENV['KANDY_VIDEO_CALL_ENABLED']}
 
   displayLoadingOverlay()
 
@@ -30,6 +31,10 @@
         callinitiatefailed: onCallInitiateFail
         oncall: onCall
         callended: onCallTerminate
+
+        callincoming: onCallIncoming
+        callanswered: onCallAnswer
+        callrejected: onCallRejected
 
     KandyAPI.login "#{@shop.kandy_api_key}", "#{current_user.kandy_user.username}", "#{current_user.kandy_user.password}", (msg) ->
       loadAndStartChat('#{chat_load_url}')
@@ -98,5 +103,4 @@
     .row#welcome-dashboard
       .panel-body
         %h3= "Hey #{current_user.display_name}"
-
 = form_tag destroy_user_session_path, method: :delete, class: 'hide', 'data-shopify-app-submit': 'logout-form-message'

@@ -595,7 +595,7 @@ button a {
   }
 }
 
-#incoming-call-control {
+#incoming-call-control, #make-call {
   text-align: center;
 
   .operator-name {
@@ -614,7 +614,7 @@ button a {
       font-size: 0.8em;
       font-weight: bold;
 
-      &.answer-btn {
+      &.answer-btn, &.call-btn {
         background: green;
       }
 
@@ -685,11 +685,11 @@ button a {
 
 #operator-img-div {
   & > div:first-child {
-    width: 100%;
+    //width: 100%;
   }
 
   & > div:last-child {
-    display: none;
+    //display: none;
   }
 
   &.in-call {

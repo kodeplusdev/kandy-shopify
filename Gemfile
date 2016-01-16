@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.2'
+gem 'rails', '4.2.5'
 
 gem 'shopify_app', '~> 6.2.0'
 gem 'jquery-rails', '~> 4.0.4'
