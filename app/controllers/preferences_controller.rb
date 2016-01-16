@@ -8,26 +8,41 @@ class PreferencesController < ApplicationController
 
   def update
     @shop = Shop.find(params[:shop][:id])
-    if @shop.update_attributes(shop_params)
-      flash[:notice] = 'Updated successful'
-      unless params[:shop][:kandy_api_key].blank?
-        kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
-        users = kandy.domain_users
-        if users.blank? || users.size < 2
-          flash[:error] = 'Your kandy account should have least 2 users.'
-        else
-          users.each do |u|
-            @shop.kandy_users.create(username: u.user_id, email: u.user_email, password: u.user_password,
-                                     first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
-                                     api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
-          end
-          session[:step] = 1
-          redirect_to action: :index, step: 2 and return
-        end
+    if params[:shop][:kandy_api_key] == nil && params[:shop][:kandy_api_secret] == nil
+      if @shop.update_attributes(shop_params)
+        flash[:notice] = 'Updated successful'
+      else
+        flash[:error] = @shop.errors.full_messages.first
       end
     else
-      flash[:error] = @shop.errors.full_messages.first
+      if !params[:shop][:kandy_api_key].blank? || !params[:shop][:kandy_api_secret].blank?
+        old_api_key = @shop.kandy_api_key
+        old_api_secret = @shop.kandy_api_secret
+        if old_api_key != params[:shop][:kandy_api_key] || old_api_secret != params[:shop][:kandy_api_secret]
+          kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
+          users = kandy.domain_users
+          if users.blank? || users.size < 1
+            flash[:error] = 'Your kandy account should have least 1 users.'
+          else
+            if @shop.update_attributes(shop_params)
+              @shop.kandy_users.destroy_all
+              users.each do |u|
+                @shop.kandy_users.create(username: u.user_id, email: u.user_email, password: u.user_password,
+                                         first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
+                                         api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
+              end
+              flash[:notice] = 'Please setup kandy user for your account and other accounts.'
+              redirect_to users_manage_edit_path(current_user) and return
+            else
+              flash[:error] = @shop.errors.full_messages.first
+            end
+          end
+        end
+      else
+        flash[:error] = 'Please enter valid kandy api keys.'
+      end
     end
+
     redirect_to params[:back_url] and return
   end
 

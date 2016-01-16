@@ -9,5 +9,7 @@ json.chatData do
   json.online @shop.users.online.size > 0
 end
 json.operators @shop.users do |u|
-  json.username u.kandy_user.kandy_username
+  unless u.kandy_user.blank?
+    json.username u.kandy_user.kandy_username
+  end
 end

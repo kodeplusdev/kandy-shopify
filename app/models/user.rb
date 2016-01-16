@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :conversations
   has_one :kandy_user
   attr_readonly :display_name, :full_name
+  attr_accessor :kandy_user_id
 
   ROLE = [
       ADMIN = 'admin',
@@ -58,6 +59,17 @@ class User < ActiveRecord::Base
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def kandy_user_id
+    puts kandy_user.id unless kandy_user.blank?
+    return kandy_user.id unless kandy_user.blank?
+    nil
+  end
+
+  def kandy_user_id=(id)
+    kandy_user = KandyUser.find(id)
+    self.kandy_user = kandy_user
   end
 
   def online?

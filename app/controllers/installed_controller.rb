@@ -65,7 +65,7 @@ class InstalledController < ApplicationController
         @shop.template = Template.new
         @shop.widget = Widget.new
         @kandy_user.user = @shop.users.create!(email: email, first_name: params[:first_name], last_name: params[:last_name], password: password, role: User::ADMIN,
-                                               phone_number: params[:phone_number], kandy_user_id: params[:kandy_user_id], invitation_accepted_at: Time.now.utc)
+                                               phone_number: params[:phone_number], invitation_accepted_at: Time.now.utc)
         update_shop_details
 
         @shop.save

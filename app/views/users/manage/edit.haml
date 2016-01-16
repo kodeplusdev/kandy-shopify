@@ -51,7 +51,7 @@
           .row.form-group
             .col-sm-12
               = f.label :kandy_user_id, 'Kandy user'
-              = f.collection_select :kandy_user_id, @kandy_users, :id, :username, {}, {class: 'select2 form-control'}
+              = f.collection_select :kandy_user_id, @kandy_users, :id, :username, {prompt: true}, {class: 'select2 form-control'}
 - if current_user.admin? && @user.id != current_user.id
   .row
     .col-sm-3

@@ -8,11 +8,11 @@ class Users::ManageController < DeviseController
 
   def edit
     @user = @shop.users.find(params[:id])
-    @kandy_users = @shop.kandy_users.where('id != ? AND (user_id IS NULL OR user_id = ?)', @shop.kandy_user_guest_id, @user.id)
+    @kandy_users = @shop.kandy_users.where('user_id IS NULL OR user_id = ?', @user.id)
   end
 
   def invite
-    @kandy_users = @shop.kandy_users.where('id != ? AND (user_id IS NULL)', @shop.kandy_user_guest_id)
+    @kandy_users = @shop.kandy_users.where('user_id IS NULL')
   end
 
   def new_invite
@@ -33,45 +33,33 @@ class Users::ManageController < DeviseController
       end
     end
 
-    @kandy_users = @shop.kandy_users.where('id != ? AND (user_id IS NULL)', @shop.kandy_user_guest_id)
+    @kandy_users = @shop.kandy_users.where('user_id IS NULL')
     render :invite
   end
 
   def update
     @user = @shop.users.find(params[:id])
-    @kandy_users = @shop.kandy_users.where('id != ? AND (user_id IS NULL OR user_id = ?)', @shop.kandy_user_guest_id, @user.id)
-
-    unless current_user.admin?
-      params[:user].delete :role
-    end
-    if @user.update_attributes(user_params)
-      flash[:notice] = 'Updated successfully.'
-
-      new_kandy_user = @shop.kandy_users.find(@user.kandy_user_id)
-      new_kandy_user.user = @user
-      new_kandy_user.save
-
-      old_kandy_user = @kandy_users.where('id != ? AND user_id = ?', @user.kandy_user_id, @user.id).first
-      if old_kandy_user
-        old_kandy_user.user = nil
-        old_kandy_user.save
-      end
-
+    @kandy_users = @shop.kandy_users.where('user_id IS NULL OR user_id = ?', @user.id)
+    if params[:user][:kandy_user_id].blank?
+      flash[:error] = 'Please select a kandy user.'
     else
-      flash[:error] = 'All fields must be valid.'
+      unless current_user.admin?
+        params[:user].delete :role
+      end
+      if @user.update_attributes(user_params)
+        flash[:notice] = 'Updated successfully.'
+      else
+        flash[:error] = 'All fields must be valid.'
+      end
     end
+
     render :edit
   end
 
   def destroy
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     @user = @shop.users.find(params[:id])
-    @kandy_user = @user.kandy_user
-
     @user.destroy
-
-    @kandy_user.user = nil
-    @kandy_user.save
     flash[:notice] = 'User deleted.'
   rescue ActiveRecord::RecordNotFound
       flash[:error] = 'User not found.'

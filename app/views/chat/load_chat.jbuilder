@@ -20,7 +20,9 @@ json.conversations @conversations do |conversation|
   end
 end
 json.users @users do |user|
-  json.kandy_username user.kandy_user.kandy_username
-  json.(user, :id, :display_name, :role, :avatar)
-  json.online user.online?
+  unless user.kandy_user.blank?
+    json.kandy_username user.kandy_user.kandy_username
+    json.(user, :id, :display_name, :role, :avatar)
+    json.online user.online?
+  end
 end
