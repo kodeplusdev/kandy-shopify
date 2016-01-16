@@ -1,5 +1,6 @@
 #= require jquery
 #= require kandy.min
+#= require jquery.barrating.min
 
 class window.KCWidget
   _self = undefined
@@ -228,9 +229,12 @@ class window.KCWidget
       $('#operator-role').text('')
       $('#in-chat-head').text(_self.config.start_chat.title)
       $('.cls-chat-msg').text(_self.config.chat_close.chat_closed);
-      $('#like').show()
-      $('#dislike').show()
-      $('#cls-chat-rating').removeClass('success')
+      $('#cls-chat-rating > select').barrating
+        theme: 'css-stars'
+        onSelect: (value, text, event) ->
+          if typeof(event) isnt 'undefined'
+            _self.ratingFromVisitor(value)
+          $('.cls-chat-msg').text(_self.config.chat_close.rating_thanks)
       _self.showTab('CloseChatTab')
       _self.showToggle('CloseChatTab')
       $('.mess-input').val('')
@@ -306,30 +310,6 @@ class window.KCWidget
 
     $('.mess-input').blur ->
       _self.removeTyping()
-
-    $(document).on 'click', '.like-img', ->
-      if this.id is 'like'
-        _self.ratingFromVisitor('like')
-        $('#dislike').hide()
-      else
-        _self.ratingFromVisitor('dislike')
-        $('#like').hide()
-      $('#cls-chat-rating').addClass('success')
-      $('.cls-chat-msg').text(_self.config.chat_close.rating_thanks)
-
-    $(document).on 'click', '.chat-like', ->
-      if this.id is 'chat-likes'
-        _self.ratingFromVisitor('like')
-        $('.chat-dislikes').attr('id', 'chat-dislikes')
-        $('#chat-likes').attr('src', '<%= asset_url('icons/thumbg.svg') %>')
-        $('.chat-likes').removeAttr('id')
-        $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbdown.svg') %>')
-      else if this.id is 'chat-dislikes'
-        _self.ratingFromVisitor('dislike')
-        $('.chat-likes').attr('id', 'chat-likes')
-        $('#chat-dislikes').attr('src', '<%= asset_url('icons/thumbr.svg') %>')
-        $('.chat-dislikes').removeAttr('id')
-        $('#chat-likes').attr('src', '<%= asset_url('icons/thumbup.svg') %>')
 
     $(document).on 'click', '#btn-send-email', ->
       $('#email2-error').hide()
@@ -858,19 +838,24 @@ class window.KCWidget
             </tr>
             <tr id='close-box'>
               <td colspan='3' style='padding:0;'>
-                <div class='name-messages'>
+                <div class='name-messages' style="text-align: center">
                   <p class='cls-chat-msg'></p>
                   <div id='cls-chat-rating'>
-                    <br>
-                    <img class='like-img' id='like' src='<%= asset_url('icons/thumbup.svg') %>' style='margin-left: 35%;'>
-                    <img style='margin-left: 7%;' class='like-img' id='dislike' src='<%= asset_url('icons/thumbdown.svg') %>'>
-                    <br>
-                    <p style='text-align: center; padding: 0px;'>
-                      <a class='like-chat-dwld' style='cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;'></a>
-                    </p>
-                    <br>
-                    <br>
+                    <select name="rating">
+                      <option value=""></option>
+                      <option value="1">Very bad</option>
+                      <option value="2">Bad</option>
+                      <option value="3">Normal</option>
+                      <option value="4">Good</option>
+                      <option value="5">Very good</option>
+                    </select>
                   </div>
+                  <br>
+                  <p style='text-align: center; padding: 0px;'>
+                    <a class='like-chat-dwld' style='cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;'></a>
+                  </p>
+                  <br/>
+                  <br/>
                 </div>
               </td>
             </tr>
@@ -1006,7 +991,6 @@ class window.KCWidget
               <option value="#{o.username}">#{o.display_name}</option>
             """
           $('#make-call').show()
-
 
     $(document).on 'click', '.call-btn', ->
       operator = $('#make-call-operator-selector :selected').val()
@@ -1474,12 +1458,8 @@ class window.KCWidget
   closeChat: ->
     if _self.config.chat_close.ask_for_rating is '1'
       $('#cls-chat-rating').show()
-      $('#like').show()
-      $('#dislike').show()
     else
       $('#cls-chat-rating').hide()
-      $('#like').hide()
-      $('#dislike').hide()
 
     if _self.config.chat_close.custom_link_button is '1'
       $('#btn-text').show()

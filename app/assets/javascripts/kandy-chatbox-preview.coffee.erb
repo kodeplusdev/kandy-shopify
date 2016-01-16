@@ -1,4 +1,5 @@
 #= require kandy.min
+#= require jquery.barrating.min
 
 class window.KCWidget
   _self = undefined
@@ -175,13 +176,10 @@ class window.KCWidget
                     </div>
                   </div>
                   <div style='width:20%;float: right;margin-top: 5%;margin-right: 2%;'>
-                    <div class='thumb-box'>
-                      <img class='chat-like chat-likes' id='chat-likes' style='margin-top: 4%;' src='<%= asset_url('icons/thumbup.svg') %>'>
+                    <div class='chat-box-control'>
+                      <img class='chat-control active' id='chat-switch' style='margin-top: 4%;'>
                       |
-                      <img class='chat-like chat-dislikes' id='chat-dislikes' src='<%= asset_url('icons/thumbdown.svg') %>'>
-                      <a style='display:none;'>
-                        <img src='<%= asset_url('icons/mail-icon.png') %>'>
-                      </a>
+                      <img class='chat-control' id='video-call-switch'>
                     </div>
                   </div>
                 </div>
@@ -226,16 +224,21 @@ class window.KCWidget
                 <div class='name-messages'>
                   <p class='cls-chat-msg'></p>
                   <div id='cls-chat-rating'>
-                    <br>
-                    <img class='like-img' id='like' src='<%= asset_url('icons/thumbup.svg') %>' style='margin-left: 35%;'>
-                    <img style='margin-left: 7%;' class='like-img' id='dislike' src='<%= asset_url('icons/thumbdown.svg') %>'>
-                    <br>
-                    <p style="text-align: center; padding: 0px;">
-                      <a class="like-chat-dwld" style="cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;"></a>
-                    </p>
-                    <br>
-                    <br>
+                    <select name="rating">
+                      <option value=""></option>
+                      <option value="1">Very bad</option>
+                      <option value="2">Bad</option>
+                      <option value="3">Normal</option>
+                      <option value="4">Good</option>
+                      <option value="5">Very good</option>
+                    </select>
                   </div>
+                  <br>
+                  <p style='text-align: center; padding: 0px;'>
+                    <a class='like-chat-dwld' style='cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;'></a>
+                  </p>
+                  <br/>
+                  <br/>
                 </div>
               </td>
             </tr>
@@ -752,12 +755,10 @@ class window.KCWidget
   closeChat: ->
     if _self.config.chat_close.ask_for_rating is '1'
       $('#cls-chat-rating').show()
-      $('#like').show()
-      $('#dislike').show()
+      $('#cls-chat-rating > select').barrating
+        theme: 'css-stars'
     else
       $('#cls-chat-rating').hide()
-      $('#like').hide()
-      $('#dislike').hide()
 
     if _self.config.chat_close.custom_link_button is '1'
       $('#btn-text').show()

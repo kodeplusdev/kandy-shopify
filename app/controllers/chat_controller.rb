@@ -76,11 +76,10 @@ class ChatController < ApplicationController
   end
 
   def rating
+    params[:rating] = 0 if params[:rating].blank?
     @conversation = Conversation.find(params[:chat_id])
-    if %w(like dislike).include?(params[:rating]) && (@conversation.rating == Conversation::NONE || @conversation.open?)
-      @conversation.rating = params[:rating]
-      @conversation.save!
-    end
+    @conversation.rating = params[:rating]
+    @conversation.save!
   rescue ActiveRecord::RecordNotFound
     head :not_found
   ensure

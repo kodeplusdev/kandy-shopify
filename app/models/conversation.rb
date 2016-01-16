@@ -8,9 +8,12 @@ class Conversation < ActiveRecord::Base
   attr_readonly :title
 
   RATING = [
-      NONE = 'none',
-      LIKE = 'like',
-      DISLIKE = 'dislike'
+      NONE = 0,
+      VERY_BAD = 1,
+      BAD = 2,
+      NORMAL = 3,
+      GOOD = 4,
+      VERY_GOOD = 5
   ]
 
   STATUS = [
@@ -21,21 +24,27 @@ class Conversation < ActiveRecord::Base
   self.per_page = 15
 
   class << self
-    RATING.each do |rating|
-      define_method "#{rating}" do
-        where(rating: rating)
-      end
-    end
-
     STATUS.each do |status|
       define_method "#{status}" do
         where(status: status)
       end
     end
-  end
 
-  def self.history(email, ip)
-    where('location LIKE ? AND email LIKE ?', "%#{ip}%", "%#{email}%")
+    def ratings(rating)
+      where(rating: rating)
+    end
+
+    def history(email, ip)
+      where('location LIKE ? AND email LIKE ?', "%#{ip}%", "%#{email}%")
+    end
+
+    def today
+      where('created_at >= ?', Time.now.utc.beginning_of_day)
+    end
+
+    def yesterday
+      where('created_at >= ? AND created_at < ?', Time.now.utc.beginning_of_day - 1, Time.now.utc.beginning_of_day)
+    end
   end
 
   def title
@@ -54,14 +63,7 @@ class Conversation < ActiveRecord::Base
   Email: #{email}
   IP Address: #{location['ip']}
   Status: #{status == 'open' ? 'Open' : 'Close'}
-  Rating: #{
-            if rating == 'like'
-              'Like'
-            else
-              rating == 'dislike' ? 'Dislike' : 'None'
-            end
-          }
-
+  Rating: #{rating}
 "
     messages.each do |m|
       if m['is_joined'] || m['is_left'] || m['is_closed']
@@ -73,23 +75,13 @@ class Conversation < ActiveRecord::Base
     text
   end
 
-  def self.today
-    where('created_at >= ?', Time.now.utc.beginning_of_day)
-  end
-
-  def self.yesterday
-    where('created_at >= ? AND created_at < ?', Time.now.utc.beginning_of_day - 1, Time.now.utc.beginning_of_day)
-  end
-
-  RATING.each do |rating|
-    define_method "#{rating}?" do
-      self.rating == rating
-    end
-  end
-
   STATUS.each do |status|
     define_method "#{status}?" do
       self.status == status
     end
+  end
+
+  def rating?(rating)
+    self.rating = rating
   end
 end

@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20151229055437) do
     t.string   "name"
     t.string   "status",            default: "open"
     t.text     "messages",          default: "[]"
-    t.string   "rating",            default: "none"
+    t.integer  "rating",            default: 0
     t.integer  "shop_id"
     t.integer  "visitor_id"
     t.datetime "created_at",                         null: false

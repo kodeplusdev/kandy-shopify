@@ -4,7 +4,7 @@ class CreateConversations < ActiveRecord::Migration
       t.string :name
       t.string :status, default: 'open'
       t.text :messages, default: '[]'
-      t.string :rating, default: 'none'
+      t.integer :rating, default: 0
       t.references :shop, index: true, foreign_key: true
       t.references :visitor, index: true, foreign_key: true
 

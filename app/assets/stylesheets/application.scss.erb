@@ -18,6 +18,7 @@
 @import "select2-bootstrap";
 @import "pagination";
 @import "sweetalert";
+@import "jquery-bar-rating-css-stars-theme";
 //@import "sweetalert.twitter.theme";
 
 body {
@@ -191,11 +192,15 @@ th.center, td.center {
   text-align: center;
 }
 
-table.table > tfoot > tr > td {
-  @extend th;
-  border-bottom: 0;
-  border-top: 2px solid #ddd;
-  font-weight: bold;
+table.table {
+  tfoot, tbody {
+    tr:first-child > td {
+      @extend th;
+      border-bottom: 0;
+      border-top: 2px solid #ddd;
+      font-weight: bold;
+    }
+  }
 }
 
 .in-call-box {
@@ -206,6 +211,40 @@ table.table > tfoot > tr > td {
   .outgoing-video {
     width: 25%;
     float: right
+  }
+}
+
+.thumb-box {
+  float: right;
+  height: 17px;
+  width: 60px;
+}
+
+.thumb-box a {
+  padding: 0px 5px;
+}
+
+.chat-box-control {
+  @extend .thumb-box;
+
+  .chat-control {
+    width: 15px;
+  }
+
+  #chat-switch {
+    content: asset_url('icons/message.png');
+
+    &:hover, &.active {
+      content: asset_url('icons/message-active.png');
+    }
+  }
+
+  #video-call-switch {
+    content: asset_url('icons/video-call.png');
+
+    &:hover, &.active {
+      content: asset_url('icons/video-call-active.png');
+    }
   }
 }
 

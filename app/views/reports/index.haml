@@ -17,56 +17,77 @@
 .panel
   .panel-body
     .row.pad
-      %table.table.table-hover
+      %table.table.table-hover.table-bordered
         %thead
           %tr
             %th.center{rowspan: 2} Operator
-            %th.center{colspan: 3} Today
-            %th.center{colspan: 3} Yesterday
-            %th.center{colspan: 3} All Time
+            %th.center{colspan: 6} Today
+            %th.center{colspan: 6} Yesterday
+            %th.center{colspan: 6} All Time
         %tbody
           %tr
             %td.center
               %i.fa.fa-user
             %td.center
               %i.fa.fa-comments-o
-            %td.center
-              %i.fa.fa-smile-o
-            %td.center
-              %i.fa.fa-frown-o
-            %td.center
-              %i.fa.fa-comments-o
-            %td.center
-              %i.fa.fa-smile-o
-            %td.center
-              %i.fa.fa-frown-o
+            %td.center 1
+            %td.center 2
+            %td.center 3
+            %td.center 4
+            %td.center 5
             %td.center
               %i.fa.fa-comments-o
+            %td.center 1
+            %td.center 2
+            %td.center 3
+            %td.center 4
+            %td.center 5
             %td.center
-              %i.fa.fa-smile-o
-            %td.center
-              %i.fa.fa-frown-o
+              %i.fa.fa-comments-o
+            %td.center 1
+            %td.center 2
+            %td.center 3
+            %td.center 4
+            %td.center 5
           - @users.each do |u|
             %tr
-              %td= u.display_name
+              %td.center= u.display_name
               %td.center= u.conversations.today.size
-              %td.center= u.conversations.today.like.size
-              %td.center= u.conversations.today.dislike.size
+              %td.center= u.conversations.today.ratings(1).size
+              %td.center= u.conversations.today.ratings(2).size
+              %td.center= u.conversations.today.ratings(3).size
+              %td.center= u.conversations.today.ratings(4).size
+              %td.center= u.conversations.today.ratings(5).size
               %td.center= u.conversations.yesterday.size
-              %td.center= u.conversations.yesterday.like.size
-              %td.center= u.conversations.yesterday.dislike.size
+              %td.center= u.conversations.yesterday.ratings(1).size
+              %td.center= u.conversations.yesterday.ratings(2).size
+              %td.center= u.conversations.yesterday.ratings(3).size
+              %td.center= u.conversations.yesterday.ratings(4).size
+              %td.center= u.conversations.yesterday.ratings(5).size
               %td.center= u.conversations.all.size
-              %td.center= u.conversations.all.like.size
-              %td.center= u.conversations.all.dislike.size
+              %td.center= u.conversations.all.ratings(1).size
+              %td.center= u.conversations.all.ratings(2).size
+              %td.center= u.conversations.all.ratings(3).size
+              %td.center= u.conversations.all.ratings(4).size
+              %td.center= u.conversations.all.ratings(5).size
         %tfoot
           %tr
             %td.center Totals
             %td.center= @conversations.today.size
-            %td.center= @conversations.today.like.size
-            %td.center= @conversations.today.dislike.size
+            %td.center= @conversations.today.ratings(1).size
+            %td.center= @conversations.today.ratings(2).size
+            %td.center= @conversations.today.ratings(3).size
+            %td.center= @conversations.today.ratings(4).size
+            %td.center= @conversations.today.ratings(5).size
             %td.center= @conversations.yesterday.size
-            %td.center= @conversations.yesterday.like.size
-            %td.center= @conversations.yesterday.dislike.size
+            %td.center= @conversations.yesterday.ratings(1).size
+            %td.center= @conversations.yesterday.ratings(2).size
+            %td.center= @conversations.yesterday.ratings(3).size
+            %td.center= @conversations.yesterday.ratings(4).size
+            %td.center= @conversations.yesterday.ratings(5).size
             %td.center= @conversations.all.size
-            %td.center= @conversations.all.like.size
-            %td.center= @conversations.all.dislike.size
+            %td.center= @conversations.all.ratings(1).size
+            %td.center= @conversations.all.ratings(2).size
+            %td.center= @conversations.all.ratings(3).size
+            %td.center= @conversations.all.ratings(4).size
+            %td.center= @conversations.all.ratings(5).size
