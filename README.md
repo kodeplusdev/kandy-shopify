@@ -28,6 +28,7 @@ A Kandy plugin for shopify websites.
     KANDY_SHOPIFY_HOST=https://your-awesome-app.com
     PG_USERNAME=<postgresql-username>
     PG_PASSWORD=<postgresql-password>
+    KANDY_VIDEO_CALL_ENABLED=<false|true>
 ```
 
 - Open ['config/database.yml'](config/database.yml) and put setup for database your application use.
