@@ -13,10 +13,9 @@
         primary:
           label: 'Send an invitation'
           message: 'save-form-message'
-        secondary:
-          label: 'Back'
-          href: "#{users_manage_path}"
-          target: 'app'
+        secondary:[
+          label: 'Back', href: "#{users_manage_path}", target: 'app'
+        ]
 
 = form_tag users_invite_path, method: :post, 'data-shopify-app-submit': 'save-form-message' do
   .row

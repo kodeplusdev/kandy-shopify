@@ -13,10 +13,9 @@
         primary:
           label: 'Update'
           message: 'save-preferences-form-message'
-        secondary:
-          label: 'Back'
-          href: "#{preferences_path}"
-          target: 'app'
+        secondary:[
+          label: 'Back', href: "#{preferences_path}", target: 'app'
+        ]
     ShopifyApp.Bar.loadingOff()
 
 = form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|

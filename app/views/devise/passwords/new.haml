@@ -9,10 +9,9 @@
         primary:
           label: 'Send instructions'
           message: 'login-form-message'
-        secondary:
-          label: 'Login'
-          href: '#{new_user_session_path}'
-          target: 'app'
+        secondary:[
+          label: 'Login', href: '#{new_user_session_path}', target: 'app'
+        ]
     ShopifyApp.Bar.loadingOff()
 
 .panel

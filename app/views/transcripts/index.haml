@@ -10,10 +10,9 @@
           href: "#{preferences_path}"
           target: 'app'
       buttons:
-        secondary:
-          label: 'Preferences'
-          href: "#{preferences_url}"
-          target: 'app'
+        secondary:[
+          label: 'Preferences', href: "#{preferences_url}", target: 'app'
+        ]
 
     $('.table.clickable > tbody > tr').on 'click', (e) ->
       if e.target.type != 'checkbox'

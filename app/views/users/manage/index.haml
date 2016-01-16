@@ -14,10 +14,9 @@
           label: 'Add new user'
           href: "#{users_invite_path}"
           target: 'app'
-        secondary:
-          label: 'Back'
-          href: "#{preferences_url}"
-          target: 'app'
+        secondary:[
+          label: 'Back', href: "#{preferences_url}", target: 'app'
+        ]
 
     $(document).on 'click', '.clickable tbody tr', ->
       window.document.location.href = $(this).data('href')
