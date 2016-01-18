@@ -1,16 +1,3 @@
-:coffeescript
-  window.mainPageTitle = 'Set your password'
-
-  ShopifyApp.ready ->
-    ShopifyApp.Bar.initialize
-      title: window.mainPageTitle
-      icon: '/icon.png'
-      buttons:
-        primary:
-          label: 'Set my password'
-          message: 'invitation-form-message'
-    ShopifyApp.Bar.loadingOff()
-
 .col-sm-6.col-sm-offset-3
   .panel
     %h2.panel-heading.text-center

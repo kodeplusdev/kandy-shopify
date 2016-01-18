@@ -52,30 +52,25 @@ class InstalledController < ApplicationController
   end
 
   def set_admin_account
-    email = params[:email]
-    password = params[:password]
+    user = @shop.users.create(email: params[:email], password: params[:password], password_confirmation: params[:password_confirmation],
+                              first_name: params[:first_name], last_name: params[:last_name], role: User::ADMIN,
+                              phone_number: params[:phone_number], invitation_accepted_at: Time.now.utc)
+    if user.persisted?
+      @kandy_user = @shop.kandy_users.find(params[:kandy_user_id])
+      @shop.template = Template.new
+      @shop.widget = Widget.new
+      @kandy_user.user = user
+      update_shop_details
 
-    if email.blank? || !(email =~ /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
-      flash[:error] = 'A valid email is required'
+      @shop.save
+      @kandy_user.save
+
+      setup_webhooks
+      setup_script_tags
+
+      redirect_to session['return_url'] || root_url and return
     else
-      if password.blank? || password.length < 8 || password != params[:password_confirmation]
-        flash[:error] = 'A valid password is required (8-min)'
-      else
-        @kandy_user = @shop.kandy_users.find(params[:kandy_user_id])
-        @shop.template = Template.new
-        @shop.widget = Widget.new
-        @kandy_user.user = @shop.users.create!(email: email, first_name: params[:first_name], last_name: params[:last_name], password: password, role: User::ADMIN,
-                                               phone_number: params[:phone_number], invitation_accepted_at: Time.now.utc)
-        update_shop_details
-
-        @shop.save
-        @kandy_user.save
-
-        setup_webhooks
-        setup_script_tags
-
-        redirect_to session['return_url'] || root_url and return
-      end
+      flash[:error] = user.errors.full_messages[0]
     end
 
     @kandy_users = @shop.kandy_users.all

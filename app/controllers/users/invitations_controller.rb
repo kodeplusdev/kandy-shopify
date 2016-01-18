@@ -1,5 +1,4 @@
 class Users::InvitationsController < Devise::InvitationsController
-  layout 'application'
   skip_filter :shopify_session, only: [:edit, :update, :destroy]
   before_action :load_shop, only: [:new, :create]
   before_filter :configure_permitted_parameters, if: :devise_controller?
@@ -8,7 +7,7 @@ class Users::InvitationsController < Devise::InvitationsController
   def new
     self.resource = resource_class.new
     @kandy_users = @shop.kandy_users.where('user_id IS NULL')
-    render :new, layout: 'embedded_app'
+    render :new
   end
 
   # POST /resource/invitation
@@ -25,8 +24,14 @@ class Users::InvitationsController < Devise::InvitationsController
       respond_with resource, :location => after_invite_path_for(current_inviter)
     else
       @kandy_users = @shop.kandy_users.where('user_id IS NULL')
-      respond_with_navigational(resource) { render :new, layout: 'embedded_app' }
+      respond_with_navigational(resource) { render :new }
     end
+  end
+
+  def edit
+    set_minimum_password_length if respond_to? :set_minimum_password_length
+    resource.invitation_token = params[:invitation_token]
+    render :edit, layout: 'application'
   end
 
   # PUT /resource/invitation
@@ -50,7 +55,7 @@ class Users::InvitationsController < Devise::InvitationsController
       redirect_to "https://#{@shop_session.url}/admin/apps/#{ShopifyApp.configuration.api_key}"
     else
       resource.invitation_token = raw_invitation_token
-      respond_with_navigational(resource){ render :edit }
+      respond_with_navigational(resource) { render :edit, layout: 'application' }
     end
   end
 

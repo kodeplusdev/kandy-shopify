@@ -1,21 +1,10 @@
-:coffeescript
-  window.mainPageTitle = 'Change your password'
-
-  ShopifyApp.ready ->
-    ShopifyApp.Bar.initialize
-      title: window.mainPageTitle
-      icon: '/icon.png'
-      buttons:
-        primary:
-          label: 'Change password'
-          message: 'login-form-message'
-    ShopifyApp.Bar.loadingOff()
-
-.panel
-  .panel-body
-    .col-sm-4
+.col-sm-6.col-sm-offset-3
+  .panel
+    %h2.panel-heading.text-center
+      %b Reset your password
+    .panel-body
       = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :put, role: 'form', 'data-shopify-app-submit': 'login-form-message'} do |f|
-        .hide
+        %h4.text-danger.text-center
           = devise_error_messages!
         = f.hidden_field :reset_password_token
         .form-group
@@ -24,5 +13,6 @@
         .form-group
           = f.label :password_confirmation, "Confirm new password"
           = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
-        = f.submit "Change my password", class: 'btn btn-primary hide'
+        .text-center
+          = f.submit "Change my password", class: 'btn btn-lg btn-primary'
       = render "devise/shared/links"
