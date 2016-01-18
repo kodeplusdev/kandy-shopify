@@ -11,10 +11,10 @@
         debug: true
 
       ShopifyApp.ready ->
-        for e in ["#{flash[:notice]}", "#{flash.now[:notice]}"]
+        for e in ["#{flash.discard(:notice)}", "#{flash.now[:notice]}"]
           if e != ""
             ShopifyApp.flashNotice(e)
-        for e in ["#{flash[:error]}", "#{flash.now[:error]}", "#{flash[:alert]}", "#{flash.now[:alert]}"]
+        for e in ["#{flash.discard(:error)}", "#{flash.now[:error]}", "#{flash.discard(:alert)}", "#{flash.now[:alert]}"]
           if e != ""
             ShopifyApp.flashError(e)
 
