@@ -32,7 +32,7 @@ class Users::PasswordsController < Devise::PasswordsController
         set_flash_message(:notice, :updated_not_active) if is_flashing_format?
       end
       #respond_with resource, location: after_resetting_password_path_for(resource)
-      redirect_to "https://#{@shop_session.url}/admin/apps/#{ShopifyApp.configuration.api_key}"
+      redirect_to "https://#{resource.shop.shopify_domain}/admin/apps/#{ShopifyApp.configuration.api_key}"
     else
       set_minimum_password_length
       #respond_with resource

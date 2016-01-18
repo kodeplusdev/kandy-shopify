@@ -13,19 +13,22 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # GET /resource/edit
-  # def edit
-  #   super
-  # end
+  def edit
+    authorize! :update, :profile
+    super
+  end
 
   # PUT /resource
-  # def update
-  #   super
-  # end
+  def update
+    authorize! :update, :profile
+    super
+  end
 
   # DELETE /resource
-  # def destroy
-  #   super
-  # end
+  def destroy
+    authorize! :destroy, :user
+    super
+  end
 
   # GET /resource/cancel
   # Forces the session data which is usually expired after sign
@@ -45,7 +48,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_account_update_params
-    devise_parameter_sanitizer.for(:account_update) << :first_name << :last_name << :phone_number << :avatar
+    devise_parameter_sanitizer.for(:account_update).concat [:first_name, :last_name, :phone_number, :avatar]
   end
 
   # The default url to be used after updating a resource

@@ -20,6 +20,8 @@ class ChatController < ApplicationController
   end
 
   def load_chat
+    authorize! :chat, :all
+
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     @users = @shop.users.all
     @conversations = @shop.conversations.open.where(deleted: false, archived: false)
@@ -37,6 +39,8 @@ class ChatController < ApplicationController
   end
 
   def join_chat
+    authorize! :chat, :all
+
     @conversation = Conversation.find(params[:id])
     unless @conversation.first_operator_id
       @conversation.first_operator_id = current_user.id
@@ -52,6 +56,8 @@ class ChatController < ApplicationController
   end
 
   def leave_chat
+    authorize! :chat, :all
+
     @conversation = Conversation.find(params[:id])
     @conversation.users.delete current_user
     @conversation.save!
@@ -94,21 +100,29 @@ class ChatController < ApplicationController
   end
 
   def send_mail_transcript
+    authorize! :chat, :all
+
     @conversation = Conversation.find(params[:id])
     OperatorMailer.send_transcript(email: params[:email], transcript: @conversation).deliver_later
     render layout: false, json: {status: true}
   end
 
   def download
+    authorize! :chat, :all
+
     @conversation = Conversation.find(params[:id])
     send_data @conversation.download, filename: "#{@conversation.title}-#{@conversation.created_at}.txt"
   end
 
   def ban
+    authorize! :chat, :all
+
     render layout: false, json: {status: true}
   end
 
   def ping
+    authorize! :chat, :all
+
     render layout: false
   end
 
@@ -119,6 +133,8 @@ class ChatController < ApplicationController
   end
 
   def change_user_status
+    authorize! :chat, :all
+
     @user = User.find(current_user.id)
     if @user
       if @user.available?

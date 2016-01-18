@@ -12,90 +12,89 @@
     ShopifyApp.Bar.loadingOff()
 
 .pad-left.pad-right
-  .row
-    .panel
-      .panel-body
-        .row
-          .col-sm-4.col-sm-offset-1
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-key.fa-3x
-                .col-xs-9
-                  %a{href: api_keys_path}
-                    %h3.font-bold API Keys
-          .col-sm-4.col-sm-offset-3
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-user.fa-3x
-                .col-xs-9
-                  %a{href: edit_user_registration_path}
-                    %h3.font-bold Profile
-  .row
-    .panel
-      .panel-body
-        .row
-          .col-sm-4.col-sm-offset-1
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-comments.fa-3x
-                .col-xs-9
-                  %a{href: chat_box_widget_path}
-                    %h3.font-bold Chat Widget
-          .col-sm-4.col-sm-offset-3
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-file-text.fa-3x
-                .col-xs-9
-                  %a{href: chat_transcripts_path}
-                    %h3.font-bold Transcripts
-        %br/
-        .row
-          .col-sm-4.col-sm-offset-1
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-users.fa-3x
-                .col-xs-9
-                  %a{href: users_manage_path}
-                    %h3.font-bold Manage Users
-          .col-sm-4.col-sm-offset-3
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-pie-chart.fa-3x
-                .col-xs-9
-                  %a{href: reports_path}
-                    %h3.font-bold Reports
-        %br.hide/
-        .row.hide
-          .col-sm-4.col-sm-offset-1
-            .widget.style1
-              .row.vertical-align
-                .col-xs-3
-                  %i.fa.fa-cubes.fa-3x
-                .col-xs-9
-                  %a{href: '#'}
-                    %h3.font-bold Mics
-  .row
-    .panel
-      .panel-body
-        .col-sm-4.col-sm-offset-1
-          .widget.style1
-            .row.vertical-align
-              .col-xs-3
-                %i.fa.fa-send.fa-3x
-              .col-xs-9
-                %a{href: sms_alert_templates_path}
-                  %h3.font-bold SMS Notifications
-        .col-sm-4.col-sm-offset-1.hide
-          .widget.style1
-            .row.vertical-align
-              .col-xs-3
-                %i.fa.fa-phone.fa-3x
-              .col-xs-9
-                %a{href: '#'}
-                  %h3.font-bold Kandy Call
+  - if (can? :update, :api_key) || (can? :update, :profile)
+    .row
+      .panel
+        .panel-body
+          .col-sm-offset-1
+            - if can? :update, :api_key
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-key.fa-3x
+                    .col-xs-9
+                      %a{href: api_keys_path}
+                        %h3.font-bold API Keys
+            - if can? :update, :profile
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-user.fa-3x
+                    .col-xs-9
+                      %a{href: edit_user_registration_path}
+                        %h3.font-bold Profile
+  - if (can? :update, :widget) || (can? :read, :transcript) || (can? :manage, :user) || (can? :read, :report)
+    .row
+      .panel
+        .panel-body
+          .col-sm-offset-1
+            - if can? :update, :widget
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-comments.fa-3x
+                    .col-xs-9
+                      %a{href: chat_box_widget_path}
+                        %h3.font-bold Chat Widget
+            - if can? :read, :transcript
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-file-text.fa-3x
+                    .col-xs-9
+                      %a{href: chat_transcripts_path}
+                        %h3.font-bold Transcripts
+            - if can? :manage, :user
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-users.fa-3x
+                    .col-xs-9
+                      %a{href: users_manage_path}
+                        %h3.font-bold Manage Users
+            - if can? :read, :report
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-pie-chart.fa-3x
+                    .col-xs-9
+                      %a{href: reports_path}
+                        %h3.font-bold Reports
+  - if can? :update, :template
+    .row
+      .panel
+        .panel-body
+          .col-sm-offset-1
+            - if can? :update, :template
+              .col-sm-6
+                .widget.style1
+                  .row.vertical-align
+                    .col-xs-3
+                      %i.fa.fa-send.fa-3x
+                    .col-xs-9
+                      %a{href: sms_alert_templates_path}
+                        %h3.font-bold SMS Notifications
+            .col-sm-6.hide
+              .widget.style1
+                .row.vertical-align
+                  .col-xs-3
+                    %i.fa.fa-phone.fa-3x
+                  .col-xs-9
+                    %a{href: '#'}
+                      %h3.font-bold Kandy Call

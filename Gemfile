@@ -31,6 +31,8 @@ gem 'pry-rails'
 gem 'dotenv-rails'
 gem 'gmaps4rails'
 
+gem 'cancancan'
+
 group :development, :test do
   gem 'sqlite3'
 end

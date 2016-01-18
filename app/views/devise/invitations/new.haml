@@ -31,7 +31,7 @@
         .row.form-group
           .col-sm-12
             = f.label :role
-            = f.select :role, User::ROLE, {}, {class: 'form-control'}
+            = f.select :role, User::ROLES.map{|role| [role.humanize, role]}, {}, {class: 'form-control'}
         .row.form-group
           .col-sm-12
             = f.label :kandy_user_id, 'Kandy user'

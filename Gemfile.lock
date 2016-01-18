@@ -49,6 +49,7 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     builder (3.2.2)
+    cancancan (1.13.1)
     coderay (1.1.0)
     coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
@@ -250,6 +251,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootstrap-sass
+  cancancan
   coffee-rails
   devise
   devise_invitable

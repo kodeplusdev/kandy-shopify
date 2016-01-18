@@ -55,6 +55,8 @@
             location.reload()
           else
             ShopifyApp.flashError("0 chat transcript deleted.")
+        error: (e) ->
+          ShopifyApp.flashError(e.responseText)
 
     $('#conversations-delete-all').on 'click', ->
       $.ajax
@@ -69,6 +71,8 @@
             location.reload()
           else
             ShopifyApp.flashError("0 chat transcript deleted.")
+        error: (e) ->
+          ShopifyApp.flashError(e.responseText)
 
     $('#conversations-search button').on 'click', ->
       searchConversations()
@@ -93,6 +97,8 @@
             location.reload()
           else
             ShopifyApp.flashError("0 chat transcript archived.")
+        error: (e) ->
+          ShopifyApp.flashError(e.responseText)
 
     $('#conversations-unarchived').on 'click', ->
       ids = $('.checkbox-ids:checked').map ->
@@ -110,6 +116,8 @@
             location.reload()
           else
             ShopifyApp.flashError("0 chat transcript unarchived.")
+        error: (e) ->
+          ShopifyApp.flashError(e)
 
     $('#conversations-show-archived').on 'click', ->
       url = window.location.href
@@ -244,9 +252,9 @@
             %li#conversations-delete-all
               %a{href: '#'} Delete all
             %li#conversations-archived{style: 'display: none;'}
-              %a{href: '#'} Archived selected
+              %a{href: '#'} Archive selected
             %li#conversations-unarchived{style: 'display: none;'}
-              %a{href: '#'} Unarchived selected
+              %a{href: '#'} Unarchive selected
             - if @archived
               %li#conversations-hide-archived
                 %a{href: '#'} Hide archived

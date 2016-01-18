@@ -3,6 +3,8 @@ class TranscriptsController < ApplicationController
   before_action :shop
 
   def index
+    authorize! :read, :transcript
+
     @widget_config_json = @shop.widget.json_string.to_json
     @archived = !(params[:archived].blank? || params[:archived] == 'false')
     if params[:q] || params[:archived] || params[:page]
@@ -29,11 +31,15 @@ class TranscriptsController < ApplicationController
   end
 
   def view
+    authorize! :read, :transcript
+
     @conversation = Conversation.find(params[:id])
     render layout: false
   end
 
   def archive
+    authorize! :update, :transcript
+
     @archived = @unarchived = 0
     unless params[:archived].blank?
       @conversations = @shop.conversations.where(deleted: false, archived: false).find(params[:archived])
@@ -63,6 +69,8 @@ class TranscriptsController < ApplicationController
   end
 
   def destroy
+    authorize! :destroy, :transcript
+
     if params[:all].blank?
       @conversations = @shop.conversations.find(params[:ids])
     else

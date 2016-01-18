@@ -7,15 +7,17 @@ class User < ActiveRecord::Base
 
   has_and_belongs_to_many :conversations
   has_one :kandy_user
+  belongs_to :shop
+
   attr_readonly :display_name, :full_name
   attr_accessor :kandy_user_id
 
   validates_format_of :email, with: Devise::email_regexp
 
-  ROLE = [
-      ADMIN = 'admin',
+  ROLES = [
+      OPERATOR = 'operator',
       SUPERUSER = 'superuser',
-      OPERATOR = 'operator'
+      ADMIN = 'admin'
   ]
 
   STATUS = [
@@ -23,7 +25,7 @@ class User < ActiveRecord::Base
       UNAVAILABLE = 'unavailable'
   ]
 
-  ROLE.each do |role|
+  ROLES.each do |role|
     define_method "#{role}?" do
       self.role == role
     end
@@ -36,7 +38,7 @@ class User < ActiveRecord::Base
   end
 
   class << self
-    ROLE.each do |role|
+    ROLES.each do |role|
       define_method "#{role}" do
         where(role: role)
       end
@@ -50,6 +52,10 @@ class User < ActiveRecord::Base
     def online
       self.available.where('last_seen >= ?', Time.now - 2.minutes)
     end
+  end
+
+  def role?(base_role)
+    ROLES.index(base_role) <= ROLES.index(role)
   end
 
   def display_name

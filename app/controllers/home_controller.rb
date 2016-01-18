@@ -2,6 +2,8 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
+    authorize! :chat, :all
+
     if current_user.kandy_user.blank?
       if current_user.admin?
         flash[:error] = 'Please setup kandy user for your account.'

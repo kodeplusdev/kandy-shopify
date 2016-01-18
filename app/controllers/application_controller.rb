@@ -13,26 +13,14 @@ class ApplicationController < ActionController::Base
     Time.use_zone(@shop_session.time_zone, &block)
   end
 
-  def admin_only!
-    unless current_user.admin?
-      redirect_to :back, error: 'Access denied.'
+  rescue_from CanCan::AccessDenied do |exception|
+    respond_to do |format|
+      format.html {
+        flash[:error] = 'Not allowed to do this action.'
+        redirect_to request.referer
+      }
+      format.json {render status: :forbidden, plain: 'Not allowed to do this action.'}
     end
-  end
-
-  def superuser_only!
-    unless current_user.superuser? && current_user.admin?
-      redirect_to :back, error: 'Access denied.'
-    end
-  end
-
-  def operator_only!
-    unless current_user.operator? && current_user.superuser? && current_user.admin?
-      redirect_to :back, error: 'Access denied.'
-    end
-  end
-
-  def error
-    raise 'Error'
   end
 
   def authenticate_user!(opts={})

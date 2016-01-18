@@ -47,7 +47,7 @@
           .row.form-group
             .col-sm-12
               = f.label :role
-              = f.select :role, User::ROLE, {}, {class: 'form-control', disabled: !(current_user.admin? && @user.id != current_user.id)}
+              = f.select :role, User::ROLES.map{|role| [role.humanize, role]}, {}, {class: 'form-control', disabled: !(current_user.admin? && @user.id != current_user.id)}
           .row.form-group
             .col-sm-12
               = f.label :kandy_user_id, 'Kandy user'

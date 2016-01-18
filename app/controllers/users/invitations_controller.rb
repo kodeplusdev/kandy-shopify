@@ -5,6 +5,8 @@ class Users::InvitationsController < Devise::InvitationsController
 
   # GET /resource/invitation/new
   def new
+    authorize! :create, :invite
+
     self.resource = resource_class.new
     @kandy_users = @shop.kandy_users.where('user_id IS NULL')
     render :new
@@ -12,6 +14,8 @@ class Users::InvitationsController < Devise::InvitationsController
 
   # POST /resource/invitation
   def create
+    authorize! :create, :invite
+
     self.resource = invite_resource
     resource_invited = resource.errors.empty?
 
@@ -21,13 +25,14 @@ class Users::InvitationsController < Devise::InvitationsController
       if is_flashing_format? && self.resource.invitation_sent_at
         set_flash_message :notice, :send_instructions, :email => self.resource.email
       end
-      respond_with resource, :location => after_invite_path_for(current_inviter)
+      respond_with resource, :location => users_manage_path #after_invite_path_for(current_inviter)
     else
       @kandy_users = @shop.kandy_users.where('user_id IS NULL')
       respond_with_navigational(resource) { render :new }
     end
   end
 
+  # GET /resource/invitation/accept?invitation_token=abcdef
   def edit
     set_minimum_password_length if respond_to? :set_minimum_password_length
     resource.invitation_token = params[:invitation_token]
@@ -52,7 +57,7 @@ class Users::InvitationsController < Devise::InvitationsController
         set_flash_message :notice, :updated_not_active if is_flashing_format?
         # respond_with resource, :location => new_session_path(resource_name)
       end
-      redirect_to "https://#{@shop_session.url}/admin/apps/#{ShopifyApp.configuration.api_key}"
+      redirect_to "https://#{resource.shop.shopify_domain}/admin/apps/#{ShopifyApp.configuration.api_key}"
     else
       resource.invitation_token = raw_invitation_token
       respond_with_navigational(resource) { render :edit, layout: 'application' }

@@ -1,12 +1,15 @@
 class PreferencesController < ApplicationController
   before_action :authenticate_user!
   before_action :load_shop, except: [:index, :update]
-  before_action :admin_only!, except: [:index]
 
   def index
   end
 
   def update
+    authorize! :update, :api_key unless params[:shop][:kandy_api_key].blank?
+    authorize! :update, :widget unless params[:shop][:widget_attributes].blank?
+    authorize! :update, :template unless params[:shop][:template_attributes].blank?
+
     @shop = Shop.find(params[:shop][:id])
     if params[:shop][:kandy_api_key] == nil && params[:shop][:kandy_api_secret] == nil
       if @shop.update_attributes(shop_params)
@@ -47,15 +50,20 @@ class PreferencesController < ApplicationController
   end
 
   def api_keys
+    authorize! :update, :api_key
   end
 
   def sms_alert_templates
+    authorize! :update, :template
   end
 
   def chat_box_widget
+    authorize! :update, :widget
   end
 
   def chat_box_widget_preview
+    authorize! :update, :widget
+
     @shop = Shop.find_by_shopify_domain(@shop_session.url)
     render layout: 'application'
   end
@@ -69,7 +77,6 @@ class PreferencesController < ApplicationController
   def shop_params
     params.require(:shop).permit(:id, :kandy_api_key, :kandy_api_secret, :kandy_username, :kandy_password, :kandy_username_guest, :kandy_password_guest,
                                  template_attributes: [:id, :order_creation, :order_update, :order_payment, :customer_creation],
-                                 profile_attributes: [:id, :first_name, :last_name, :phone_number, :email],
                                  widget_attributes: [:id, :name, :enabled, :color,
                                                      json_string: [
                                                          collapse: [:title, :position, :type, :image, :custom_image_url, :horizontal, :vertical, :scale, :image_in_front_of_tab, :page_load, :show_widget_hide_button],
