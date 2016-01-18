@@ -4,7 +4,7 @@ A Kandy plugin for shopify websites.
 
 ## Features
 - Live chat
-- PSTN/voice/video call supported (coming soon)
+- Call supported
 - SMS notifications
 
 ## Install
