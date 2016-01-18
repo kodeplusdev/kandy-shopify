@@ -62,8 +62,8 @@ class Conversation < ActiveRecord::Base
   Name: #{title}
   Email: #{email}
   IP Address: #{location['ip']}
-  Status: #{status == 'open' ? 'Open' : 'Close'}
-  Rating: #{rating}
+  Status: #{status == 'open' ? 'Open' : (first_operator_id ? 'Close' : 'Missed')}
+  Rating: #{rating > 0 ? rating : 'Not rated'}
 "
     messages.each do |m|
       if m['is_joined'] || m['is_left'] || m['is_closed']

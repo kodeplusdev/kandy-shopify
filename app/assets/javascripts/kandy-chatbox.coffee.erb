@@ -6,6 +6,7 @@ class window.KCWidget
   _self = undefined
 
   KANDY_SHOPIFY_CHAT_ID = 'kandy_shopify_chat_id'
+  KANDY_API_URL = 'https://api.kandy.io/v1.2'
 
   constructor: (options) ->
     _self = @
@@ -34,7 +35,7 @@ class window.KCWidget
 
   getAnonymousUser: (domainAccessToken, success, failure) ->
     $.ajax
-      url: 'https://api.kandy.io/v1.2/domains/access_token/users/user/anonymous'
+      url: KANDY_API_URL + '/domains/access_token/users/user/anonymous'
       type: 'GET'
       data:
         key: domainAccessToken
@@ -229,6 +230,16 @@ class window.KCWidget
       $('#operator-role').text('')
       $('#in-chat-head').text(_self.config.start_chat.title)
       $('.cls-chat-msg').text(_self.config.chat_close.chat_closed);
+      $('#cls-chat-rating').html """
+        <select name="rating">
+          <option value=""></option>
+          <option value="1">Very bad</option>
+          <option value="2">Bad</option>
+          <option value="3">Normal</option>
+          <option value="4">Good</option>
+          <option value="5">Very good</option>
+        </select>
+      """
       $('#cls-chat-rating > select').barrating
         theme: 'css-stars'
         onSelect: (value, text, event) ->
@@ -841,21 +852,11 @@ class window.KCWidget
                 <div class='name-messages' style="text-align: center">
                   <p class='cls-chat-msg'></p>
                   <div id='cls-chat-rating'>
-                    <select name="rating">
-                      <option value=""></option>
-                      <option value="1">Very bad</option>
-                      <option value="2">Bad</option>
-                      <option value="3">Normal</option>
-                      <option value="4">Good</option>
-                      <option value="5">Very good</option>
-                    </select>
                   </div>
                   <br>
                   <p style='text-align: center; padding: 0px;'>
                     <a class='like-chat-dwld' style='cursor: pointer;font-family:Open Sans,Helvetica Neue,Helvetica,Arial,sans-serif !important;'></a>
                   </p>
-                  <br/>
-                  <br/>
                 </div>
               </td>
             </tr>
