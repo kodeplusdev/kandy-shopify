@@ -533,6 +533,7 @@ closeChat = (id, msg) ->
       break
 
   if $("#conversation-tabs-#{id}").html()
+    $("#conversation-tabs-#{id} .dropdown-menu").hide()
     appendStatusChange(id, msg)
     $("#conversation-tabs-content-#{id} .send-form-container").html """
       <center>

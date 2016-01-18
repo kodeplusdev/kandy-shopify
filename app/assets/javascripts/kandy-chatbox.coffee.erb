@@ -1002,6 +1002,7 @@ class window.KCWidget
         display_name: $('#make-call-operator-selector :selected').text()
 
     unless _self.kandyVideoCallEnabled
+      $('#in-call').hide()
       $('#incoming-call-control label').hide()
       $('#make-call-start-with-video-label').hide()
 

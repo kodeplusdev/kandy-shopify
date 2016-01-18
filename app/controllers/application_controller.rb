@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html {
         flash[:error] = 'Not allowed to do this action.'
-        redirect_to request.referer
+        redirect_to request.referer.include?(request.path) ? root_path : request.referer
       }
       format.json {render status: :forbidden, plain: 'Not allowed to do this action.'}
     end

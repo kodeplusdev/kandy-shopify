@@ -281,7 +281,7 @@
                   %input.checkbox-ids{type: 'checkbox', value: conversation.id}
                 %td= conversation.created_at
                 %td= conversation.title
-                %td= conversation.first_operator_id ? conversation.first_operator.display_name : ''
+                %td= conversation.first_operator ? conversation.first_operator.display_name : (conversation.first_operator_id ? 'Removed': '')
                 %td.center= conversation.rating == 0 ? 'Not rated' : conversation.rating
                 %td.center= conversation.status == 'open' ? 'Open' : (conversation.first_operator_id ? 'Close' : 'Missed')
     .row
