@@ -10,6 +10,8 @@ class User < ActiveRecord::Base
   attr_readonly :display_name, :full_name
   attr_accessor :kandy_user_id
 
+  validates_format_of :email, with: Devise::email_regexp
+
   ROLE = [
       ADMIN = 'admin',
       SUPERUSER = 'superuser',
@@ -44,6 +46,7 @@ class User < ActiveRecord::Base
         where(status: status)
       end
     end
+
     def online
       self.available.where('last_seen >= ?', Time.now - 2.minutes)
     end
@@ -62,7 +65,6 @@ class User < ActiveRecord::Base
   end
 
   def kandy_user_id
-    puts kandy_user.id unless kandy_user.blank?
     return kandy_user.id unless kandy_user.blank?
     nil
   end

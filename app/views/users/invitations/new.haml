@@ -23,9 +23,18 @@
   .col-sm-9.panel
     .panel-body
       = form_for resource, as: resource_name, url: invitation_path(resource_name), html: {method: :post, 'data-shopify-app-submit': 'save-form-message'} do |f|
-        = devise_error_messages!
-        - resource.class.invite_key_fields.each do |field|
-          .form-group
-            = f.label field
-            = f.text_field field, class: 'form-control'
+        .hide
+          = devise_error_messages!
+        = f.hidden_field :shop_id, value: @shop_session.id
+        .form-group
+          = f.label :email
+          = f.email_field :email, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = f.label :role
+            = f.select :role, User::ROLE, {}, {class: 'form-control'}
+        .row.form-group
+          .col-sm-12
+            = f.label :kandy_user_id, 'Kandy user'
+            = f.select :kandy_user_id, options_from_collection_for_select(@kandy_users, :id, :username), {}, {class: 'select2 form-control'}
         %p= f.submit 'Send an invitation', class: 'hide'

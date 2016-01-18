@@ -1,0 +1,48 @@
+:coffeescript
+  window.mainPageTitle = 'Set your password'
+
+  ShopifyApp.ready ->
+    ShopifyApp.Bar.initialize
+      title: window.mainPageTitle
+      icon: '/icon.png'
+      buttons:
+        primary:
+          label: 'Set my password'
+          message: 'invitation-form-message'
+    ShopifyApp.Bar.loadingOff()
+
+.col-sm-6.col-sm-offset-3
+  .panel
+    %h2.panel-heading.text-center
+      %b Welcome
+    .panel-body
+      = form_for resource, as: resource_name, url: invitation_path(resource_name), html: { method: :put, 'data-shopify-app-submit': 'invitation-form-message' } do |f|
+        %h4.text-danger.text-center
+          = devise_error_messages!
+        = f.hidden_field :invitation_token
+        .row.form-group
+          .col-sm-12
+            = f.label :email
+            = f.text_field :email, class: 'form-control', disabled: ''
+        .row.form-group
+          .col-sm-6
+            = label_tag :first_name, 'First name'
+            = text_field_tag :first_name, nil, class: 'form-control'
+          .col-sm-6
+            = label_tag :last_name, 'Last name'
+            = text_field_tag :last_name, nil, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = f.label :phone_number
+            = f.text_field :phone_number, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = f.label :password
+            = f.password_field :password, class: 'form-control'
+        .row.form-group
+          .col-sm-12
+            = f.label :password_confirmation
+            = f.password_field :password_confirmation, class: 'form-control'
+        .row.form-group
+          .col-sm-12.text-center
+            = f.submit 'Submit', class: 'btn btn-lg btn-success'

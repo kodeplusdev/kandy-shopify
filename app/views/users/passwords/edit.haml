@@ -15,7 +15,8 @@
   .panel-body
     .col-sm-4
       = form_for resource, as: resource_name, url: password_path(resource_name), html: { method: :put, role: 'form', 'data-shopify-app-submit': 'login-form-message'} do |f|
-        = devise_error_messages!
+        .hide
+          = devise_error_messages!
         = f.hidden_field :reset_password_token
         .form-group
           = f.label :password
