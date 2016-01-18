@@ -52,7 +52,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def first_operator
-    User.where(shop_id: shop_id).find(first_operator_id)
+    User.where(shop_id: shop_id, id: first_operator_id).first
   end
 
   def download

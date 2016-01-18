@@ -117,7 +117,7 @@
           else
             ShopifyApp.flashError("0 chat transcript unarchived.")
         error: (e) ->
-          ShopifyApp.flashError(e)
+          ShopifyApp.flashError(e.responseText)
 
     $('#conversations-show-archived').on 'click', ->
       url = window.location.href
