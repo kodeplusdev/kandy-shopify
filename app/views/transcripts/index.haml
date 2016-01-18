@@ -262,27 +262,28 @@
               %li#conversations-show-archived
                 %a{href: '#'} Show archived
 
-    .row.pad-top
-      %table.table.table-hover.clickable
-        %thead
-          %tr
-            %th
-              %input#checkbox-all{type: 'checkbox'}
-            %th Date
-            %th Visitor
-            %th Operator
-            %th Rating
-            %th Status
-        %tbody
-          - @conversations.each do |conversation|
-            %tr{'data-href': chat_transcript_path(conversation)}
-              %td
-                %input.checkbox-ids{type: 'checkbox', value: conversation.id}
-              %td= conversation.created_at
-              %td= conversation.title
-              %td= conversation.first_operator_id ? conversation.first_operator.display_name : ''
-              %td= conversation.rating == 'like' ? 'Like' : (conversation.rating == 'dislike' ? 'Dislike' : 'None')
-              %td= conversation.status == 'open' ? 'Open' : (conversation.first_operator_id ? 'Close' : 'Missed')
+    .row.pad
+      .table-responsive
+        %table.table.table-hover.clickable.table-bordered
+          %thead
+            %tr.active
+              %th.center
+                %input#checkbox-all{type: 'checkbox'}
+              %th.center Date
+              %th.center Visitor
+              %th.center Operator
+              %th.center Rating
+              %th.center Status
+          %tbody
+            - @conversations.each do |conversation|
+              %tr{'data-href': chat_transcript_path(conversation), class: conversation.status == 'open' ? 'success' : (conversation.first_operator_id ? 'warning' : 'danger')}
+                %td.center
+                  %input.checkbox-ids{type: 'checkbox', value: conversation.id}
+                %td= conversation.created_at
+                %td= conversation.title
+                %td= conversation.first_operator_id ? conversation.first_operator.display_name : ''
+                %td.center= conversation.rating == 0 ? 'Not rated' : conversation.rating
+                %td.center= conversation.status == 'open' ? 'Open' : (conversation.first_operator_id ? 'Close' : 'Missed')
     .row
       .pull-right.pad-right
         = will_paginate @conversations, class: 'digg_pagination'

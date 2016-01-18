@@ -12,19 +12,21 @@ class TranscriptsController < ApplicationController
     end
     if params[:q].blank?
       if @archived
-        @conversations = @shop.conversations.where(deleted: false).paginate(page: params[:page])
+        @conversations = @shop.conversations.where(deleted: false).order(created_at: :desc).paginate(page: params[:page])
       else
-        @conversations = @shop.conversations.where(deleted: false, archived: @archived).paginate(page: params[:page])
+        @conversations = @shop.conversations.where(deleted: false, archived: @archived).order(created_at: :desc).paginate(page: params[:page])
       end
     else
       q = params[:q]
       if @archived
         @conversations = @shop.conversations.where(deleted: false)
                              .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.first_name LIKE :q OR users.last_name LIKE :q', {q: "%#{q}%"})
+                             .order(created_at: :desc)
                              .paginate(page: params[:page])
       else
         @conversations = @shop.conversations.where(deleted: false, archived: @archived)
                              .joins(:users).where('conversations.name LIKE :q OR conversations.email LIKE :q OR users.email LIKE :q OR users.first_name LIKE :q OR users.last_name LIKE :q', {q: "%#{q}%"})
+                             .order(created_at: :desc)
                              .paginate(page: params[:page])
       end
     end
@@ -75,13 +77,13 @@ class TranscriptsController < ApplicationController
       @conversations = @shop.conversations.find(params[:ids])
     else
       if params[:all]
-        @conversations = @shop.conversations.all
+        @conversations = @shop.conversations.where('status != ?', Conversation::OPEN).all
       end
     end
     @deleted = 0
     if @conversations.size > 0
       @conversations.each do |c|
-        unless c.deleted
+        if !c.deleted && c.status != Conversation::OPEN
           @deleted += 1
           c.deleted = true
           c.save

@@ -18,34 +18,40 @@
           label: 'Back', href: "#{preferences_url}", target: 'app'
         ]
 
-    $(document).on 'click', '.clickable tbody tr', ->
-      window.document.location.href = $(this).data('href')
+    if "#{can? :update, :user}" is "true"
+      $(document).on 'click', '.clickable tbody tr', ->
+        window.document.location.href = $(this).data('href')
 
 .panel
   .panel-body
-    %table.table.table-hover.clickable
-      %thead
-        %tr
-          %th Avatar
-          %th Full name
-          %th Email
-          %th Phone number
-          %th
-      %tbody
-        - @users.each do |u|
-          %tr{'data-href': users_manage_edit_path(u)}
-            - if u.avatar.blank?
-              %td
-                %img{width: 32, height: 32, src: asset_url('avatars/avatar-operator.png')}
-            - else
-              %td
-                %img{width: 32, height: 32, src: u.avatar}
-            %td= u.full_name
+    .table-responsive
+      %table.table.table-hover.clickable.table-bordered
+        %thead
+          %tr.active
+            %th.center Avatar
+            %th.center Full name
+            %th.center Email
+            %th.center Phone number
+            %th.center Role
+            - if can? :update, :user
+              %th
+        %tbody
+          - @users.each do |u|
+            %tr{'data-href': users_manage_edit_path(u)}
+              - if u.avatar.blank?
+                %td.center
+                  %img{width: 32, height: 32, src: asset_url('avatars/avatar-operator.png')}
+              - else
+                %td.center
+                  %img{width: 32, height: 32, src: u.avatar}
+              %td= u.full_name
 
-            %td= u.email
-            %td= u.phone_number
-            %td
-              %a.btn.btn-xs.btn-primary{href: users_manage_edit_path(u)}
-                %i.fa.fa-edit
-              - if current_user.admin? && !u.admin?
-                = link_to ' x ', users_manage_edit_path(u), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-xs btn-danger'
+              %td= u.email
+              %td= u.phone_number
+              %td.center= u.role.humanize
+              - if can? :update, :user
+                %td.center
+                  %a.btn.btn-xs.btn-primary{href: users_manage_edit_path(u)}
+                    %i.fa.fa-edit
+                  - if current_user.admin? && !u.admin?
+                    = link_to ' x ', users_manage_edit_path(u), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-xs btn-danger'
