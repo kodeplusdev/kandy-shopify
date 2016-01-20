@@ -959,7 +959,7 @@ class window.KCWidget
     $(document).on 'click', '#in-call-control .end-btn', ->
       KandyAPI.call.endCall(_self.callId)
 
-    $(document).on 'click', '#-call-control .hold-btn', ->
+    $(document).on 'click', '#in-call-control .hold-btn', ->
       if $(this).text() == 'Hold'
         KandyAPI.call.holdCall(_self.callId)
         $(this).text('Resume')
