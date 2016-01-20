@@ -60,7 +60,8 @@ module KandyApp
       allow do
         origins '*'
         resource '/chat/*',
-                 methods: [:get, :post, :put, :delete, :options],
+                 headers: :any,
+                 methods: [:get, :post, :put, :patch, :delete, :options],
                  max_age: 600
       end
     end
