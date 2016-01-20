@@ -226,7 +226,10 @@ displayConversation = (idx) ->
           """
       $(document).on 'click', "#call-btn-#{c.id}", (e) ->
         e.preventDefault()
+
         startWithVideo = $("#start-with-video-checkbox-#{c.id}").prop('checked')
+        $("#video-call-views-#{c.id}").hide() unless startWithVideo
+
         KandyAPI.call.makeCall(c.full_user_id, startWithVideo)
         $("#call-popover-btn-#{c.id}").popover('hide')
     else
@@ -725,6 +728,7 @@ getVisitorFromCall = (call) ->
   return undefined
 
 window.onCallIncoming = (call) ->
+  #console.log call.canReceiveVideo()
   c = getVisitorFromCall(call)
   if c.callId
     KandyAPI.call.reject(call.getId())
@@ -741,7 +745,8 @@ window.onCallIncoming = (call) ->
     swal
       title: "#{c.title} is calling..."
       showCancelButton: true
-      confirmButtonColor: "#DD6B55"
+      cancelButtonColor: "#DD6B55"
+      confirmButtonColor: "#449d44"
       confirmButtonText: "Accept"
       cancelButtonText: "Reject"
       closeOnConfirm: false
@@ -756,6 +761,7 @@ window.onCallIncoming = (call) ->
               confirmButtonText: "Yes"
               cancelButtonText: "No"
             , (isConfirm2)->
+              $("#video-call-views-#{c.id}").hide() unless isConfirm2
               KandyAPI.call.answerCall(c.callId, isConfirm2)
           else
             KandyAPI.call.answerCall(c.callId, false)
@@ -790,6 +796,7 @@ window.onCallTerminate = (call)->
   for c in chatData.conversations
     if c.callId == call.getId()
       c.callId = undefined
+      $("#video-call-views-#{c.id}").show() if kandyVideoCallEnabled
       $(".call-btn-#{c.id}").removeClass('disabled')
       $("#in-call-box-#{c.id}").hide()
       #appendStatusChange(c.id, "Call terminated.")

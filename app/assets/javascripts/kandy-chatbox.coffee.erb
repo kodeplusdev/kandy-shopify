@@ -144,6 +144,7 @@ class window.KCWidget
       _self.callingOperator = undefined
       _self.audioRingOut[0].pause()
       _self.audioRingIn[0].pause()
+      $('#in-call video').show() if _self.kandyVideoCallEnabled
       $('#chat-switch').click()
       $('#incoming-call-control').hide()
       $('#operator-img-div').removeClass('in-call')
@@ -951,6 +952,7 @@ class window.KCWidget
 
     $(document).on 'click', '#incoming-call-control .answer-btn', ->
       videoEnabled = $('#start-with-video-checkbox').prop('checked')
+      $('#in-call video').hide() unless videoEnabled
       KandyAPI.call.answerCall(_self.callId, videoEnabled)
 
     $(document).on 'click', '#incoming-call-control .reject-btn', ->
@@ -996,14 +998,17 @@ class window.KCWidget
 
     $(document).on 'click', '.call-btn', ->
       operator = $('#make-call-operator-selector :selected').val()
+
       startWithVideo = $('#make-call-start-with-video-checkbox').prop('checked')
+      $('#in-call video').hide() unless startWithVideo
+
       KandyAPI.call.makeCall(operator, startWithVideo)
       _self.callingOperator =
         username: operator
         display_name: $('#make-call-operator-selector :selected').text()
 
     unless _self.kandyVideoCallEnabled
-      $('#in-call').hide()
+      $('#in-call video').hide()
       $('#incoming-call-control label').hide()
       $('#make-call-start-with-video-label').hide()
 
