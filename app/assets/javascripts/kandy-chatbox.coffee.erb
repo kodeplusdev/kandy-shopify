@@ -965,6 +965,7 @@ class window.KCWidget
         $(this).text('Resume')
       else
         KandyAPI.call.unHoldCall(_self.callId)
+        $(this).text('Hold')
 
     $(document).on 'click', '#chat-switch', ->
       $('#in-call').hide()

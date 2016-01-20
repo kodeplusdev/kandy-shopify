@@ -109,7 +109,7 @@ displayMessage = (idx) ->
   else if c.operators.length > 0
     $('#other-active-conversations-list').append """
       <a id="conversation-#{c.id}" href='#' class='list-group-item'>
-        <span class='badge'>#{time.toLocaleTimeString()}</span>
+        <span class='badge'>#{time.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</span>
         <h5 class='list-group-item-heading'>#{c.title}</h5>
         <div class='list-group-item-text'>#{c.location.country_name}</div>
       </a>
@@ -117,7 +117,7 @@ displayMessage = (idx) ->
   else
     $('#conversations-list').append """
       <a id="conversation-#{c.id}" href='#' class='list-group-item'>
-        <span class='badge'>#{time.toLocaleTimeString()}</span>
+        <span class='badge'>#{time.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</span>
         <h5 class='list-group-item-heading'>#{c.title}</h5>
         <div class='list-group-item-text'>#{c.location.country_name}</div>
       </a>

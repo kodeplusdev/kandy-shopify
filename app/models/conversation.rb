@@ -57,19 +57,19 @@ class Conversation < ActiveRecord::Base
 
   def download
     text =
-"Details:
-  Date: #{created_at}
-  Name: #{title}
-  Email: #{email}
-  IP Address: #{location['ip']}
-  Status: #{status == 'open' ? 'Open' : (first_operator_id ? 'Close' : 'Missed')}
-  Rating: #{rating > 0 ? rating : 'Not rated'}
+"Details:\r\n
+  Date: #{created_at}\r\n
+  Name: #{title}\r\n
+  Email: #{email}\r\n
+  IP Address: #{location['ip']}\r\n
+  Status: #{status == 'open' ? 'Open' : (first_operator_id ? 'Close' : 'Missed')}\r\n
+  Rating: #{rating > 0 ? rating : 'Not rated'}\r\n\r\n
 "
     messages.each do |m|
       if m['is_joined'] || m['is_left'] || m['is_closed']
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['text']}\n"
+        text += "[#{DateTime.strptime((m['timestamp'].to_i / 1000).to_s, '%s').to_datetime.in_time_zone }] #{m['text']}\r\n"
       else
-        text += "[#{DateTime.strptime(m['timestamp'], '%s').to_datetime}] #{m['display_name']} said: #{m['text']}\n"
+        text += "[#{DateTime.strptime((m['timestamp'].to_i / 1000).to_s, '%s').to_datetime.in_time_zone }] #{m['display_name']} said: #{m['text']}\r\n"
       end
     end
     text
