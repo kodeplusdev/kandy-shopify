@@ -22,7 +22,7 @@ class PreferencesController < ApplicationController
         old_api_key = @shop.kandy_api_key
         old_api_secret = @shop.kandy_api_secret
         if old_api_key != params[:shop][:kandy_api_key] || old_api_secret != params[:shop][:kandy_api_secret]
-          kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
+          kandy = Kandy.new(domain_api_key: params[:shop][:kandy_api_key], domain_api_secret: params[:shop][:kandy_api_secret])
           users = kandy.domain_users
           if users.blank? || users.size < 1
             flash[:error] = 'Your kandy account should have least 1 users.'
