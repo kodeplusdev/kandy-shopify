@@ -82,6 +82,28 @@ class window.KCWidget
         return o.display_name
     return false
 
+  addLocalStreamURL: (call, url) ->
+    call.localStreamURL = url
+    _self.updateVideoURL(call)
+
+  addRemoteStreamURL: (call, url) ->
+    call.remoteStreamURL = url
+    _self.updateVideoURL(call)
+
+  updateVideoURL: (call) ->
+    if call.canReceiveVideo()
+      $("#incoming-video video").attr('src', call.remoteStreamURL)
+    else
+      $("#incoming-video video").attr('src', '')
+    if call.canSendVideo()
+      if call.canReceiveVideo()
+        $("#outgoing-video video").attr('src', call.localStreamURL)
+      else
+        $("#incoming-video video").attr('src', call.localStreamURL)
+        $("#outgoing-video video").attr('src', '')
+    else
+      $("#outgoing-video video").attr('src', '')
+
   onCallInitiate: (call) ->
     _self.audioRingOut[0].play()
     _self.callId = call.getId()
@@ -90,10 +112,11 @@ class window.KCWidget
     $('.hold-btn').hide()
 
     $('#in-call-control .operator-name').text('Calling to ' + _self.callingOperator.display_name + ' ...')
+
     call.onStreamAdded = (url) ->
-      $('#incoming-video video').attr('src', url)
+      _self.addRemoteStreamURL(call, url)
     call.onLocalStreamAdded = (url) ->
-      $('#outgoing-video video').attr('src', url)
+      _self.addLocalStreamURL(call, url)
 
   onCallInitiateFail: (call) ->
     _self.audioRingOut[0].pause()
@@ -119,19 +142,20 @@ class window.KCWidget
         $('#incoming-call-control .operator-name').text(user + ' is calling...')
 
         call.onStreamAdded = (url) ->
-          $('#incoming-video video').attr('src', url)
+          _self.addRemoteStreamURL(call, url)
         call.onLocalStreamAdded = (url) ->
-          $('#outgoing-video video').attr('src', url)
+          _self.addLocalStreamURL(call, url)
 
   onCall: (call) ->
+    _self.updateVideoURL(call)
     _self.audioRingOut[0].pause()
     $('.hold-btn').show()
     $('#make-call').hide()
+    $('#in-call').show()
     $('#in-call-control').hide()
     $('#in-call-control .operator-name').text('')
     $('#operator-img-div').addClass('in-call')
     $('#incoming-call-control').hide()
-    $('#outgoing-video video').attr('src', call.localStreamURL)
     $('#video-call-switch').click()
 
   onCallAnswer: (call) ->
@@ -146,6 +170,7 @@ class window.KCWidget
       _self.audioRingIn[0].pause()
       $('#in-call video').show() if _self.kandyVideoCallEnabled
       $('#chat-switch').click()
+      $('#in-call').hide()
       $('.chat-box-control').show()
       $('#incoming-call-control').hide()
       $('#operator-img-div').removeClass('in-call')
@@ -953,7 +978,7 @@ class window.KCWidget
 
     $(document).on 'click', '#incoming-call-control .answer-btn', ->
       videoEnabled = $('#start-with-video-checkbox').prop('checked')
-      $('#in-call video').hide() unless videoEnabled
+      #$('#in-call video').hide() unless videoEnabled
       KandyAPI.call.answerCall(_self.callId, videoEnabled)
 
     $(document).on 'click', '#incoming-call-control .reject-btn', ->
@@ -1001,7 +1026,7 @@ class window.KCWidget
       operator = $('#make-call-operator-selector :selected').val()
 
       startWithVideo = $('#make-call-start-with-video-checkbox').prop('checked')
-      $('#in-call video').hide() unless startWithVideo
+      #$('#in-call video').hide() unless startWithVideo
 
       KandyAPI.call.makeCall(operator, startWithVideo)
       _self.callingOperator =

@@ -213,6 +213,7 @@ displayConversation = (idx) ->
         html: true
         placement: 'bottom'
         container: 'body'
+        trigger: 'manual'
         content: ->
           return """
           <div class="form-inline" style="min-width: 156px">
@@ -224,11 +225,13 @@ displayConversation = (idx) ->
             <button class="btn btn-sm btn-primary" id="call-btn-#{c.id}">Call</button>
           </div>
           """
+      $(document).on 'click', "#call-popover-btn-#{c.id}", ->
+        $("#call-popover-btn-#{c.id}").popover('toggle')
       $(document).on 'click', "#call-btn-#{c.id}", (e) ->
         e.preventDefault()
 
         startWithVideo = $("#start-with-video-checkbox-#{c.id}").prop('checked')
-        $("#video-call-views-#{c.id}").hide() unless startWithVideo
+        #$("#video-call-views-#{c.id}").hide() unless startWithVideo
 
         KandyAPI.call.makeCall(c.full_user_id, startWithVideo)
         $("#call-popover-btn-#{c.id}").popover('hide')
@@ -419,8 +422,8 @@ displayInfoVisitor = (idx) ->
   $('#conversation-location').html('')
 
   shopGmap 'conversation-location',
-      latitude: conversation.location.latitude
-      longitude: conversation.location.longitude
+    latitude: conversation.location.latitude
+    longitude: conversation.location.longitude
 
 checkOperatorJoined = (userId, chatId) ->
   for c in chatData.conversations
@@ -576,20 +579,20 @@ sendMailConversation = (id) ->
     showLoaderOnConfirm: true
     closeOnConfirm: false
   , (email) ->
-      if email is false
-        return false
-      if email is "" || !(/^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/).test(email)
-        swal.showInputError("You need to enter a valid email!")
-        return false
-      $.ajax
-        url: "#{chatData.shop.host}/chat/send-mail-transcript"
-        type: 'POST'
-        dataType: 'json'
-        data:
-          id: id
-          email: email
-        success: (res) ->
-          swal('Done!', 'A email has been sent to you.', 'success')
+    if email is false
+      return false
+    if email is "" || !(/^([a-zA-Z0-9_\.\-])+\@.(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,5})+$/).test(email)
+      swal.showInputError("You need to enter a valid email!")
+      return false
+    $.ajax
+      url: "#{chatData.shop.host}/chat/send-mail-transcript"
+      type: 'POST'
+      dataType: 'json'
+      data:
+        id: id
+        email: email
+      success: (res) ->
+        swal('Done!', 'A email has been sent to you.', 'success')
 
 
 banVisitorIP = (id) ->
@@ -680,35 +683,57 @@ addNewMessage = (message) ->
 isValidChat = (json) ->
   return json
 
+addLocalStreamURL = (call, url) ->
+  call.localStreamURL = url
+  updateVideoURL(call)
+
+addRemoteStreamURL = (call, url) ->
+  call.remoteStreamURL = url
+  updateVideoURL(call)
+
+updateVideoURL = (call) ->
+  if !call.canReceiveVideo() && !call.canSendVideo()
+    $("#video-call-views-#{call.id}").hide()
+  else if kandyVideoCallEnabled
+    $("#video-call-views-#{call.id}").show()
+    if call.canReceiveVideo()
+      $("#incoming-video-#{call.id}").attr('src', call.remoteStreamURL)
+    else
+      $("#incoming-video-#{call.id}").attr('src', '')
+    if call.canSendVideo()
+      if call.canReceiveVideo()
+        $("#outgoing-video-#{call.id}").attr('src', call.localStreamURL)
+      else
+        $("#incoming-video-#{call.id}").attr('src', call.localStreamURL)
+        $("#outgoing-video-#{call.id}").attr('src', '')
+    else
+      $("#outgoing-video-#{call.id}").attr('src', '')
+    updateVideoViews(1000)
+
 window.onCallInitiate = (call) ->
   audioRingIn[0].pause()
   audioRingOut[0].play()
 
-  console.log call
-  console.log call.getRemoteVideoState()
-
   idx = $("#conversation-tabs li[class*='active'] a[data-toggle='tab']").data('idx')
   c = getConversationByIndex(idx)
+  call.id = c.id
+  updateVideoURL(call)
   c.callId = call.getId()
   $(".call-btn-#{c.id}").addClass('disabled')
-  $("#in-call-box-#{c.id}").show()
   unless kandyVideoCallEnabled
     $("#video-call-views-#{c.id}").hide()
 
-  $("#outgoing-video-#{c.id}").attr('src', null)
-  $("#incoming-video-#{c.id}").attr('src', call.localStreamURL)
+  call.onLocalStreamAdded = (url) ->
+    addLocalStreamURL(call, url)
   call.onStreamAdded = (url) ->
-    $("#incoming-video-#{c.id}").attr('src', url)
-    $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
-    updateVideoViews(1500)
-  updateVideoViews()
-  #appendStatusChange(c.id, "Calling #{c.title}...")
+    addRemoteStreamURL(call, url)
+
   swal
     title: "Calling #{c.title}..."
     confirmButtonColor: "#DD6B55"
     confirmButtonText: "End"
-    , ->
-      KandyAPI.call.endCall(call.getId())
+  , ->
+    KandyAPI.call.endCall(call.getId())
 
 window.onCallInitiateFail = ->
   audioRingOut[0].pause();
@@ -718,7 +743,6 @@ window.onCallInitiateFail = ->
   $(".call-btn-#{c.id}").removeClass('disabled')
   $("#in-call-box-#{c.id}").hide()
   swal('Oops...', 'call initiate failed!', 'error')
-  #appendStatusChange(c.id, "Error: call initiate failed.")
 
 getVisitorFromCall = (call) ->
   callee = call.callerNumber
@@ -728,19 +752,18 @@ getVisitorFromCall = (call) ->
   return undefined
 
 window.onCallIncoming = (call) ->
-  #console.log call.canReceiveVideo()
   c = getVisitorFromCall(call)
   if c.callId
     KandyAPI.call.reject(call.getId())
   else
     audioRingIn[0].play();
+    call.id = c.id
     c.callId = call.getId()
+
     call.onStreamAdded = (url) ->
-      $("#incoming-video-#{c.id}").attr('src', url)
-      updateVideoViews(1500)
+      addRemoteStreamURL(call, url)
     call.onLocalStreamAdded = (url) ->
-      $("#outgoing-video-#{c.id}").attr('src', call.localStreamURL)
-      updateVideoViews(1500)
+      addLocalStreamURL(call, url)
 
     swal
       title: "#{c.title} is calling..."
@@ -751,24 +774,24 @@ window.onCallIncoming = (call) ->
       cancelButtonText: "Reject"
       closeOnConfirm: false
     , (isConfirm)->
-        if isConfirm
-          if kandyVideoCallEnabled
-            swal
-              title: "Video Call"
-              text: "Accept this call with video sharing enabled?"
-              showCancelButton: true
-              cancelButtonColor: "#DD6B55"
-              confirmButtonColor: "#449d44"
-              confirmButtonText: "Yes"
-              cancelButtonText: "No"
-            , (isConfirm2)->
-              $("#video-call-views-#{c.id}").hide() unless isConfirm2
-              KandyAPI.call.answerCall(c.callId, isConfirm2)
-          else
-            KandyAPI.call.answerCall(c.callId, false)
-          $('#conversation-tabs-10').tab('show')
+      if isConfirm
+        if kandyVideoCallEnabled
+          swal
+            title: "Video Call"
+            text: "Accept this call with video sharing enabled?"
+            showCancelButton: true
+            cancelButtonColor: "#DD6B55"
+            confirmButtonColor: "#449d44"
+            confirmButtonText: "Yes"
+            cancelButtonText: "No"
+          , (isConfirm2)->
+            #$("#video-call-views-#{c.id}").hide() unless isConfirm2
+            KandyAPI.call.answerCall(c.callId, isConfirm2)
         else
-          KandyAPI.call.rejectCall(c.callId)
+          KandyAPI.call.answerCall(c.callId, false)
+        $("#conversation-tabs-#{c.id}").tab('show')
+      else
+        KandyAPI.call.rejectCall(c.callId)
 
 window.onCallAnswer = (call) ->
   c = getVisitorFromCall(call)
@@ -784,9 +807,8 @@ window.onCallRejected = (call) ->
   swal.close()
 
 window.onCall = (call) ->
-  console.log call
-  console.log call.canReceiveVideo()
-
+  updateVideoURL(call)
+  $("#in-call-box-#{call.id}").show()
   audioRingOut[0].pause();
   swal.close()
 
@@ -800,5 +822,4 @@ window.onCallTerminate = (call)->
       $("#video-call-views-#{c.id}").show() if kandyVideoCallEnabled
       $(".call-btn-#{c.id}").removeClass('disabled')
       $("#in-call-box-#{c.id}").hide()
-      #appendStatusChange(c.id, "Call terminated.")
       break
