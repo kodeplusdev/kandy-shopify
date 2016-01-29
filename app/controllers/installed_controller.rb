@@ -3,14 +3,17 @@ class InstalledController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_action :load_shop
 
+  # GET /app/installed
   def index
     if @shop.initialized
       redirect_to root_url
     else
+      # if app is initialized but it is uninstalled from shop, ...
       if @shop.users.size > 0
-        update_shop_details
+        update_shop_details # ...get shop details
         @shop.save
 
+        # ...and update webhooks and script tags
         setup_webhooks
         setup_script_tags
 
@@ -30,6 +33,7 @@ class InstalledController < ApplicationController
     end
   end
 
+  # POST /app/installed/kandy_account
   def set_kandy_account
     if @shop.update_attributes(shop_params)
       kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
@@ -37,10 +41,12 @@ class InstalledController < ApplicationController
       if users.blank? || users.size < 1
         flash[:error] = 'Your kandy account should have least 1 user.'
       else
+        # save all kandy users to database
         users.each do |u|
           @shop.kandy_users.create(username: u.user_id, email: u.user_email, password: u.user_password,
                                    first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
                                    api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
+          # save domain access token for next usages
           @shop.kandy_domain_access_token = kandy.domain_access_token
           @shop.save
         end
@@ -51,11 +57,13 @@ class InstalledController < ApplicationController
     end
   end
 
+  # POST /app/installed/admin_account
   def set_admin_account
     user = @shop.users.create(email: params[:email], password: params[:password], password_confirmation: params[:password_confirmation],
                               first_name: params[:first_name], last_name: params[:last_name], role: User::ADMIN,
                               phone_number: params[:phone_number], invitation_accepted_at: Time.now.utc)
     if user.persisted?
+      # create new admin user and setup shopify
       @kandy_user = @shop.kandy_users.find(params[:kandy_user_id])
       @shop.template = Template.new
       @shop.widget = Widget.new
@@ -79,6 +87,7 @@ class InstalledController < ApplicationController
 
   private
 
+  # get shop owner details (timezone, email and phone number)
   def update_shop_details
     @shop.initialized = true
     @shop_details = ShopifyAPI::Shop.current
@@ -87,10 +96,11 @@ class InstalledController < ApplicationController
     @shop.phone = @shop_details.phone
   end
 
+  # create some webhooks
   def setup_webhooks
     begin
       webhooks = ShopifyAPI::Webhook.find :all
-      webhooks.each do |webhook|
+      webhooks.each do |webhook| # remove old webhooks
         webhook.destroy if webhook.address.include?(root_url)
       end
       [
@@ -109,10 +119,11 @@ class InstalledController < ApplicationController
     end
   end
 
+  # add a script tags to load widget on pageload
   def setup_script_tags
     begin
       tags = ShopifyAPI::ScriptTag.find :all
-      tags.each do |tag|
+      tags.each do |tag| # remove old script tags
         tag.destroy if tag.src.include?(root_url)
       end
       [script_tags_url].each do |tag|

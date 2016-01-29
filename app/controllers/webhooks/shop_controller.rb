@@ -1,4 +1,6 @@
 class Webhooks::ShopController < WebhooksController
+
+  # POST /webhooks/shop/update
   def update
     render nothing: true, status: 200
     Thread.new do

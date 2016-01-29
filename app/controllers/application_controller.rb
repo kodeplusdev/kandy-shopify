@@ -5,10 +5,12 @@ class ApplicationController < ActionController::Base
   around_filter :set_time_zone, :if => :shop_session
   protect_from_forgery
 
+  # redirect to login page with shop url parameter
   def after_sign_out_path_for(resource_or_scope)
     new_user_session_path(shop: @shop_session.url)
   end
 
+  # set timezone for each request
   def set_time_zone(&block)
     Time.use_zone(@shop_session.time_zone, &block)
   end
@@ -23,6 +25,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # check whether shop was initialized or not?
   def authenticate_user!(opts={})
     if @shop_session.blank? || @shop_session.initialized
       super(opts)

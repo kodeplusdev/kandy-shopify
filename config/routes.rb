@@ -13,8 +13,6 @@ KandyApp::Application.routes.draw do
         controller :manage do
           get '/' => :index, as: 'manage'
           get '/edit/:id' => :edit, as: 'manage_edit'
-          get '/invite' => :invite, as: 'invite'
-          post '/invite' => :new_invite
           post '/edit/:id' => :update
           delete '/edit/:id' => :destroy
         end
@@ -58,7 +56,7 @@ KandyApp::Application.routes.draw do
       get 'sms-alert-templates' => :sms_alert_templates, as: 'sms_alert_templates'
       get 'chat-box-widget' => :chat_box_widget, as: 'chat_box_widget'
       get 'chat-box-widget-preview' => :chat_box_widget_preview, as: 'chat_box_widget_preview'
-      post 'update' => :update
+      post '/' => :update
     end
     controller :transcripts do
       get '/transcripts' => :index, as: 'chat_transcripts'

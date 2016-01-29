@@ -18,7 +18,7 @@
         ]
     ShopifyApp.Bar.loadingOff()
 
-= form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+= form_for @shop, url: preferences_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
   = f.hidden_field :id
   = hidden_field_tag :back_url, api_keys_path
   .row

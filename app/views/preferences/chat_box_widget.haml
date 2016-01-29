@@ -58,7 +58,7 @@
 
 .panel.jumbotron
   .panel-body
-    = form_for @shop, url: update_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
+    = form_for @shop, url: preferences_path, method: :post, html: {'data-shopify-app-submit': 'save-preferences-form-message'} do |f|
       = f.hidden_field :id
       = hidden_field_tag :back_url, chat_box_widget_path
       = f.fields_for :widget do |w|

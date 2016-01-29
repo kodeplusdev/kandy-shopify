@@ -2,31 +2,39 @@ class PreferencesController < ApplicationController
   before_action :authenticate_user!
   before_action :load_shop, except: [:index, :update]
 
+  # GET /preferences
   def index
   end
 
+  # POST /preferences
   def update
+    # check permissions
     authorize! :update, :api_key unless params[:shop][:kandy_api_key].blank?
     authorize! :update, :widget unless params[:shop][:widget_attributes].blank?
     authorize! :update, :template unless params[:shop][:template_attributes].blank?
 
     @shop = Shop.find(params[:shop][:id])
     if params[:shop][:kandy_api_key] == nil && params[:shop][:kandy_api_secret] == nil
+      # update preferences except api keys
       if @shop.update_attributes(shop_params)
         flash[:notice] = 'Updated successful'
       else
         flash[:error] = @shop.errors.full_messages.first
       end
-    else
+    else # update api keys
       if !params[:shop][:kandy_api_key].blank? || !params[:shop][:kandy_api_secret].blank?
         old_api_key = @shop.kandy_api_key
         old_api_secret = @shop.kandy_api_secret
+
         if old_api_key != params[:shop][:kandy_api_key] || old_api_secret != params[:shop][:kandy_api_secret]
+          # Only update keys when api keys is different
           kandy = Kandy.new(domain_api_key: params[:shop][:kandy_api_key], domain_api_secret: params[:shop][:kandy_api_secret])
           users = kandy.domain_users
+
           if users.blank? || users.size < 1
             flash[:error] = 'Your kandy account should have least 1 users.'
           else
+            # delete all current kandy users and save new kandy users
             if @shop.update_attributes(shop_params)
               @shop.kandy_users.destroy_all
               users.each do |u|
@@ -34,6 +42,7 @@ class PreferencesController < ApplicationController
                                          first_name: u.user_first_name, last_name: u.user_last_name, phone_number: u.user_phone_number,
                                          api_key: u.user_api_key, api_secret: u.user_api_secret, country_code: u.user_country_code, domain_name: u.domain_name)
               end
+
               flash[:notice] = 'Please setup kandy user for your account and other accounts.'
               redirect_to users_manage_edit_path(current_user) and return
             else
@@ -49,18 +58,22 @@ class PreferencesController < ApplicationController
     redirect_to params[:back_url] and return
   end
 
+  # GET /preferences/api-keys
   def api_keys
     authorize! :update, :api_key
   end
 
+  # GET /preferences/sms-alert-templates
   def sms_alert_templates
     authorize! :update, :template
   end
 
+  # GET /preferences/chat-box-widget
   def chat_box_widget
     authorize! :update, :widget
   end
 
+  # GET /preferences/chat-box-widget-preview
   def chat_box_widget_preview
     authorize! :update, :widget
 

@@ -1,5 +1,6 @@
 class Webhooks::SmsController < WebhooksController
 
+  # POST /webhooks/sms/order-creation
   def order_creation
     render nothing: true, status: 200
     Thread.new do
@@ -18,6 +19,7 @@ class Webhooks::SmsController < WebhooksController
     end
   end
 
+  # POST /webhooks/sms/order-update
   def order_update
     render nothing: true, status: 200
     Thread.new do
@@ -36,6 +38,7 @@ class Webhooks::SmsController < WebhooksController
     end
   end
 
+  # POST /webhooks/sms/order-payment
   def order_payment
     render nothing: true, status: 200
     Thread.new do
@@ -52,6 +55,7 @@ class Webhooks::SmsController < WebhooksController
     end
   end
 
+  # POST /webhooks/sms/customer-creation
   def customer_creation
     render nothing: true, status: 200
     Thread.new do
@@ -74,14 +78,15 @@ class Webhooks::SmsController < WebhooksController
     unless admin
       puts 'Unknown phone number' and return
     end
-
-    template = Liquid::Template.parse(template)
-
+    # render template with parameters recieved
     params[:host] = @shop.shopify_domain
+    template = Liquid::Template.parse(template)
     text = template.render(params)
 
+    # remove plus symbol from phone number
     from = admin.phone_number.split('+').last
     to = to.split('+').last
+
     unless text.blank?
       kandy = Kandy.new(domain_api_key: @shop.kandy_api_key, domain_api_secret: @shop.kandy_api_secret)
       kandy.send_sms(username: admin.kandy_user.username, password: admin.kandy_user.password, source: from, destination: to, text: text)

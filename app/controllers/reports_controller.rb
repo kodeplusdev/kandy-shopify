@@ -1,6 +1,7 @@
 class ReportsController < ApplicationController
   before_action :authenticate_user!
 
+  # GET /reports
   def index
     authorize! :read, :report
 

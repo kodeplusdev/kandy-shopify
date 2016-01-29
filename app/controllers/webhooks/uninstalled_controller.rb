@@ -1,4 +1,6 @@
 class Webhooks::UninstalledController < WebhooksController
+
+  # POST /webhooks/app/uninstalled
   def index
     render nothing: true, status: 200
     Thread.new do

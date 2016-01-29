@@ -11,7 +11,6 @@ class Kandy
     @version ||= 'v1.2'
 
     @resource = RestClient::Resource.new(url)
-    RestClient.log = Logger.new(STDOUT)
   end
 
   def url
