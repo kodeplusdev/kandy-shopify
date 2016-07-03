@@ -69,7 +69,7 @@ window.loadAndStartChat = (url) ->
               id: chatData.me.id
               status: res.status
             for o in chatData.users
-              KandyAPI.messaging.sendJSON o.kandy_username, json, undefined, (msg) ->
+              kandy.messaging.sendJSON o.kandy_username, json, undefined, (msg) ->
                 displayErrorMessage(msg)
 
       if res.users
@@ -233,12 +233,12 @@ displayConversation = (idx) ->
         startWithVideo = $("#start-with-video-checkbox-#{c.id}").prop('checked')
         #$("#video-call-views-#{c.id}").hide() unless startWithVideo
 
-        KandyAPI.call.makeCall(c.full_user_id, startWithVideo)
+        kandy.call.makeCall(c.full_user_id, startWithVideo)
         $("#call-popover-btn-#{c.id}").popover('hide')
     else
       $(document).on 'click', "#call-popover-btn-#{c.id}", (e) ->
         e.preventDefault()
-        KandyAPI.call.makeCall(c.full_user_id, false)
+        kandy.call.makeCall(c.full_user_id, false)
 
     $(document).on 'click', "#conversation-tabs-#{c.id}-end-btn", ->
       notifyOperatorCloseChat(idx)
@@ -275,21 +275,23 @@ displayConversation = (idx) ->
       $("#conversation-tabs-content-#{c.id} form textarea").val('')
 
     $(document).on 'click', "#end-btn-#{c.id}", ->
-      KandyAPI.call.endCall(c.callId)
+      kandy.call.endCall(c.callId)
 
     $(document).on 'click', "#hold-btn-#{c.id}", ->
       if $(this).text() == 'Hold'
-        KandyAPI.call.holdCall(c.callId)
+        kandy.call.holdCall(c.callId)
         $(this).text('Resume')
       else
-        KandyAPI.call.unHoldCall(c.callId)
+        kandy.call.unHoldCall(c.callId)
         $(this).text('Hold')
 
     $('.dropdown-toggle').dropdown()
 
-  $("#conversation-tabs-#{c.id} > a:first-child").tab('show')
-  elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
-  $(elems).scrollTop($(elems)[0].scrollHeight)
+  setTimeout ->
+    $("#conversation-tabs-#{c.id}").tab('show')
+    elems = "#conversation-tabs-content-#{c.id} .messages-display-container"
+    $(elems).scrollTop($(elems)[0].scrollHeight)
+  , 1000
 
 displayHistoryMessages = (idx) ->
   c = getConversationByIndex(idx)
@@ -378,12 +380,12 @@ removeTyping = ->
 sendMessageToGuestAndOperators = (idx, message) ->
   c = getConversationByIndex(idx)
 
-  KandyAPI.messaging.sendJSON c.full_user_id, message, undefined, (msg) ->
+  kandy.messaging.sendJSON c.full_user_id, message, undefined, (msg) ->
     console.log(message)
     displayErrorMessage(msg)
 
   for o in chatData.users
-    KandyAPI.messaging.sendJSON o.kandy_username, message, undefined, (msg) ->
+    kandy.messaging.sendJSON o.kandy_username, message, undefined, (msg) ->
       console.log(message)
       displayErrorMessage(msg)
 
@@ -733,7 +735,7 @@ window.onCallInitiate = (call) ->
     confirmButtonColor: "#DD6B55"
     confirmButtonText: "End"
   , ->
-    KandyAPI.call.endCall(call.getId())
+    kandy.call.endCall(call.getId())
 
 window.onCallInitiateFail = ->
   audioRingOut[0].pause();
@@ -754,7 +756,7 @@ getVisitorFromCall = (call) ->
 window.onCallIncoming = (call) ->
   c = getVisitorFromCall(call)
   if c.callId
-    KandyAPI.call.reject(call.getId())
+    kandy.call.reject(call.getId())
   else
     audioRingIn[0].play();
     call.id = c.id
@@ -786,12 +788,12 @@ window.onCallIncoming = (call) ->
             cancelButtonText: "No"
           , (isConfirm2)->
             #$("#video-call-views-#{c.id}").hide() unless isConfirm2
-            KandyAPI.call.answerCall(c.callId, isConfirm2)
+            kandy.call.answerCall(c.callId, isConfirm2)
         else
-          KandyAPI.call.answerCall(c.callId, false)
+          kandy.call.answerCall(c.callId, false)
         $("#conversation-tabs-#{c.id}").tab('show')
       else
-        KandyAPI.call.rejectCall(c.callId)
+        kandy.call.rejectCall(c.callId)
 
 window.onCallAnswer = (call) ->
   c = getVisitorFromCall(call)

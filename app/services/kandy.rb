@@ -50,7 +50,7 @@ class Kandy
   def user_access_token(params)
     if @user_access_token.blank?
       begin
-        res = @resource['/domains/users/accesstokens'].get params: {key: domain_api_key, user_id: params[:username], user_password: params[:password]}
+        res = @resource['/domains/users/accesstokens'].get params: {key: domain_api_key, user_id: params[:username], user_password: params[:password], domain_api_secret: domain_api_secret}
         json = JSON.parse res, object_class: OpenStruct
         if json.status == 0
           @user_access_token = json.result.user_access_token

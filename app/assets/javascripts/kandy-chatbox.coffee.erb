@@ -26,10 +26,9 @@ class window.KCWidget
   createConnection: ->
     _self.registerEventListeners()
     _self.getAnonymousUser _self.domain.accessToken, (user) ->
-      _self.visitor = user
-      _self.onConnected()
-#      KandyAPI.login _self.domain.apiKey, _self.visitor.user_name, _self.visitor.user_password, undefined , (e) ->
-#        console.log(e)
+      if user
+        _self.visitor = user
+        _self.onConnected()
     , (e) ->
       console.log(e)
 
@@ -46,7 +45,7 @@ class window.KCWidget
 
 
   registerEventListeners: ->
-    KandyAPI.setup
+    kandy.setup
       listeners:
         message: _self.handleEventListeners
         callincoming: _self.onCallIncoming
@@ -130,7 +129,7 @@ class window.KCWidget
     user = _self.isValidCall(call)
     if user
       if _self.callId
-        KandyAPI.call.rejectCall(call.getId())
+        kandy.call.rejectCall(call.getId())
       else
         _self.audioRingIn[0].play()
         _self.callId = call.getId()
@@ -409,7 +408,7 @@ class window.KCWidget
               user_password: _self.chatData.user_password
               user_access_token: _self.chatData.user_access_token
 
-        KandyAPI.loginSSO _self.visitor.user_access_token, ->
+        kandy.loginSSO _self.visitor.user_access_token, ->
           _self.checkOperatorAvaliableAndBindWidget()
         , (e) ->
           console.log(e)
@@ -498,7 +497,7 @@ class window.KCWidget
     json.location = _self.location
 
     for o in _self.operators
-      KandyAPI.messaging.sendJSON o.username, json, undefined, (msg) ->
+      kandy.messaging.sendJSON o.username, json, undefined, (msg) ->
         console.log (msg)
 
   sendMessageFromVisitor: (msg) ->
@@ -514,7 +513,7 @@ class window.KCWidget
         timestamp: new Date().getTime()
 
       for o in _self.operators
-        KandyAPI.messaging.sendJSON  o.username, message, undefined, (msg) ->
+        kandy.messaging.sendJSON  o.username, message, undefined, (msg) ->
           _self.displayErrorMessage(msg)
 
       _self.displayMessage(message)
@@ -565,7 +564,7 @@ class window.KCWidget
             timestamp: new Date().getTime()
 
           for o in _self.operators
-            KandyAPI.messaging.sendJSON o.username, message, undefined, (msg) ->
+            kandy.messaging.sendJSON o.username, message, undefined, (msg) ->
               _self.displayErrorMessage(msg)
 
           _self.saveMessage(message)
@@ -979,20 +978,20 @@ class window.KCWidget
     $(document).on 'click', '#incoming-call-control .answer-btn', ->
       videoEnabled = $('#start-with-video-checkbox').prop('checked')
       #$('#in-call video').hide() unless videoEnabled
-      KandyAPI.call.answerCall(_self.callId, videoEnabled)
+      kandy.call.answerCall(_self.callId, videoEnabled)
 
     $(document).on 'click', '#incoming-call-control .reject-btn', ->
-      KandyAPI.call.rejectCall(_self.callId)
+      kandy.call.rejectCall(_self.callId)
 
     $(document).on 'click', '#in-call-control .end-btn', ->
-      KandyAPI.call.endCall(_self.callId)
+      kandy.call.endCall(_self.callId)
 
     $(document).on 'click', '#in-call-control .hold-btn', ->
       if $(this).text() == 'Hold'
-        KandyAPI.call.holdCall(_self.callId)
+        kandy.call.holdCall(_self.callId)
         $(this).text('Resume')
       else
-        KandyAPI.call.unHoldCall(_self.callId)
+        kandy.call.unHoldCall(_self.callId)
         $(this).text('Hold')
 
     $(document).on 'click', '#chat-switch', ->
@@ -1028,7 +1027,7 @@ class window.KCWidget
       startWithVideo = $('#make-call-start-with-video-checkbox').prop('checked')
       #$('#in-call video').hide() unless startWithVideo
 
-      KandyAPI.call.makeCall(operator, startWithVideo)
+      kandy.call.makeCall(operator, startWithVideo)
       _self.callingOperator =
         username: operator
         display_name: $('#make-call-operator-selector :selected').text()

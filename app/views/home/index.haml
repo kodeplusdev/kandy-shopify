@@ -22,7 +22,7 @@
           {label: 'Logout', message: 'logout-form-message'}
         ]
 
-    KandyAPI.setup
+    kandy.setup
       #remoteVideoContainer: $('.incoming-video')
       #localVideoContainer: $('.outgoing-video')
       listeners:
@@ -36,11 +36,18 @@
         callanswered: onCallAnswer
         callrejected: onCallRejected
 
-    KandyAPI.login "#{@shop.kandy_api_key}", "#{current_user.kandy_user.username}", "#{current_user.kandy_user.password}", (msg) ->
-      loadAndStartChat('#{chat_load_url}')
-    , (e) ->
-      ShopifyApp.flashError("Error occurred while connecting to Kandy server. Press F5 to refresh.")
-      console.log e
+    if "#{current_user.kandy_user.password}" is ""
+      kandy.loginSSO "#{current_user.kandy_user.access_token}", (msg) ->
+        loadAndStartChat('#{chat_load_url}')
+      , (e) ->
+        ShopifyApp.flashError("Error occurred while connecting to Kandy server. Press F5 to refresh.")
+        console.log e
+    else
+      kandy.login "#{@shop.kandy_api_key}", "#{current_user.kandy_user.username}", "#{current_user.kandy_user.password}", (msg) ->
+        loadAndStartChat('#{chat_load_url}')
+      , (e) ->
+        ShopifyApp.flashError("Error occurred while connecting to Kandy server. Press F5 to refresh.")
+        console.log e
 
 .row
   .col-sm-3.col-xs-12
